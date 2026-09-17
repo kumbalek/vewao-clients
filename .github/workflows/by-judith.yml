@@ -1,0 +1,98 @@
+name: By Judith CI and dev deployment
+on:
+  push:
+    branches: [main]
+    paths: ['clients/by-judith/**', '.github/workflows/by-judith.yml']
+  pull_request:
+    paths: ['clients/by-judith/**', '.github/workflows/by-judith.yml']
+  workflow_dispatch:
+concurrency:
+  group: by-judith-${{ github.ref }}
+  cancel-in-progress: false
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: clients/by-judith/storefront
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.20.0'
+          cache: pnpm
+          cache-dependency-path: clients/by-judith/storefront/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck && pnpm lint && pnpm test
+      - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test:e2e
+  image:
+    needs: test
+    runs-on: ubuntu-latest
+    environment: dev
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      digest: ${{ steps.image.outputs.digest }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Require dev URLs and publishable key for release builds
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        env:
+          KEY: ${{ vars.MEDUSA_PUBLISHABLE_KEY }}
+          API: ${{ vars.MEDUSA_PUBLIC_URL }}
+          SHOP: ${{ vars.STOREFRONT_URL }}
+        run: |
+          [[ "$KEY" == pk_* && "$API" == https://* && "$SHOP" == https://* ]]
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        id: image
+        with:
+          context: clients/by-judith/storefront
+          platforms: linux/arm64
+          push: ${{ github.ref == 'refs/heads/main' && github.event_name != 'pull_request' }}
+          tags: ghcr.io/kumbalek/by-judith-storefront:${{ github.sha }}
+          build-args: |
+            NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=${{ vars.MEDUSA_PUBLISHABLE_KEY || 'pk_ci_placeholder' }}
+            NEXT_PUBLIC_MEDUSA_BACKEND_URL=${{ vars.MEDUSA_PUBLIC_URL || 'https://api.example.invalid' }}
+            NEXT_PUBLIC_BASE_URL=${{ vars.STOREFRONT_URL || 'https://shop.example.invalid' }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+  deploy:
+    needs: image
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && vars.DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - name: Deploy immutable image over SSH
+        env:
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ vars.DEPLOY_USER }}
+          SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+          IMAGE: ghcr.io/kumbalek/by-judith-storefront@${{ needs.image.outputs.digest }}
+        run: |
+          set -euo pipefail
+          test -n "$DEPLOY_HOST" && test -n "$DEPLOY_USER"
+          test -n "$SSH_KEY" && test -n "$KNOWN_HOSTS"
+          [[ "$DEPLOY_HOST" =~ ^[a-zA-Z0-9][a-zA-Z0-9.-]*$ ]]
+          [[ "$DEPLOY_USER" =~ ^[a-z_][a-z0-9_-]*$ ]]
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          ssh -o BatchMode=yes -o StrictHostKeyChecking=yes "$DEPLOY_USER@$DEPLOY_HOST" \
+            "/opt/by-judith-dev/deploy.sh storefront '$IMAGE'"

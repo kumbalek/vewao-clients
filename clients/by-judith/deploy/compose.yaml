@@ -1,0 +1,94 @@
+name: by-judith-dev
+services:
+  postgres:
+    image: postgres:16.10-bookworm
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
+    environment:
+      POSTGRES_USER: medusa
+      POSTGRES_DB: medusa
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+    volumes: ["postgres-data:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U medusa -d medusa"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    mem_limit: 768m
+  redis:
+    image: redis:7.4.5-bookworm
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes: ["redis-data:/data"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    mem_limit: 256m
+  platform:
+    image: ${PLATFORM_IMAGE:?Set PLATFORM_IMAGE digest}
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
+    env_file: platform.env
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgres://medusa:${POSTGRES_PASSWORD}@postgres:5432/medusa?sslmode=disable
+      REDIS_URL: redis://redis:6379
+      STORE_CORS: https://${SHOP_DOMAIN:?Set the separate dev storefront domain}
+      ADMIN_CORS: https://${API_DOMAIN:?Set the separate dev API domain}
+      AUTH_CORS: https://${SHOP_DOMAIN:?Set the separate dev storefront domain},https://${API_DOMAIN:?Set the separate dev API domain}
+      MEDUSA_BACKEND_URL: https://${API_DOMAIN:?Set the separate dev API domain}
+      FILE_PUBLIC_URL: https://${API_DOMAIN:?Set the separate dev API domain}/static
+    volumes: ["uploads:/repo/apps/core/.medusa/server/static"]
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:9000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      start_period: 30s
+      retries: 12
+    networks:
+      default:
+      proxy:
+        aliases: [by-judith-dev-api]
+    mem_limit: 1792m
+  storefront:
+    image: ${STOREFRONT_IMAGE:?Set STOREFRONT_IMAGE digest}
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
+    environment:
+      MEDUSA_BACKEND_URL: http://platform:9000
+      NEXT_PUBLIC_DEFAULT_REGION: cz
+    depends_on:
+      platform: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8000/logo.webp').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    networks:
+      default:
+      proxy:
+        aliases: [by-judith-dev-storefront]
+    mem_limit: 768m
+
+volumes:
+  postgres-data:
+  redis-data:
+  uploads:
+networks:
+  proxy:
+    external: true
+    name: ${NPM_NETWORK:?Set the existing Nginx Proxy Manager Docker network}

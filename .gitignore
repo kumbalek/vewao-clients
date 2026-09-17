@@ -1,0 +1,23 @@
+node_modules/
+.next/
+dist/
+dist-test/
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+!.env.template
+.DS_Store
+coverage/
+cypress/screenshots/
+cypress/videos/
+*.log
+test-results/
+playwright-report/
+playwright/.cache/
+
+# Server-only deployment state
+platform.env
+images.env
+clients/by-judith/deploy/backups/
+clients/by-judith/deploy/releases/

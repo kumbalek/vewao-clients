@@ -1,0 +1,35 @@
+import { retrieveCart } from "@lib/data/cart"
+import { retrieveCustomer } from "@lib/data/customer"
+import PaymentWrapper from "@modules/checkout/components/payment-wrapper"
+import CheckoutForm from "@modules/checkout/templates/checkout-form"
+import CheckoutSummary from "@modules/checkout/templates/checkout-summary"
+import { notFound } from "next/navigation"
+import { getTranslations } from "next-intl/server"
+
+export async function generateMetadata({ params }: any) {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: "metadata" })
+
+  return {
+    title: t("checkoutTitle"),
+  }
+}
+
+export default async function Checkout() {
+  const cart = await retrieveCart()
+
+  if (!cart) {
+    return notFound()
+  }
+
+  const customer = await retrieveCustomer()
+
+  return (
+    <div className="grid grid-cols-1 small:grid-cols-[1fr_416px] content-container gap-x-32 py-12">
+      <PaymentWrapper cart={cart}>
+        <CheckoutForm cart={cart} customer={customer} />
+      </PaymentWrapper>
+      <CheckoutSummary cart={cart} />
+    </div>
+  )
+}
