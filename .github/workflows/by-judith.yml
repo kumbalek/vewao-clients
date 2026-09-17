@@ -34,7 +34,7 @@ jobs:
   image:
     needs: test
     runs-on: ubuntu-latest
-    environment: dev
+    environment: develop
     permissions:
       contents: read
       packages: write
@@ -75,7 +75,7 @@ jobs:
     needs: image
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && vars.DEPLOY_ENABLED == 'true'
     runs-on: ubuntu-latest
-    environment: dev
+    environment: develop
     steps:
       - name: Deploy immutable image over SSH
         env:
