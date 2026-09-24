@@ -126,6 +126,16 @@ crawlers; it is not access control. Use synthetic test data. HTTPS, authenticate
 admin, provider sandbox setup, checkout success/failure and callback URLs must be
 verified on the actual domains before real provider testing.
 
+## Dev monitoring
+
+The isolated Grafana Alloy collector and its runbook are in
+[`monitoring/`](monitoring/README.md). It is a separate Compose project, publishes
+no host ports and must not be folded into the application deployment. It was
+installed on 2026-09-23 and now provides host metrics, internal probes, scoped
+application logs and required-container state to Grafana Cloud. External checks
+and alert notifications are intentionally deferred for dev; the production work
+is tracked in [`monitoring/PRODUCTION-TODO.md`](monitoring/PRODUCTION-TODO.md).
+
 ## Recorded preparation — 2026-09-15
 
 Files installed at `/opt/by-judith-dev` on 95.217.222.10; no new services started.

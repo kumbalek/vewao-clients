@@ -1,0 +1,124 @@
+name: by-judith-dev-monitoring
+
+services:
+  socket-proxy:
+    image: ghcr.io/linuxserver/socket-proxy:3.4.3-r0-ls93@sha256:5907a638bb14ee873500f6161dd3aaa4d9b3e67a35912db8c9995e134d990ec0
+    restart: unless-stopped
+    environment:
+      ALLOW_LOGS: "1"
+      CONTAINERS: "1"
+      EVENTS: "1"
+      NETWORKS: "1"
+      PING: "1"
+      POST: "0"
+      VERSION: "1"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    read_only: true
+    tmpfs:
+      - /run:size=8m,mode=0755
+      - /tmp:size=8m,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    mem_limit: 64m
+    cpus: 0.10
+    pids_limit: 64
+    logging:
+      driver: json-file
+      options: {max-size: "5m", max-file: "2"}
+    networks:
+      - collector
+
+  container-state-exporter:
+    image: docker.io/library/python:3.13.15-alpine3.24@sha256:79e7a9b9ff1cbceff819f856fb374477792a5967759d94df266de7b7b4120e6f
+    restart: unless-stopped
+    user: "65532:65532"
+    command: ["python", "/opt/exporter/exporter.py"]
+    environment:
+      COMPOSE_PROJECT: by-judith-dev
+      DOCKER_API_URL: http://socket-proxy:2375
+      REQUIRED_SERVICES: platform,storefront,postgres,redis
+      PYTHONDONTWRITEBYTECODE: "1"
+      PYTHONUNBUFFERED: "1"
+    volumes:
+      - ./container-state-exporter/exporter.py:/opt/exporter/exporter.py:ro
+    read_only: true
+    tmpfs:
+      - /tmp:size=8m,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    mem_limit: 48m
+    cpus: 0.10
+    pids_limit: 32
+    depends_on:
+      - socket-proxy
+    healthcheck:
+      # BusyBox wget avoids spending most of the small CPU quota starting a
+      # second Python interpreter for every health check.
+      test: ["CMD", "wget", "-q", "-T", "2", "-O", "/dev/null", "http://127.0.0.1:9101/-/healthy"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+    logging:
+      driver: json-file
+      options: {max-size: "5m", max-file: "2"}
+    networks:
+      - collector
+
+  alloy:
+    image: docker.io/grafana/alloy:v1.19.2@sha256:b8ec653c44235fbe910879145dac3597d66b0aaecf60bcbbe82580767771a839
+    restart: unless-stopped
+    # Match the packaged Alloy account and the named volume ownership. Token
+    # files are root-owned and group-readable only by this numeric group.
+    user: "473:473"
+    command:
+      - run
+      - --server.http.listen-addr=127.0.0.1:12345
+      - --storage.path=/var/lib/alloy/data
+      - /etc/alloy/config.alloy
+    env_file:
+      - .env
+    volumes:
+      - ./config.alloy:/etc/alloy/config.alloy:ro
+      - ./blackbox.yml:/etc/alloy/blackbox.yml:ro
+      - ./secrets/grafana-metrics-password:/run/secrets/grafana-metrics-password:ro
+      - ./secrets/grafana-logs-password:/run/secrets/grafana-logs-password:ro
+      - alloy-data:/var/lib/alloy/data
+      - /:/host/root:ro,rslave
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /run/udev/data:/run/udev/data:ro
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    mem_limit: 256m
+    cpus: 0.50
+    pids_limit: 256
+    depends_on:
+      - socket-proxy
+      - container-state-exporter
+    logging:
+      driver: json-file
+      options: {max-size: "10m", max-file: "3"}
+    networks:
+      - collector
+      - application
+
+volumes:
+  alloy-data:
+
+networks:
+  # No ports are published. Keep normal egress on this private project network
+  # so Alloy can reach Grafana Cloud regardless of Docker's default-route choice.
+  collector:
+  application:
+    external: true
+    name: ${APP_NETWORK:-by-judith-dev_default}

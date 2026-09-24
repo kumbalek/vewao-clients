@@ -1,0 +1,199 @@
+prometheus.remote_write "grafana_cloud" {
+  external_labels = {
+    environment = "dev",
+    client      = "by-judith",
+    source      = "hetzner",
+  }
+
+  endpoint {
+    url = sys.env("GRAFANA_METRICS_URL")
+
+    basic_auth {
+      username      = sys.env("GRAFANA_METRICS_USERNAME")
+      password_file = "/run/secrets/grafana-metrics-password"
+    }
+  }
+}
+
+loki.write "grafana_cloud" {
+  external_labels = {
+    environment = "dev",
+    client      = "by-judith",
+    source      = "docker",
+  }
+
+  endpoint {
+    url = sys.env("GRAFANA_LOGS_URL")
+
+    basic_auth {
+      username      = sys.env("GRAFANA_LOGS_USERNAME")
+      password_file = "/run/secrets/grafana-logs-password"
+    }
+  }
+}
+
+// Host metrics use read-only host mounts. Keep the collector set small enough
+// for the CAX11 and sufficient for CPU, memory, disk, inode and OOM diagnosis.
+prometheus.exporter.unix "host" {
+  rootfs_path = "/host/root"
+  procfs_path = "/host/proc"
+  sysfs_path  = "/host/sys"
+
+  set_collectors = [
+    "cpu",
+    "diskstats",
+    "filesystem",
+    "loadavg",
+    "meminfo",
+    "netdev",
+    "stat",
+    "time",
+    "uname",
+    "vmstat",
+  ]
+
+  filesystem {
+    fs_types_exclude     = "^(autofs|binfmt_misc|bpf|cgroup2?|configfs|debugfs|devpts|devtmpfs|fusectl|hugetlbfs|iso9660|mqueue|nsfs|overlay|proc|procfs|pstore|rpc_pipefs|securityfs|selinuxfs|squashfs|sysfs|tracefs)$"
+    mount_points_exclude = "^/(dev|proc|run/credentials/.+|sys|var/lib/docker/.+)($|/)"
+    mount_timeout        = "5s"
+  }
+
+  netdev {
+    device_exclude = "^(veth.*|br-.*|docker0)$"
+  }
+}
+
+discovery.relabel "host" {
+  targets = prometheus.exporter.unix.host.targets
+
+  rule {
+    target_label = "instance"
+    replacement  = "by-judith-dev-hetzner"
+  }
+
+  rule {
+    target_label = "service"
+    replacement  = "host"
+  }
+}
+
+prometheus.scrape "host" {
+  targets         = discovery.relabel.host.output
+  scrape_interval = "30s"
+  forward_to      = [prometheus.remote_write.grafana_cloud.receiver]
+}
+
+// These probes stay inside the application network. The storefront probe is a
+// static liveness check until the application gets a backend-aware readiness
+// endpoint; the dashboard must label it accordingly.
+prometheus.exporter.blackbox "internal" {
+  config_file = "/etc/alloy/blackbox.yml"
+
+  target {
+    name    = "platform"
+    address = "http://platform:9000/health"
+    module  = "http_2xx"
+    labels = {
+      service = "platform",
+      scope   = "internal",
+      check   = "health",
+    }
+  }
+
+  target {
+    name    = "storefront"
+    address = "http://storefront:8000/logo.webp"
+    module  = "http_2xx"
+    labels = {
+      service = "storefront",
+      scope   = "internal",
+      check   = "static-liveness",
+    }
+  }
+}
+
+prometheus.scrape "internal_probes" {
+  targets         = prometheus.exporter.blackbox.internal.targets
+  scrape_interval = "60s"
+  forward_to      = [prometheus.remote_write.grafana_cloud.receiver]
+}
+
+// A narrow exporter emits explicit state for the four required Compose services.
+// It talks only to the private read-only socket proxy; missing services remain
+// visible as zero-valued series instead of disappearing from Prometheus.
+prometheus.scrape "container_state" {
+  targets = [
+    {
+      __address__ = "container-state-exporter:9101",
+      collector   = "container-state-exporter",
+      instance    = "by-judith-dev-hetzner",
+    },
+  ]
+
+  scrape_interval = "30s"
+  scrape_timeout  = "10s"
+  forward_to      = [prometheus.remote_write.grafana_cloud.receiver]
+}
+
+// The proxy exposes only read-only Docker endpoints and is not published on a
+// host port. Server-side filtering prevents unrelated containers being tailed.
+discovery.docker "application" {
+  host                = "http://socket-proxy:2375"
+  match_first_network = true
+
+  filter {
+    name   = "label"
+    values = ["com.docker.compose.project=by-judith-dev"]
+  }
+}
+
+discovery.relabel "application_logs" {
+  targets = discovery.docker.application.targets
+
+  rule {
+    source_labels = ["__meta_docker_container_label_com_docker_compose_service"]
+    target_label  = "service"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "/(.*)"
+    target_label  = "container"
+  }
+}
+
+loki.source.docker "application" {
+  host             = "http://socket-proxy:2375"
+  targets          = discovery.relabel.application_logs.output
+  relabel_rules    = discovery.relabel.application_logs.rules
+  refresh_interval = "60s"
+  forward_to       = [loki.process.application.receiver]
+}
+
+loki.process "application" {
+  stage.docker {}
+
+  // Do not backfill rotated bootstrap logs on first installation. Grafana Cloud
+  // rejects entries older than this stack's ingestion window as a whole batch.
+  stage.drop {
+    older_than          = "24h"
+    drop_counter_reason = "bootstrap_backlog"
+  }
+
+  stage.decolorize {}
+
+  // Routine successful health probes add volume without diagnostic value.
+  stage.drop {
+    expression          = "(?i)(GET|HEAD) /(health|logo\\.webp)([ ?].*)? (200|204)"
+    drop_counter_reason = "successful_health_check"
+  }
+
+  // Defence in depth for common accidental credential logging. Application
+  // code must still avoid logging headers, bodies and secrets in the first place.
+  stage.replace {
+    expression = "(?i)(authorization|cookie|set-cookie|password|token|secret|api[-_]?key)([^A-Za-z0-9_-]+)([^ ,;]+)"
+    replace    = "<redacted>"
+  }
+
+  forward_to = [loki.write.grafana_cloud.receiver]
+}
