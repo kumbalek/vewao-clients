@@ -6,7 +6,6 @@ import Hero from "@modules/home/components/hero"
 import Reviews from "@modules/home/components/reviews"
 import Icons from "@modules/home/components/icons"
 import About from "@modules/home/components/about"
-// import ActionBanner from "@modules/home/components/action-banner"
 import { listCollections } from "@lib/data/collections"
 import { getRegion } from "@lib/data/regions"
 import { Heading } from "@medusajs/ui"
@@ -47,9 +46,6 @@ export default async function Home(props: {
 
   return (
     <>
-      <div className="mt-4 mb-6 pb-4 px-2 flex justify-center">
-        {/* <ActionBanner countryCode={countryCode} /> */}
-      </div>
       <Hero />
       <Icons />
       <div className="py-12 small:py-24 flex flex-col items-center">
