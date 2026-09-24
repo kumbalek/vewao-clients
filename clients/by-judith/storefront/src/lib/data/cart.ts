@@ -2,6 +2,12 @@
 
 import { sdk } from "@lib/config"
 import medusaError from "@lib/util/medusa-error"
+import {
+  isComgate,
+  isManual,
+  isPickupOption,
+  paymentReturnStatus,
+} from "@lib/util/payment-methods"
 import { HttpTypes } from "@medusajs/types"
 import { revalidateTag } from "next/cache"
 import { redirect } from "next/navigation"
@@ -13,6 +19,7 @@ import {
   removeCartId,
   setCartId,
 } from "./cookies"
+import { listCartShippingMethods } from "./fulfillment"
 import { getRegion } from "./regions"
 
 /**
@@ -336,7 +343,7 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
     if (!formData) {
       throw new Error("No form data found when setting addresses")
     }
-    const cartId = getCartId()
+    const cartId = await getCartId()
     if (!cartId) {
       throw new Error("No existing cart found when setting addresses")
     }
@@ -383,16 +390,67 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
   )
 }
 
+function gatewayUrl(value: unknown): string | null {
+  if (typeof value !== "string") {
+    return null
+  }
+  try {
+    const url = new URL(value)
+    const secure =
+      url.protocol === "https:" ||
+      (process.env.NODE_ENV !== "production" && url.protocol === "http:")
+    return secure ? url.toString() : null
+  } catch {
+    return null
+  }
+}
+
 /**
- * Places an order for a cart. If no cart ID is provided, it will use the cart ID from the cookies.
- * @param cartId - optional - The ID of the cart to place an order for.
- * @returns The cart object if the order was successful, or null if not.
+ * Places the order for the current cart.
+ *
+ * Comgate is paid on its gateway first: the cart is kept and the customer is
+ * sent to the gateway. The return route or Comgate's webhook completes the
+ * cart once the backend confirms the payment. Pay-on-site completes at once,
+ * and only for clinic pickup.
  */
 export async function placeOrder(cartId?: string) {
   const id = cartId || (await getCartId())
 
   if (!id) {
     throw new Error("No existing cart found when placing an order")
+  }
+
+  const cart = await retrieveCart(id)
+  const session = cart?.payment_collection?.payment_sessions?.find(
+    (paymentSession) => paymentSession.status === "pending"
+  )
+
+  if (!cart || !session) {
+    throw new Error("Zvolte prosím znovu způsob platby.")
+  }
+
+  if (isComgate(session.provider_id)) {
+    const url = gatewayUrl(session.data?.redirect)
+    if (!url) {
+      throw new Error(
+        "Platební bránu se nepodařilo otevřít. Zvolte prosím platbu znovu."
+      )
+    }
+    redirect(url)
+  }
+
+  if (!isManual(session.provider_id)) {
+    throw new Error("Zvolte prosím znovu způsob platby.")
+  }
+
+  const shippingOptions = await listCartShippingMethods(id)
+  if (
+    !isPickupOption(
+      cart.shipping_methods?.at(-1)?.shipping_option_id,
+      shippingOptions
+    )
+  ) {
+    throw new Error("Platbu na místě lze zvolit jen při osobním odběru.")
   }
 
   const headers = {
@@ -415,51 +473,94 @@ export async function placeOrder(cartId?: string) {
     const orderCacheTag = await getCacheTag("orders")
     revalidateTag(orderCacheTag)
 
-    removeCartId()
+    await removeCartId()
 
     redirect(`/${countryCode}/order/${cartRes?.order.id}/confirmed`)
   }
 
-  if (cartRes?.error?.type === "payment_requires_more_error") {
-    const paymentSessions =
-      cartRes?.cart?.payment_collection?.payment_sessions || []
-    const comgateRedirectUrl =
-      (paymentSessions[0]?.data?.comgate_redirect_url as string) || undefined
+  throw new Error(
+    cartRes?.error?.message || "Objednávku se nepodařilo dokončit."
+  )
+}
 
-    if (comgateRedirectUrl) {
-      // const secondCartRes = await sdk.store.cart
-      //   .complete(id, {}, headers)
-      //   .then(async (secondCartRes) => {
-      //     const secondCartCacheTag = await getCacheTag("carts")
-      //     revalidateTag(secondCartCacheTag)
+export type PaymentReturn =
+  | { status: "order"; orderId: string; countryCode?: string }
+  | { status: "pending" | "failed" | "missing" }
 
-      //     if (secondCartRes?.type === "order") {
-      //       const orderCacheTag = await getCacheTag("orders")
-      //       revalidateTag(orderCacheTag)
+async function retrieveFreshCart(id: string) {
+  const headers = {
+    ...(await getAuthHeaders()),
+  }
 
-      //       removeOrderId()
-      //       removeCartId()
+  return sdk.client
+    .fetch<HttpTypes.StoreCartResponse>(`/store/carts/${id}`, {
+      method: "GET",
+      query: { fields: "id,completed_at,*payment_collection.payment_sessions" },
+      headers,
+      cache: "no-store",
+    })
+    .then(({ cart }) => cart)
+    .catch(() => null)
+}
 
-      //       setOrderId(secondCartRes?.order.id)
-      //     }
+/**
+ * Finishes the cart after the customer returns from the Comgate gateway.
+ *
+ * Completing makes the backend ask Comgate for the payment status; the return
+ * URL's parameters are never trusted. Only carts paid through the gateway are
+ * completed here, so a link to this route cannot place a pay-on-site order.
+ * Completion is idempotent: a cart the webhook already completed returns its
+ * existing order.
+ */
+export async function completeRedirectPayment(): Promise<PaymentReturn> {
+  const id = await getCartId()
+  if (!id) {
+    return { status: "missing" }
+  }
 
-      //     return secondCartRes
-      //   })
-      //   .catch(medusaError)
+  const cart = await retrieveFreshCart(id)
+  if (!cart) {
+    return { status: "missing" }
+  }
 
-      // if (secondCartRes?.type === "order") {
-      // }
+  const sessions = cart.payment_collection?.payment_sessions ?? []
+  const paidThroughGateway =
+    sessions.length > 0 &&
+    sessions.every((paymentSession) => isComgate(paymentSession.provider_id))
+  if (!cart.completed_at && !paidThroughGateway) {
+    return { status: "failed" }
+  }
 
-      const orderCacheTag = await getCacheTag("orders")
-      revalidateTag(orderCacheTag)
+  const headers = {
+    ...(await getAuthHeaders()),
+  }
+  // Unpaid, cancelled and concurrently completing carts reject completion;
+  // the refreshed session status below tells them apart.
+  const completed = await sdk.store.cart
+    .complete(id, {}, headers)
+    .catch(() => null)
 
-      removeCartId()
+  const cartCacheTag = await getCacheTag("carts")
+  revalidateTag(cartCacheTag)
 
-      redirect(comgateRedirectUrl)
+  if (completed?.type === "order") {
+    const orderCacheTag = await getCacheTag("orders")
+    revalidateTag(orderCacheTag)
+    await removeCartId()
+
+    return {
+      status: "order",
+      orderId: completed.order.id,
+      countryCode: completed.order.shipping_address?.country_code?.toLowerCase(),
     }
   }
 
-  return cartRes.cart
+  const refreshed = await retrieveFreshCart(id)
+  const session = refreshed?.payment_collection?.payment_sessions?.find(
+    (paymentSession) => isComgate(paymentSession.provider_id)
+  )
+
+  return { status: paymentReturnStatus(session?.status) }
 }
 
 /**

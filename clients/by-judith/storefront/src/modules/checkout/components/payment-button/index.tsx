@@ -10,12 +10,14 @@ import { useTranslations } from "next-intl"
 
 type PaymentButtonProps = {
   cart: HttpTypes.StoreCart
+  isPickup: boolean
   "data-testid": string
   disabled?: boolean
 }
 
 const PaymentButton: React.FC<PaymentButtonProps> = ({
   cart,
+  isPickup,
   "data-testid": dataTestId,
   disabled,
 }) => {
@@ -28,10 +30,13 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     (cart.shipping_methods?.length ?? 0) < 1 ||
     !!disabled
 
-  const paymentSession = cart.payment_collection?.payment_sessions?.[0]
+  const paymentSession = cart.payment_collection?.payment_sessions?.find(
+    (session) => session.status === "pending"
+  )
 
   switch (true) {
-    case isManual(paymentSession?.provider_id):
+    // Pay-on-site stays unavailable if the customer switched to delivery.
+    case isManual(paymentSession?.provider_id) && isPickup:
       return <OrderPaymentButton notReady={notReady} data-testid={dataTestId} />
     case isComgate(paymentSession?.provider_id):
       return <OrderPaymentButton notReady={notReady} data-testid={dataTestId} />

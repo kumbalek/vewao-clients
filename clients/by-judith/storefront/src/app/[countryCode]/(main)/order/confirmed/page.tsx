@@ -1,43 +1,15 @@
-import { Metadata } from "next"
-import { getTranslations } from "next-intl/server"
-import { Heading } from "@medusajs/ui"
-import Help from "@modules/order/components/help"
+import { redirect } from "next/navigation"
 
 type Props = {
-  params: Promise<{ id: string }>
+  params: Promise<{ countryCode: string }>
 }
 
-export async function generateMetadata({ params }: any): Promise<Metadata> {
-  const { locale } = await params
-  const t = await getTranslations({ locale, namespace: "metadata" })
-
-  return {
-    title: t("orderConfirmationTitle"),
-    description: t("orderConfirmationDescription"),
-  }
-}
-
+/**
+ * Legacy gateway return URL. Arriving here proves nothing about the payment,
+ * so hand over to the route that asks the backend.
+ */
 export default async function OrderConfirmedPage(props: Props) {
-  const t = await getTranslations("confirm")
+  const { countryCode } = await props.params
 
-  return (
-    <div className="py-6 min-h-[calc(100vh-64px)]">
-      <div className="content-container flex flex-col justify-center items-center gap-y-10 max-w-4xl h-full w-full">
-        <div
-          className="flex flex-col gap-4 max-w-4xl h-full bg-white w-full py-10"
-          data-testid="order-complete-container"
-        >
-          <Heading
-            level="h1"
-            className="flex flex-col gap-y-3 text-ui-fg-base text-3xl mb-4"
-          >
-            <span>{t("thankYou")}</span>
-            <span>{t("orderSuccessful")}</span>
-          </Heading>
-          <p>{t("detailsSentToEmail")}</p>
-          <Help />
-        </div>
-      </div>
-    </div>
-  )
+  redirect(`/${countryCode}/checkout/payment-return`)
 }

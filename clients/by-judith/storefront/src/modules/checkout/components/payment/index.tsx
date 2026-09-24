@@ -17,16 +17,16 @@ import { useTranslations } from "next-intl"
 const Payment = ({
   cart,
   availablePaymentMethods,
+  isPickup,
 }: {
   cart: HttpTypes.StoreCart
   availablePaymentMethods: HttpTypes.StorePaymentProvider[]
+  isPickup: boolean
 }) => {
   const t = useTranslations("checkout")
   const activeSession = cart.payment_collection?.payment_sessions?.find(
     (paymentSession) => paymentSession.status === "pending"
   )
-  const activeShippingPrice = cart?.shipping_methods?.[0]?.amount
-
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(
@@ -38,12 +38,13 @@ const Payment = ({
   const pathname = usePathname()
 
   const isOpen = searchParams.get("step") === "payment"
+  const paymentFailed = searchParams.get("payment") === "failed"
 
   const isComgate = isComgateFunc(selectedPaymentMethod)
 
   const filteredPaymentMethods = useMemo(
-    () => filterPaymentMethods(availablePaymentMethods, activeShippingPrice),
-    [availablePaymentMethods, activeShippingPrice]
+    () => filterPaymentMethods(availablePaymentMethods, isPickup),
+    [availablePaymentMethods, isPickup]
   )
 
   const setPaymentMethod = async (method: string) => {
@@ -51,12 +52,20 @@ const Payment = ({
     setSelectedPaymentMethod(method)
   }
 
-  const paymentReady = activeSession && (cart.shipping_methods?.length ?? 0) > 0
+  // A pay-on-site session left over from pickup does not count for delivery.
+  const activeSessionAllowed =
+    !!activeSession &&
+    filteredPaymentMethods.some(
+      (method) => method.id === activeSession.provider_id
+    )
+  const paymentReady =
+    activeSessionAllowed && (cart.shipping_methods?.length ?? 0) > 0
 
   const createQueryString = useCallback(
     (name: string, value: string) => {
       const params = new URLSearchParams(searchParams)
       params.set(name, value)
+      params.delete("payment")
 
       return params.toString()
     },
@@ -83,6 +92,7 @@ const Payment = ({
     setIsLoading(true)
     try {
       const checkActiveSession =
+        activeSessionAllowed &&
         activeSession?.provider_id === selectedPaymentMethod
 
       if (!checkActiveSession) {
@@ -114,8 +124,15 @@ const Payment = ({
   }, [isOpen])
 
   useEffect(() => {
-    setSelectedPaymentMethod("")
-  }, [activeShippingPrice, setSelectedPaymentMethod])
+    if (
+      selectedPaymentMethod &&
+      !filteredPaymentMethods.some(
+        (method) => method.id === selectedPaymentMethod
+      )
+    ) {
+      setSelectedPaymentMethod("")
+    }
+  }, [filteredPaymentMethods, selectedPaymentMethod])
 
   return (
     <div className="bg-white">
@@ -147,6 +164,15 @@ const Payment = ({
       </div>
       <div>
         <div className={isOpen ? "block" : "hidden"}>
+          {paymentFailed && (
+            <p
+              role="alert"
+              className="mb-4 text-small-regular text-rose-500"
+              data-testid="payment-failed-message"
+            >
+              {t("paymentFailed")}
+            </p>
+          )}
           {filteredPaymentMethods.length > 0 && (
             <>
               <RadioGroup

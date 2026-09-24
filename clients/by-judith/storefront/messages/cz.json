@@ -170,6 +170,7 @@
     "paidAt": " – ",
     "giftCard": "Dárkový poukaz",
     "anotherPaymentStep": "Po odeslání objednávky vás přesměrujeme na platební bránu.",
+    "paymentFailed": "Platba nebyla dokončena a objednávka nevznikla. Zkuste platbu znovu, nebo zvolte jiný způsob platby.",
     "review": "Přehled objednávky",
     "agreeLabel": "Souhlasím s Obchodními podmínkami",
     "agreeLabelLink": "Obchodními podmínkami",
@@ -191,6 +192,8 @@
     "canceledTitle": "Vaše platba byla zrušena.",
     "pendingTitle": "Vaše platba ještě nebyla vyřízena.",
     "pendingSentToEmail": "O vyřízení vás budeme informovat na váš email.",
+    "checkPayment": "Ověřit stav platby",
+    "pendingUnknown": "Pokud byla platba úspěšná, potvrzení objednávky vám přijde e-mailem.",
     "needHelp": "Potřebujete pomoc?",
     "contact": "Kontakt",
     "customerService": "Zákaznická podpora"

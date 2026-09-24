@@ -4,7 +4,8 @@ import { Heading } from "@medusajs/ui"
 import Help from "@modules/order/components/help"
 
 type Props = {
-  params: Promise<{ id: string }>
+  params: Promise<{ countryCode: string }>
+  searchParams: Promise<{ cart?: string }>
 }
 
 export async function generateMetadata({ params }: any): Promise<Metadata> {
@@ -19,13 +20,18 @@ export async function generateMetadata({ params }: any): Promise<Metadata> {
 
 export default async function OrderPendingPage(props: Props) {
   const t = await getTranslations("confirm")
+  const { countryCode } = await props.params
+  const { cart } = await props.searchParams
+  // Without the cart cookie the storefront cannot check the payment; the
+  // gateway webhook still completes a paid order and the email confirms it.
+  const cartKnown = cart !== "missing"
 
   return (
     <div className="py-6 min-h-[calc(100vh-64px)]">
       <div className="content-container flex flex-col justify-center items-center gap-y-10 max-w-4xl h-full w-full">
         <div
           className="flex flex-col gap-4 max-w-4xl h-full bg-white w-full py-10"
-          data-testid="order-complete-container"
+          data-testid="order-pending-container"
         >
           <Heading
             level="h1"
@@ -33,7 +39,17 @@ export default async function OrderPendingPage(props: Props) {
           >
             {t("pendingTitle")}
           </Heading>
-          <p>{t("pendingSentToEmail")}</p>
+          <p>{cartKnown ? t("pendingSentToEmail") : t("pendingUnknown")}</p>
+          {cartKnown && (
+            // A plain link: prefetching this route would re-run completion.
+            <a
+              href={`/${countryCode}/checkout/payment-return`}
+              className="w-fit underline text-ui-fg-interactive hover:text-ui-fg-interactive-hover"
+              data-testid="check-payment-link"
+            >
+              {t("checkPayment")}
+            </a>
+          )}
           <Help />
         </div>
       </div>

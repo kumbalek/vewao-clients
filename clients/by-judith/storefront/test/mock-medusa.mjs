@@ -1,23 +1,56 @@
 // Isolated storefront contract fixture. Never forwards requests to a real backend.
+// It also plays the Comgate gateway on "localhost", a different site from the
+// storefront on 127.0.0.1, so returning from it is a cross-site navigation.
 import { createServer } from "node:http"
 
+const STOREFRONT = "http://127.0.0.1:8101"
+const GATEWAY = "http://localhost:9101"
 const region = { id: "reg_test", name: "Česko", currency_code: "czk", countries: [{ iso_2: "cz", display_name: "Česko" }] }
 const address = { first_name: "Test", last_name: "Customer", address_1: "Testovací 1", city: "Praha", postal_code: "11000", country_code: "cz", phone: "777000000" }
-const carts = new Map()
-const requests = []
-const shipping = { id: "so_test", name: "Doručení", price_type: "flat", amount: 89, service_zone: { fulfillment_set: { type: "shipping" } }, prices: [] }
+const shippingOptions = [
+  { id: "so_ppl", name: "Přepravce PPL", price_type: "flat", amount: 150, service_zone: { fulfillment_set: { type: "shipping" } }, prices: [] },
+  { id: "so_pickup", name: "Pobočka Beauty Body Clinic", price_type: "flat", amount: 0, service_zone: { fulfillment_set: { type: "pickup", location: { address: { address_1: "Kosmická 19", postal_code: "149 00", city: "Praha 4 - Háje", country_code: "cz" } } } }, prices: [] },
+]
 const providers = [{ id: "pp_comgate_comgate" }, { id: "pp_system_default" }, { id: "pp_stripe_stripe" }]
+const carts = new Map()
+const orders = new Map()
+const requests = []
+let gatewayOutcome = "PAID"
+
+// Cart id prefixes select the fixture: pickup, free PPL delivery (≥ 5 000 Kč) or paid PPL delivery.
+function shippingFor(id) {
+  if (id.startsWith("cart_pickup")) return { option: shippingOptions[1], amount: 0 }
+  if (id.startsWith("cart_freeppl")) return { option: shippingOptions[0], amount: 0 }
+  return { option: shippingOptions[0], amount: 150 }
+}
 function cart(id) {
-  if (!carts.has(id)) carts.set(id, {
-    id, region_id: region.id, region, currency_code: "czk", email: "test@example.invalid",
-    shipping_address: address, billing_address: address,
-    items: [{ id: "item_test", title: "Testovací produkt", product_title: "Testovací produkt", product_handle: "testovaci-produkt", quantity: 1, unit_price: 490, total: 490, original_total: 490, thumbnail: "/logo.webp", variant: { id: "variant_test", title: "Standard", options: [] }, product: { id: "prod_test", handle: "testovaci-produkt" }, metadata: {} }],
-    shipping_methods: [{ id: "sm_test", shipping_option_id: shipping.id, name: id.startsWith("cart_pickup") ? "Osobní odběr" : "Doručení", amount: id.startsWith("cart_pickup") ? 0 : 89 }],
-    total: id.startsWith("cart_pickup") ? 490 : 579, subtotal: 490, shipping_subtotal: id.startsWith("cart_pickup") ? 0 : 89,
-    discount_total: 0, tax_total: 0, promotions: [],
-    payment_collection: { id: `paycol_${id}`, payment_sessions: [] },
-  })
+  if (!carts.has(id)) {
+    const { option, amount } = shippingFor(id)
+    carts.set(id, {
+      id, region_id: region.id, region, currency_code: "czk", email: "test@example.invalid", completed_at: null,
+      shipping_address: address, billing_address: address,
+      items: [{ id: "item_test", title: "Testovací produkt", product_title: "Testovací produkt", product_handle: "testovaci-produkt", quantity: 1, unit_price: 490, total: 490, original_total: 490, thumbnail: "/logo.webp", variant: { id: "variant_test", title: "Standard", options: [] }, product: { id: "prod_test", handle: "testovaci-produkt" }, metadata: {} }],
+      shipping_methods: [{ id: "sm_test", shipping_option_id: option.id, name: option.name, amount, total: amount }],
+      total: 490 + amount, subtotal: 490, item_total: 490, shipping_subtotal: amount, shipping_total: amount,
+      discount_total: 0, tax_total: 0, original_total: 490 + amount, promotions: [],
+      payment_collection: { id: `paycol_${id}`, payment_sessions: [] },
+    })
+  }
   return carts.get(id)
+}
+function placeOrder(current, session) {
+  const order = {
+    id: `order_${current.id}`, display_id: 1001, created_at: new Date().toISOString(), email: current.email,
+    currency_code: "czk", status: "pending", payment_status: session.provider_id === "pp_system_default" ? "authorized" : "captured",
+    fulfillment_status: "not_fulfilled", items: current.items, shipping_address: current.shipping_address,
+    shipping_methods: current.shipping_methods, subtotal: current.subtotal, item_total: current.item_total,
+    total: current.total, shipping_total: current.shipping_total, shipping_subtotal: current.shipping_subtotal,
+    discount_total: 0, tax_total: 0, original_total: current.total,
+    payment_collections: [{ payments: [{ id: "pay_test", provider_id: session.provider_id, amount: current.total, created_at: new Date().toISOString() }] }],
+  }
+  current.completed_at = order.created_at
+  orders.set(order.id, order)
+  return order
 }
 const server = createServer(async (req, res) => {
   const url = new URL(req.url, "http://127.0.0.1:9101")
@@ -27,7 +60,16 @@ const server = createServer(async (req, res) => {
   const data = body ? JSON.parse(body) : {}
   if (url.pathname === "/health") return send({ ok: true })
   if (url.pathname === "/__requests") return send(requests)
-  if (url.pathname === "/__reset") { carts.clear(); requests.length = 0; return send({ ok: true }) }
+  if (url.pathname === "/__reset") { carts.clear(); orders.clear(); requests.length = 0; gatewayOutcome = "PAID"; return send({ ok: true }) }
+  if (url.pathname === "/__comgate/outcome") { gatewayOutcome = data.status; return send({ ok: true }) }
+  if (url.pathname === "/__comgate/pay") {
+    // A gateway page the customer leaves by clicking, as on Comgate: the return
+    // is then initiated by another site, which is what SameSite cookies see.
+    requests.push({ method: req.method, path: url.pathname, body: {} })
+    const back = `${STOREFRONT}/cz/checkout/payment-return?id=TEST-TRANS&refId=${encodeURIComponent(url.searchParams.get("refId") ?? "")}`
+    res.writeHead(200, { "content-type": "text/html; charset=utf-8" })
+    return res.end(`<!doctype html><title>Test gateway</title><a href="${back}">Zpět do obchodu</a>`)
+  }
   requests.push({ method: req.method, path: url.pathname, body: data })
   if (url.pathname === "/store/regions") return send({ regions: [region] })
   if (url.pathname === "/store/regions/reg_test") return send({ region })
@@ -35,17 +77,34 @@ const server = createServer(async (req, res) => {
   if (url.pathname === "/store/product-categories") return send({ product_categories: [], count: 0 })
   if (url.pathname === "/store/products") return send({ products: [], count: 0 })
   if (url.pathname === "/store/customers/me") return send({ message: "Not authenticated" }, 401)
-  if (url.pathname === "/store/shipping-options") return send({ shipping_options: [shipping] })
+  if (url.pathname === "/store/shipping-options") return send({ shipping_options: shippingOptions })
   if (url.pathname === "/store/payment-providers") return send({ payment_providers: providers })
+  const orderMatch = url.pathname.match(/^\/store\/orders\/([^/]+)$/)
+  if (orderMatch) return orders.has(orderMatch[1]) ? send({ order: orders.get(orderMatch[1]) }) : send({ message: "Order not found" }, 404)
   const cartMatch = url.pathname.match(/^\/store\/carts\/([^/]+)$/)
   if (cartMatch) return send({ cart: cart(cartMatch[1]) })
+  const completeMatch = url.pathname.match(/^\/store\/carts\/([^/]+)\/complete$/)
+  if (completeMatch && req.method === "POST") {
+    const current = cart(completeMatch[1])
+    if (current.completed_at) return send({ type: "order", order: orders.get(`order_${current.id}`) })
+    const session = current.payment_collection.payment_sessions[0]
+    if (!session) return send({ type: "invalid_data", message: "No payment sessions" }, 400)
+    if (session.provider_id === "pp_comgate_comgate" && gatewayOutcome !== "PAID") {
+      // Like Medusa: authorization stores the gateway status, then rejects completion.
+      if (gatewayOutcome === "CANCELLED") session.status = "canceled"
+      return send({ type: "not_allowed", message: `Session: ${session.id} was not authorized with the provider.` }, 400)
+    }
+    return send({ type: "order", order: placeOrder(current, session) })
+  }
   const sessionMatch = url.pathname.match(/^\/store\/payment-collections\/paycol_(.+)\/payment-sessions$/)
   if (sessionMatch && req.method === "POST") {
     const current = cart(sessionMatch[1])
-    current.payment_collection.payment_sessions = [{ id: "payses_test", provider_id: data.provider_id, status: "pending", data: { comgate_redirect_url: "https://payments.example.invalid/test" } }]
+    const id = `payses_${current.payment_collection.payment_sessions.length + 1}_${current.id}`
+    const sessionData = data.provider_id === "pp_comgate_comgate" ? { transId: "TEST-TRANS", redirect: `${GATEWAY}/__comgate/pay?refId=${id}` } : {}
+    // Medusa replaces the collection's existing session with the new one.
+    current.payment_collection.payment_sessions = [{ id, provider_id: data.provider_id, status: "pending", data: sessionData }]
     return send({ payment_collection: current.payment_collection })
   }
-  // Completing an order is deliberately unsupported: these tests cannot charge or place orders.
   send({ message: `Unexpected fixture request: ${req.method} ${url.pathname}` }, 501)
 })
 server.listen(9101, "127.0.0.1", () => process.stdout.write("Mock Medusa ready on 127.0.0.1:9101\n"))

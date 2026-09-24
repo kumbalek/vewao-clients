@@ -9,7 +9,7 @@ import { useTranslations } from "next-intl"
 import { Label, Switch } from "@medusajs/ui"
 import InteractiveLink from "@modules/common/components/interactive-link"
 
-const Review = ({ cart }: { cart: any }) => {
+const Review = ({ cart, isPickup }: { cart: any; isPickup: boolean }) => {
   const [acceptAgreement, setAccept] = useState(false)
   const t = useTranslations("checkout")
   const searchParams = useSearchParams()
@@ -63,6 +63,7 @@ const Review = ({ cart }: { cart: any }) => {
           </div>
           <PaymentButton
             cart={cart}
+            isPickup={isPickup}
             data-testid="submit-order-button"
             disabled={!acceptAgreement}
           />
