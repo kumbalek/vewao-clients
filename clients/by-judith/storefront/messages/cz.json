@@ -171,6 +171,7 @@
     "giftCard": "Dárkový poukaz",
     "anotherPaymentStep": "Po odeslání objednávky vás přesměrujeme na platební bránu.",
     "paymentFailed": "Platba nebyla dokončena a objednávka nevznikla. Zkuste platbu znovu, nebo zvolte jiný způsob platby.",
+    "paymentSetupFailed": "Platbu se nepodařilo připravit. Zkuste to prosím znovu, nebo zvolte jiný způsob platby.",
     "review": "Přehled objednávky",
     "agreeLabel": "Souhlasím s Obchodními podmínkami",
     "agreeLabelLink": "Obchodními podmínkami",

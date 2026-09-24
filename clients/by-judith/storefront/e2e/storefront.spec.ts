@@ -187,6 +187,22 @@ test("returns a cancelled Comgate payment to the payment step with the cart kept
   await expect(page).not.toHaveURL(/payment=failed/)
 })
 
+test("explains a gateway setup failure in Czech and stays on payment", async ({
+  page,
+  context,
+}) => {
+  await context.addCookies([cartCookie(`cart_gatewaydown_${crypto.randomUUID()}`)])
+  await page.goto("/cz/checkout?step=payment")
+  await waitForPaymentHydration(page)
+  await page.getByRole("radio", { name: /Comgate/ }).click()
+  await page.getByTestId("submit-payment-button").click()
+
+  await expect(page.getByTestId("payment-method-error-message")).toHaveText(
+    /Platbu se nepodařilo připravit/
+  )
+  await expect(page).toHaveURL(/step=payment/)
+})
+
 test("shows a pending Comgate payment without claiming success", async ({
   page,
   request,

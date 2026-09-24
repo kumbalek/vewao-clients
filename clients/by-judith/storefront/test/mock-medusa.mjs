@@ -16,6 +16,14 @@ const carts = new Map()
 const orders = new Map()
 const requests = []
 let gatewayOutcome = "PAID"
+// Mirrors Medusa's store relation limit (platform medusa-config: 4). Deeper
+// `fields` expansions get HTTP 400 from the real backend, which empties checkout.
+const STORE_RELATIONS_LIMIT = 4
+function relationsDepth(field) {
+  const star = field.startsWith("*") || field.endsWith(".*")
+  const segments = field.replace(/(^\*|\.\*$)/, "").split(".").length
+  return star ? segments : segments - 1
+}
 
 // Cart id prefixes select the fixture: pickup, free PPL delivery (≥ 5 000 Kč) or paid PPL delivery.
 function shippingFor(id) {
@@ -71,6 +79,8 @@ const server = createServer(async (req, res) => {
     return res.end(`<!doctype html><title>Test gateway</title><a href="${back}">Zpět do obchodu</a>`)
   }
   requests.push({ method: req.method, path: url.pathname, body: data })
+  const tooDeep = (url.searchParams.get("fields") ?? "").split(",").filter((f) => f && relationsDepth(f.trim()) > STORE_RELATIONS_LIMIT)
+  if (tooDeep.length) return send({ type: "invalid_data", message: `The following fields expand more than the maximum of ${STORE_RELATIONS_LIMIT} allowed relations: ${tooDeep.join(", ")}` }, 400)
   if (url.pathname === "/store/regions") return send({ regions: [region] })
   if (url.pathname === "/store/regions/reg_test") return send({ region })
   if (url.pathname === "/store/collections") return send({ collections: [], count: 0 })
@@ -99,6 +109,10 @@ const server = createServer(async (req, res) => {
   const sessionMatch = url.pathname.match(/^\/store\/payment-collections\/paycol_(.+)\/payment-sessions$/)
   if (sessionMatch && req.method === "POST") {
     const current = cart(sessionMatch[1])
+    if (current.id.startsWith("cart_gatewaydown") && data.provider_id === "pp_comgate_comgate") {
+      // What Medusa returns when Comgate rejects or cannot create the payment.
+      return send({ type: "unknown_error", message: "Error setting up the request: An unknown error occurred." }, 500)
+    }
     const id = `payses_${current.payment_collection.payment_sessions.length + 1}_${current.id}`
     const sessionData = data.provider_id === "pp_comgate_comgate" ? { transId: "TEST-TRANS", redirect: `${GATEWAY}/__comgate/pay?refId=${id}` } : {}
     // Medusa replaces the collection's existing session with the new one.

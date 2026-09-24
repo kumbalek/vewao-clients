@@ -110,10 +110,9 @@ const Payment = ({
       return router.push(pathname + "?" + createQueryString("step", "review"), {
         scroll: false,
       })
-    } catch (err: unknown) {
-      setError(
-        err instanceof Error ? err.message : "Platbu se nepodařilo připravit."
-      )
+    } catch {
+      // Gateway errors are technical and in English; the backend logs them.
+      setError(t("paymentSetupFailed"))
     } finally {
       setIsLoading(false)
     }
