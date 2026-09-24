@@ -61,8 +61,7 @@ Environment secrets in both repos:
 
 Repository variable `DEPLOY_ENABLED=true` enables deployment after `main` passes.
 Leave unset during initial bootstrap. Protect `main` with required CI checks.
-These files are local changes until committed and pushed in their respective
-repositories; no workflow or secret has been configured remotely yet.
+Both repositories are now configured and deploying; see the 2026-09-24 record below.
 
 ## First boot (resolves the publishable-key dependency)
 
@@ -200,3 +199,17 @@ the probe was removed. The temporary public port-80 firewall allowance can now
 be removed, retaining Cloudflare source ranges on ports 80/443. Keep SSL mode
 Full (strict); this dashboard setting was not independently inspected. Admin
 account setup and GitHub CI/CD activation remain pending.
+
+### Automatic deployment verified — 2026-09-24
+
+The owner activated GitHub Actions deployment for both repositories. GitHub
+settings and run history were not inspected in this check; the server records
+confirm the result. `releases/` shows successful script deployments on
+2026-09-18 of storefront `sha256:5b1809b84dc1…` (09:06Z) and platform
+`sha256:d10582a3e620…` (13:18Z), replacing the local bootstrap images. An
+earlier attempt at 08:33Z saved the previous pair but recorded no success.
+All four services were healthy and running exactly the `images.env` digests.
+The installed `deploy.sh`, `compose.yaml` and monitoring configuration were
+byte-identical to their repository versions. Release records contain digests
+only; map a digest to its commit through the GitHub run that published it.
+Admin account setup was not re-verified.
