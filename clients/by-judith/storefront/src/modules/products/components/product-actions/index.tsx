@@ -35,7 +35,14 @@ export default function ProductActions({
   disabled,
 }: ProductActionsProps) {
   const t = useTranslations("cart")
-  const [options, setOptions] = useState<Record<string, string | undefined>>({})
+  // Preselect a single variant during render, not in an effect: otherwise the
+  // server HTML shows every single-variant product as sold out.
+  const [options, setOptions] = useState<Record<string, string | undefined>>(
+    () =>
+      product.variants?.length === 1
+        ? optionsAsKeymap(product.variants[0].options) ?? {}
+        : {}
+  )
   const [isAdding, setIsAdding] = useState(false)
   const countryCode = useParams().countryCode as string
   const { delayedRefresh, isRefreshing } = useDelayedRefresh()
