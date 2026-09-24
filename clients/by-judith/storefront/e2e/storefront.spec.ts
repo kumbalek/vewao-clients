@@ -152,6 +152,9 @@ test("creates a Comgate order only after the gateway returns paid", async ({
   await expect(page.getByTestId("order-complete-container")).toContainText(
     "Děkujeme"
   )
+  // Items 490 + PPL 150: the subtotal line must not already include shipping.
+  await expect(page.getByTestId("cart-subtotal")).toHaveAttribute("data-value", "490")
+  await expect(page.getByTestId("cart-shipping")).toHaveAttribute("data-value", "150")
   const paths = (await mockRequests(request)).map(({ path }) => path)
   const gateway = paths.indexOf("/__comgate/pay")
   const completions = paths.filter((path) => path.endsWith("/complete"))

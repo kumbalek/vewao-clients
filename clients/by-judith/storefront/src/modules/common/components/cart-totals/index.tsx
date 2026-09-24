@@ -8,6 +8,7 @@ type CartTotalsProps = {
   totals: {
     total?: number | null
     subtotal?: number | null
+    item_subtotal?: number | null
     tax_total?: number | null
     shipping_total?: number | null
     discount_total?: number | null
@@ -22,20 +23,24 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
     currency_code,
     total,
     subtotal,
+    item_subtotal,
     tax_total,
     discount_total,
     gift_card_total,
     shipping_subtotal,
   } = totals
   const t = useTranslations("cart")
+  // Medusa's `subtotal` already includes shipping, which is listed below.
+  const itemsSubtotal =
+    item_subtotal ?? (subtotal ?? 0) - (shipping_subtotal ?? 0)
 
   return (
     <div>
       <div className="flex flex-col gap-y-2 txt-medium text-ui-fg-subtle ">
         <div className="flex items-center justify-between">
           <span className="flex gap-x-1 items-center">{t("subtotal")}</span>
-          <span data-testid="cart-subtotal" data-value={subtotal || 0}>
-            {convertToLocale({ amount: subtotal ?? 0, currency_code })}
+          <span data-testid="cart-subtotal" data-value={itemsSubtotal}>
+            {convertToLocale({ amount: itemsSubtotal, currency_code })}
           </span>
         </div>
         {!!discount_total && (

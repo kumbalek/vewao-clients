@@ -39,7 +39,8 @@ function cart(id) {
       shipping_address: address, billing_address: address,
       items: [{ id: "item_test", title: "Testovací produkt", product_title: "Testovací produkt", product_handle: "testovaci-produkt", quantity: 1, unit_price: 490, total: 490, original_total: 490, thumbnail: "/logo.webp", variant: { id: "variant_test", title: "Standard", options: [] }, product: { id: "prod_test", handle: "testovaci-produkt" }, metadata: {} }],
       shipping_methods: [{ id: "sm_test", shipping_option_id: option.id, name: option.name, amount, total: amount }],
-      total: 490 + amount, subtotal: 490, item_total: 490, shipping_subtotal: amount, shipping_total: amount,
+      // As in Medusa 2.20: `subtotal` includes shipping; `item_subtotal` does not.
+      total: 490 + amount, subtotal: 490 + amount, item_subtotal: 490, item_total: 490, shipping_subtotal: amount, shipping_total: amount,
       discount_total: 0, tax_total: 0, original_total: 490 + amount, promotions: [],
       payment_collection: { id: `paycol_${id}`, payment_sessions: [] },
     })
@@ -51,7 +52,7 @@ function placeOrder(current, session) {
     id: `order_${current.id}`, display_id: 1001, created_at: new Date().toISOString(), email: current.email,
     currency_code: "czk", status: "pending", payment_status: session.provider_id === "pp_system_default" ? "authorized" : "captured",
     fulfillment_status: "not_fulfilled", items: current.items, shipping_address: current.shipping_address,
-    shipping_methods: current.shipping_methods, subtotal: current.subtotal, item_total: current.item_total,
+    shipping_methods: current.shipping_methods, subtotal: current.subtotal, item_subtotal: current.item_subtotal, item_total: current.item_total,
     total: current.total, shipping_total: current.shipping_total, shipping_subtotal: current.shipping_subtotal,
     discount_total: 0, tax_total: 0, original_total: current.total,
     payment_collections: [{ payments: [{ id: "pay_test", provider_id: session.provider_id, amount: current.total, created_at: new Date().toISOString() }] }],
