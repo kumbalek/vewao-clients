@@ -101,9 +101,24 @@ async function getCountryCode(
 }
 
 /**
- * Middleware to handle region selection and onboarding status.
+ * Dev and local instances serve the real shop's content, so every host sends
+ * noindex unless ALLOW_INDEXING=true is set at runtime (production only).
+ * Crawling stays allowed in robots.txt so crawlers can see this header.
  */
 export async function middleware(request: NextRequest) {
+  const response = await routeRequest(request)
+
+  if (process.env.ALLOW_INDEXING !== "true") {
+    response.headers.set("X-Robots-Tag", "noindex, nofollow")
+  }
+
+  return response
+}
+
+/**
+ * Handles region selection and onboarding status.
+ */
+async function routeRequest(request: NextRequest) {
   let redirectUrl = request.nextUrl.href
 
   let cacheIdCookie = request.cookies.get("_medusa_cache_id")

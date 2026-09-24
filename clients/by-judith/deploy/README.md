@@ -81,9 +81,8 @@ repositories; no workflow or secret has been configured remotely yet.
 
 3. Add two **new** proxy hosts in NPM, without editing the old shop's hosts:
    API domain → `http://by-judith-dev-api:9000` (WebSocket support enabled),
-   storefront domain → `http://by-judith-dev-storefront:8000`. Enable HTTPS and
-   add `add_header X-Robots-Tag "noindex, nofollow" always;` in their Advanced
-   configuration. Open `https://dev-api.your-domain/app`. In admin configure the Czech/CZK region,
+   storefront domain → `http://by-judith-dev-storefront:8000`. Enable HTTPS.
+   Open `https://dev-api.your-domain/app`. In admin configure the Czech/CZK region,
    sales channel, and publishable API key linked to that channel. This instance
    runs NODE_ENV=production: the localhost-only seed intentionally refuses to run.
 4. Put that publishable key and public URLs into the clients repo's `dev`
@@ -121,8 +120,13 @@ The CAX11 has limited RAM/disk. Memory limits leave room for the OS, and builds 
 elsewhere. Monitor `docker stats` and free disk; configure Docker log rotation and
 remove unused images deliberately while retaining rollback revisions.
 
-Configure the NPM dev hosts to send `X-Robots-Tag: noindex, nofollow`. This prevents indexing by compliant
-crawlers; it is not access control. Use synthetic test data. HTTPS, authenticated
+The storefront itself sends `X-Robots-Tag: noindex, nofollow` on every response
+unless its runtime environment sets `ALLOW_INDEXING=true`; set that only for
+production. Its `robots.txt` deliberately allows crawling so crawlers can see the
+header. On 2026-09-24 no `X-Robots-Tag` reached the origin response from either
+NPM dev host, despite the Advanced-configuration step formerly listed here, so do
+not rely on NPM for it; the API host currently sends none. This prevents indexing
+by compliant crawlers; it is not access control. Use synthetic test data. HTTPS, authenticated
 admin, provider sandbox setup, checkout success/failure and callback URLs must be
 verified on the actual domains before real provider testing.
 

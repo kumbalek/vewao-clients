@@ -29,6 +29,16 @@ test("keeps the Czech homepage and its original branding", async ({
   })
 })
 
+test("keeps non-production hosts out of search results", async ({ page }) => {
+  const home = await page.request.get("/cz")
+  expect(home.ok()).toBe(true)
+  expect(home.headers()["x-robots-tag"]).toBe("noindex, nofollow")
+
+  const robots = await page.request.get("/robots.txt")
+  expect(robots.headers()["content-type"]).toContain("text/plain")
+  expect(await robots.text()).toContain("Allow: /")
+})
+
 test("offers Comgate without loading obsolete payment scripts", async ({
   page,
   request,
