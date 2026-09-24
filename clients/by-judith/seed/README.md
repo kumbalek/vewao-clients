@@ -29,7 +29,7 @@ channel. Keep the secret key out of shell history and git; revoke it when done.
 | --- | --- |
 | Shipping | `Pobočka Beauty Body Clinic` (pickup, free); `Přepravce PPL` (150 Kč, free from 5 000 Kč) |
 | Fulfilment | Manual provider; no carrier integration |
-| Payment rule | Pay on site only with clinic pickup (enforced in the storefront) |
+| Payment rule | Pay on site only with clinic pickup (storefront, and backend with `FEATURE_PAY_ON_SITE_PICKUP_ONLY=true`) |
 | Stock | 100 per SKU at Beauty Body Clinic (dev value, not real stock) |
 | Tax | Prices are VAT-inclusive; **no tax rates** until verified with the accountant |
 

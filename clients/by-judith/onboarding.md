@@ -26,13 +26,25 @@ no legacy price observations or fabricated historical coverage.
   implementation and accountant verification remain open.
 - Inherited analytics is disabled until the shared consent integration is ready.
 
+## Launch methods — decided 2026-09-24
+
+The owner confirmed the old instance's setup for launch:
+
+- Shipping: clinic pickup at Beauty Body Clinic (free) and PPL courier
+  (150 Kč, free from 5 000 Kč), both fulfilled manually; PPL labels in the PPL
+  portal. Packeta stays off.
+- Payment: Comgate for every order; pay on site only with clinic pickup. Free
+  PPL delivery is still paid online. No cash on delivery.
+- Enforced in the storefront and at cart completion
+  (`FEATURE_PAY_ON_SITE_PICKUP_ONLY`). `seed/` sets this up on local/dev.
+
 ## Access and decisions still needed
 
 | Item | State |
 |---|---|
 | Local/test backend + CZ region + publishable key | Set up and seed; `.env.example` contains placeholders only |
-| Comgate sandbox/production account ownership and callback URLs | Confirm with merchant |
-| Actual shipping methods / pickup payment rules | Confirm against running operations |
+| Comgate sandbox/production account ownership and callback URLs | Owner adding dev test credentials; separate dev shop connection, return URL `/cz/checkout/payment-return` |
+| Actual shipping methods / pickup payment rules | Decided 2026-09-24 (above); merchant acceptance at launch |
 | Gift-packaging variant mapping | Set after data import/seed |
 | Tax rates, merchant identity, invoice numbering and Money S3 settings | Verify with merchant/accountant |
 | Resend sender/domain, storage and required live integrations | Confirm ownership/access |
