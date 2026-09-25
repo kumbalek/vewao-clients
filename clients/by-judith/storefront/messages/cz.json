@@ -221,7 +221,8 @@
     "ingredients": "Složení",
     "info": "Důležité informace",
     "viewAll": "Zobrazit kolekci",
-    "collection": "Kolekce"
+    "collection": "Kolekce",
+    "referencePrice": "Nejnižší cena za 30 dní před slevou:"
   },
   "payment": {
     "title": "Zpracováváme vaši platbu. Vyčkejte prosím."

@@ -1,3 +1,4 @@
+import { listSalePriceReferences } from "@lib/data/price-history"
 import { listProducts } from "@lib/data/products"
 import { HttpTypes } from "@medusajs/types"
 import ProductActions from "@modules/products/components/product-actions"
@@ -21,5 +22,13 @@ export default async function ProductActionsWrapper({
     return null
   }
 
-  return <ProductActions product={product} region={region} />
+  const priceReferences = await listSalePriceReferences(product, region.id)
+
+  return (
+    <ProductActions
+      product={product}
+      region={region}
+      priceReferences={priceReferences}
+    />
+  )
 }

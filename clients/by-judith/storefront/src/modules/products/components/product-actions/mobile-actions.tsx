@@ -7,7 +7,9 @@ import useToggleState from "@lib/hooks/use-toggle-state"
 import ChevronDown from "@modules/common/icons/chevron-down"
 import X from "@modules/common/icons/x"
 
+import { claimForPrice, type PriceReference } from "@lib/util/discount-claim"
 import { getProductPrice } from "@lib/util/get-product-price"
+import { convertToLocale } from "@lib/util/money"
 import OptionSelect from "./option-select"
 import { HttpTypes } from "@medusajs/types"
 import { isSimpleProduct } from "@lib/util/product"
@@ -22,6 +24,7 @@ type MobileActionsProps = {
   isAdding?: boolean
   show: boolean
   optionsDisabled: boolean
+  priceReferences?: PriceReference[]
 }
 
 const MobileActions: React.FC<MobileActionsProps> = ({
@@ -34,6 +37,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
   isAdding,
   show,
   optionsDisabled,
+  priceReferences,
 }) => {
   const t = useTranslations("cart")
   const { state, open, close } = useToggleState()
@@ -51,6 +55,8 @@ const MobileActions: React.FC<MobileActionsProps> = ({
 
     return variantPrice || cheapestPrice || null
   }, [price])
+
+  const claim = claimForPrice(selectedPrice, priceReferences)
 
   const isSimple = isSimpleProduct(product)
 
@@ -80,17 +86,19 @@ const MobileActions: React.FC<MobileActionsProps> = ({
               <span>—</span>
               {selectedPrice ? (
                 <div className="flex items-end gap-x-2 text-ui-fg-base">
-                  {selectedPrice.price_type === "sale" && (
+                  {claim && (
                     <p>
                       <span className="line-through text-small-regular">
-                        {selectedPrice.original_price}
+                        {convertToLocale({
+                          amount: claim.referenceAmount,
+                          currency_code: selectedPrice.currency_code,
+                        })}
                       </span>
                     </p>
                   )}
                   <span
                     className={clx({
-                      "text-ui-fg-interactive":
-                        selectedPrice.price_type === "sale",
+                      "text-ui-fg-interactive": !!claim,
                     })}
                   >
                     {selectedPrice.calculated_price}

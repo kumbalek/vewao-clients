@@ -1,5 +1,7 @@
 import { Text } from "@medusajs/ui"
+import { listPriceReferences } from "@lib/data/price-history"
 import { listProducts } from "@lib/data/products"
+import { claimForPrice } from "@lib/util/discount-claim"
 import { getProductPrice } from "@lib/util/get-product-price"
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
@@ -27,6 +29,13 @@ export default async function ProductPreview({
   const { cheapestPrice } = getProductPrice({
     product,
   })
+  const claim =
+    cheapestPrice?.price_type === "sale"
+      ? claimForPrice(
+          cheapestPrice,
+          await listPriceReferences(product.id, region.id)
+        )
+      : null
 
   return (
     <LocalizedClientLink href={`/products/${product.handle}`} className="group">
@@ -42,7 +51,9 @@ export default async function ProductPreview({
             {product.title}
           </Text>
           <div className="flex items-center gap-x-2">
-            {cheapestPrice && <PreviewPrice price={cheapestPrice} />}
+            {cheapestPrice && (
+              <PreviewPrice price={cheapestPrice} claim={claim} />
+            )}
           </div>
         </div>
       </div>

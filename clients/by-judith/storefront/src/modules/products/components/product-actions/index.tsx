@@ -1,6 +1,7 @@
 "use client"
 
 import { addToCart } from "@lib/data/cart"
+import type { PriceReference } from "@lib/util/discount-claim"
 import { useIntersection } from "@lib/hooks/use-in-view"
 import { HttpTypes } from "@medusajs/types"
 import { Button } from "@medusajs/ui"
@@ -19,6 +20,7 @@ type ProductActionsProps = {
   product: HttpTypes.StoreProduct
   region: HttpTypes.StoreRegion
   disabled?: boolean
+  priceReferences?: PriceReference[]
 }
 
 const optionsAsKeymap = (
@@ -33,6 +35,7 @@ const optionsAsKeymap = (
 export default function ProductActions({
   product,
   disabled,
+  priceReferences,
 }: ProductActionsProps) {
   const t = useTranslations("cart")
   // Preselect a single variant during render, not in an effect: otherwise the
@@ -152,7 +155,11 @@ export default function ProductActions({
           )}
         </div>
 
-        <ProductPrice product={product} variant={selectedVariant} />
+        <ProductPrice
+          product={product}
+          variant={selectedVariant}
+          priceReferences={priceReferences}
+        />
 
         <Button
           onClick={handleAddToCart}
@@ -185,6 +192,7 @@ export default function ProductActions({
           isAdding={isAdding || isRefreshing}
           show={!inView}
           optionsDisabled={!!disabled || isAdding || isRefreshing}
+          priceReferences={priceReferences}
         />
       </div>
     </>

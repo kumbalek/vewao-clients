@@ -250,3 +250,20 @@ test("places a pay-on-site pickup order directly, but never from the gateway ret
   await page.getByTestId("submit-order-button").click()
   await expect(page).toHaveURL(/\/cz\/order\/order_cart_pickup_.+\/confirmed$/)
 })
+
+test("announces a sale only against the 30-day lowest price", async ({
+  page,
+  request,
+}) => {
+  await page.goto("/cz/products/akcni-produkt")
+  await expect(page.getByTestId("product-price").first()).toHaveAttribute("data-value", "1490")
+  // The reference is the ledger's 30-day lowest (1 690), not Medusa's list price (1 890).
+  await expect(page.getByTestId("reference-product-price").first()).toHaveAttribute("data-value", "1690")
+  await expect(page.getByTestId("product-price-discount").first()).toHaveText("-11 %")
+
+  await request.post(`${MOCK}/__price-history`, { data: { history_complete: false } })
+  await page.goto("/cz/products/akcni-produkt?incomplete")
+  await expect(page.getByTestId("product-price").first()).toHaveAttribute("data-value", "1490")
+  await expect(page.getByTestId("reference-product-price")).toHaveCount(0)
+  await expect(page.getByTestId("product-price-discount")).toHaveCount(0)
+})

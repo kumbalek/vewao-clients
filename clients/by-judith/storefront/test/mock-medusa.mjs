@@ -16,6 +16,19 @@ const carts = new Map()
 const orders = new Map()
 const requests = []
 let gatewayOutcome = "PAID"
+// A product on a sale price list: Medusa's list price 1 890, sale price 1 490.
+const saleProduct = {
+  id: "prod_sale", handle: "akcni-produkt", title: "Akční produkt", subtitle: "Testovací akce", description: "Popis produktu",
+  thumbnail: "/logo.webp", images: [], collection: null, collection_id: null, tags: [], metadata: {}, type: null,
+  options: [{ id: "opt_default", title: "Default option", values: [{ id: "optval_default", value: "Default option value" }] }],
+  variants: [{
+    id: "variant_sale", title: "Standard", sku: "SALE-1", manage_inventory: false, allow_backorder: false, inventory_quantity: 10,
+    options: [{ id: "optval_default", option_id: "opt_default", value: "Default option value" }],
+    calculated_price: { calculated_amount: 1490, original_amount: 1890, currency_code: "czk", calculated_price: { price_list_type: "sale" }, original_price: { price_list_type: null } },
+  }],
+}
+// What the platform's price ledger says about it; tests set it per case.
+let priceHistory = { current_amount: 1490, reference_price: 1690, history_complete: true }
 // Mirrors Medusa's store relation limit (platform medusa-config: 4). Deeper
 // `fields` expansions get HTTP 400 from the real backend, which empties checkout.
 const STORE_RELATIONS_LIMIT = 4
@@ -69,7 +82,8 @@ const server = createServer(async (req, res) => {
   const data = body ? JSON.parse(body) : {}
   if (url.pathname === "/health") return send({ ok: true })
   if (url.pathname === "/__requests") return send(requests)
-  if (url.pathname === "/__reset") { carts.clear(); orders.clear(); requests.length = 0; gatewayOutcome = "PAID"; return send({ ok: true }) }
+  if (url.pathname === "/__reset") { carts.clear(); orders.clear(); requests.length = 0; gatewayOutcome = "PAID"; priceHistory = { current_amount: 1490, reference_price: 1690, history_complete: true }; return send({ ok: true }) }
+  if (url.pathname === "/__price-history") { priceHistory = { ...priceHistory, ...data }; return send({ ok: true }) }
   if (url.pathname === "/__comgate/outcome") { gatewayOutcome = data.status; return send({ ok: true }) }
   if (url.pathname === "/__comgate/pay") {
     // A gateway page the customer leaves by clicking, as on Comgate: the return
@@ -79,14 +93,21 @@ const server = createServer(async (req, res) => {
     res.writeHead(200, { "content-type": "text/html; charset=utf-8" })
     return res.end(`<!doctype html><title>Test gateway</title><a href="${back}">Zpět do obchodu</a>`)
   }
-  requests.push({ method: req.method, path: url.pathname, body: data })
+  requests.push({ method: req.method, path: url.pathname, query: url.search, body: data })
   const tooDeep = (url.searchParams.get("fields") ?? "").split(",").filter((f) => f && relationsDepth(f.trim()) > STORE_RELATIONS_LIMIT)
   if (tooDeep.length) return send({ type: "invalid_data", message: `The following fields expand more than the maximum of ${STORE_RELATIONS_LIMIT} allowed relations: ${tooDeep.join(", ")}` }, 400)
   if (url.pathname === "/store/regions") return send({ regions: [region] })
   if (url.pathname === "/store/regions/reg_test") return send({ region })
   if (url.pathname === "/store/collections") return send({ collections: [], count: 0 })
   if (url.pathname === "/store/product-categories") return send({ product_categories: [], count: 0 })
-  if (url.pathname === "/store/products") return send({ products: [], count: 0 })
+  if (url.pathname === "/store/products") {
+    // The SDK encodes id arrays as id[0]=…; accept any id key.
+    const wanted = url.searchParams.get("handle") === saleProduct.handle || [...url.searchParams].some(([key, value]) => key.startsWith("id") && value === saleProduct.id)
+    return send(wanted ? { products: [saleProduct], count: 1 } : { products: [], count: 0 })
+  }
+  if (url.pathname === `/store/products/${saleProduct.id}/price-history`) {
+    return send({ product_id: saleProduct.id, region_id: region.id, variants: [{ variant_id: "variant_sale", currency_code: "czk", ...priceHistory }] })
+  }
   if (url.pathname === "/store/customers/me") return send({ message: "Not authenticated" }, 401)
   if (url.pathname === "/store/shipping-options") return send({ shipping_options: shippingOptions })
   if (url.pathname === "/store/payment-providers") return send({ payment_providers: providers })

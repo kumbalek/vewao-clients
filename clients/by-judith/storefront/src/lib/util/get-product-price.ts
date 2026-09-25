@@ -8,6 +8,7 @@ export const getPricesForVariant = (variant: any) => {
   }
 
   return {
+    variant_id: variant.id as string,
     calculated_price_number: variant.calculated_price.calculated_amount,
     calculated_price: convertToLocale({
       amount: variant.calculated_price.calculated_amount,

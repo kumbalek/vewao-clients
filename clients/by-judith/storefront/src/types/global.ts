@@ -8,6 +8,7 @@ export type FeaturedProduct = {
 }
 
 export type VariantPrice = {
+  variant_id: string
   calculated_price_number: number
   calculated_price: string
   original_price_number: number
