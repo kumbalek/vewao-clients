@@ -23,8 +23,10 @@ const nextConfig = {
   },
   images: {
     remotePatterns: [
+      // Files uploaded to Medusa (content and product images) are served from
+      // /static. A bare URL would allow only its own path "/", nothing below it.
       ...(process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL
-        ? [new URL(process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL)]
+        ? [new URL("/static/**", process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL)]
         : []),
       {
         protocol: "http",
