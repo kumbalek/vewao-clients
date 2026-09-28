@@ -10,17 +10,17 @@
 
   .scrollbar::-webkit-scrollbar-track {
     border-radius: 100vh;
-    background: #f4e7d0;
+    background: theme("colors.cream");
   }
 
   .scrollbar::-webkit-scrollbar-thumb {
-    background: #cac8b6;
+    background: theme("colors.greige");
     border-radius: 100vh;
-    border: 2px solid #cac8b6;
+    border: 2px solid theme("colors.greige");
   }
 
   .scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #85977b;
+    background: theme("colors.sage.DEFAULT");
   }
 
   /* Chrome, Safari and Opera */
@@ -132,13 +132,13 @@
 }
 
 @layer base {
-  *{
-    border-color: #e3ddc9; 
+  * {
+    border-color: theme("colors.line");
   }
 }
 
 .text-ui-fg-interactive {
-  color: #85977b !important;
+  color: theme("colors.sage.DEFAULT") !important;
 }
 
 .shadow-elevation-card-rest {

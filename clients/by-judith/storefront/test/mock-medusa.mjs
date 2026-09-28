@@ -1,6 +1,7 @@
 // Isolated storefront contract fixture. Never forwards requests to a real backend.
 // It also plays the Comgate gateway on "localhost", a different site from the
 // storefront on 127.0.0.1, so returning from it is a cross-site navigation.
+import { readFileSync } from "node:fs"
 import { createServer } from "node:http"
 
 const STOREFRONT = "http://127.0.0.1:8101"
@@ -26,6 +27,63 @@ const saleProduct = {
     options: [{ id: "optval_default", option_id: "opt_default", value: "Default option value" }],
     calculated_price: { calculated_amount: 1490, original_amount: 1890, currency_code: "czk", calculated_price: { price_list_type: "sale" }, original_price: { price_list_type: null } },
   }],
+}
+// Magazine articles as the Content plugin serves them: newest first, body_html
+// only on the detail route (the plugin renders and sanitises Markdown).
+const photo = { image: "http://localhost:9101/static/dn.webp", image_width: 1200, image_height: 1798, gallery: [] }
+const articles = [
+  {
+    id: "ci_1", slug: "rozhovor-s-testovaci-klientkou", title: "Rozhovor s testovací klientkou",
+    body: "**Jak jste se k nám dostala?**\\\n**A proč právě akupunktura?**\n\nDíky [doporučení](<https://example.com/>).",
+    body_html: '<p><strong>Jak jste se k nám dostala?</strong><br>\n<strong>A proč právě akupunktura?</strong></p>\n<p>Díky <a href="https://example.com/" rel="nofollow noopener noreferrer" target="_blank">doporučení</a>.</p>',
+    tags: [{ id: "tag_1", value: "akupunktura" }],
+    metadata: { ...photo, excerpt: "Perex testovacího rozhovoru.", image_alt: "Testovací fotografie" },
+  },
+  {
+    id: "ci_2", slug: "o-bylinach", title: "O bylinách",
+    body: "Byliny **pomáhají**.", body_html: "<p>Byliny <strong>pomáhají</strong>.</p>",
+    tags: [], metadata: { excerpt: null, image: null, gallery: [] },
+  },
+  {
+    id: "ci_3", slug: "akupunktura-v-praxi", title: "Akupunktura v praxi",
+    body: "Jak probíhá ošetření.", body_html: "<p>Jak probíhá ošetření.</p>",
+    tags: [{ id: "tag_2", value: "akupunktura" }, { id: "tag_3", value: "fytoterapie" }],
+    metadata: { ...photo, excerpt: "Jak probíhá ošetření.", image_alt: "Ošetření" },
+  },
+]
+// Clinic collections (seed/import-clinic.ts): one category, two of its
+// procedures plus one from another category, its FAQ, the team and O nás.
+const clinic = {
+  stranky: [
+    { slug: "o-nas", title: "O nás", body: "Text o klinice.", body_html: "<p>Text o klinice.</p>", metadata: { ...photo, perex: "Perex o klinice.", image_alt: "Interiér kliniky" } },
+  ],
+  tym: [
+    { slug: "jana-recepcni", title: "Jana Recepční", body: null, metadata: { role: "recepční", pismeno: "J", poradi: 2 } },
+    { slug: "mgr-testovaci-terapeutka", title: "Mgr. Testovací Terapeutka", body: "První odstavec medailonku.\n\nDruhý odstavec medailonku.", metadata: { ...photo, role: "terapeutka", image_alt: "Testovací terapeutka", poradi: 1 } },
+  ],
+  "kategorie-procedur": [
+    {
+      slug: "akupunktura", title: "Akupunktura", body: "Úvod kategorie.",
+      body_html: "<p>Úvod kategorie.</p>\n<h2>Na co se zaměřujeme?</h2>\n<h3>Dermatologie</h3>\n<p>akné, ekzém</p>",
+      metadata: { ...photo, perex: null, image_alt: "Aplikace akupunktury", poradi: 1 },
+    },
+  ],
+  procedury: [
+    { slug: "druha-procedura", title: "Druhá procedura", body: "Druhý popis.", body_html: "<p>Druhý popis.</p>", metadata: { kategorie: "akupunktura", cena: null, poradi: 2 } },
+    {
+      slug: "testovaci-procedura", title: "Testovací procedura", body: "Popis **procedury**.", body_html: "<p>Popis <strong>procedury</strong>.</p>",
+      metadata: { ...photo, kategorie: "akupunktura", cena: "od 1.000 Kč", delka: "45 min", cenik: "Jedno sezení — 1.000 Kč\nBalíček 5 sezení — 4.000 Kč", image_alt: "Procedura", poradi: 1 },
+    },
+    { slug: "cizi-procedura", title: "Cizí procedura", body: "Jinde.", body_html: "<p>Jinde.</p>", metadata: { kategorie: "beauty", poradi: 1 } },
+  ],
+  faq: [{ slug: "faq-boli-to", title: "Bolí to?", body: "Většinou vůbec ne.", metadata: { kategorie: "akupunktura", poradi: 1 } }],
+}
+const contentCollections = { magazin: articles, ...clinic }
+for (const [slug, items] of Object.entries(contentCollections)) {
+  items.forEach((item, i) => Object.assign(item, {
+    id: item.id ?? `ci_${slug}_${i}`, tags: item.tags ?? [], status: "published", published_at: null,
+    created_at: `2026-09-2${8 - i}T10:00:00.000Z`, content_collection: { id: `cc_${slug}`, slug },
+  }))
 }
 // What the platform's price ledger says about it; tests set it per case.
 let priceHistory = { current_amount: 1490, reference_price: 1690, history_complete: true }
@@ -96,6 +154,24 @@ const server = createServer(async (req, res) => {
   requests.push({ method: req.method, path: url.pathname, query: url.search, body: data })
   const tooDeep = (url.searchParams.get("fields") ?? "").split(",").filter((f) => f && relationsDepth(f.trim()) > STORE_RELATIONS_LIMIT)
   if (tooDeep.length) return send({ type: "invalid_data", message: `The following fields expand more than the maximum of ${STORE_RELATIONS_LIMIT} allowed relations: ${tooDeep.join(", ")}` }, 400)
+  if (url.pathname === "/static/dn.webp") {
+    res.writeHead(200, { "content-type": "image/webp" })
+    return res.end(readFileSync(new URL("../public/dn.webp", import.meta.url)))
+  }
+  const listMatch = url.pathname.match(/^\/content\/([^/]+)\/items$/)
+  if (listMatch) {
+    const tag = url.searchParams.get("tag")
+    const items = (contentCollections[listMatch[1]] ?? [])
+      .filter((a) => !tag || a.tags.some((t) => t.value === tag))
+      .map(({ body_html, ...a }) => a)
+    return send({ content_items: items, count: items.length, limit: 200, offset: 0 })
+  }
+  // Like the plugin: the detail route finds an item by slug in any collection.
+  const itemMatch = url.pathname.match(/^\/content\/[^/]+\/items\/([^/]+)$/)
+  if (itemMatch) {
+    const item = Object.values(contentCollections).flat().find((a) => a.slug === decodeURIComponent(itemMatch[1]))
+    return item ? send({ content_item: item }) : send({ type: "not_found", message: `Content item "${itemMatch[1]}" not found` }, 404)
+  }
   if (url.pathname === "/store/regions") return send({ regions: [region] })
   if (url.pathname === "/store/regions/reg_test") return send({ region })
   if (url.pathname === "/store/collections") return send({ collections: [], count: 0 })

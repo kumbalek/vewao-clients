@@ -14,9 +14,9 @@ export default function RootLayout(props: { children: React.ReactNode }) {
         <link rel="stylesheet" href="https://use.typekit.net/jwc1iop.css" />
       </head>
       <body>
-        <main className="relative">
+        <div className="relative">
           <NextIntlClientProvider>{props.children}</NextIntlClientProvider>
-        </main>
+        </div>
       </body>
     </html>
   )

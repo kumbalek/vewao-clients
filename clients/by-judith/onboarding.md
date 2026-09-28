@@ -38,6 +38,44 @@ The owner confirmed the old instance's setup for launch:
 - Enforced in the storefront and at cart completion
   (`FEATURE_PAY_ON_SITE_PICKUP_ONLY`). `seed/` sets this up on local/dev.
 
+## Wireframe v1 — 2026-09-28
+
+`wireframe.jpg` covers 11 screens of a combined clinic and shop site. These are
+beyond the launch baseline in `docs/REQUIREMENTS.md`: procedures, booking,
+pricing, offers, magazine, team and account. The existing e-shop (screen 04) is
+kept. The owner chose to build in steps:
+
+- Built: global header, mobile menu and footer (screen 00), on the storefront
+  design system. Product search posts to `/store?q=`.
+- Built (2026-09-28): Magazín (screen 08), `/magazin` and `/magazin/<slug>`,
+  served by the Content plugin. The 36 bbclinic.cz articles are imported with
+  `seed/import-magazin.ts` (see `seed/README.md`): local backend, then the dev
+  server on 2026-09-28 (54 records; a re-run created nothing). Its images are in
+  the dev `uploads` volume. The source has no dates, authors or product links,
+  so articles show none, and "Související produkty" is not built. Only 8
+  articles carry categories, which become the topic filter.
+- Built (2026-09-28): O nás with the team (screen 10), a procedure category
+  page (02) and procedure detail (03), and the header's Procedury menu, all
+  from the Content plugin. The content was copied from bbclinic.cz with
+  `seed/import-clinic.ts` (see `seed/README.md`): O nás, 7 team members, and the
+  Akupunktura service as the first category with 5 procedures and 5 FAQ.
+  Imported on local and dev. Marked `[doplnit]` until supplied: category menu
+  perex, procedure benefits/steps/therapist, vouchers. Not built: reviews
+  (needs C4 authenticity handling) and "Rezervovat u" per team member.
+  Procedure prices were copied as the old site shows them, including "Akce …
+  místo …" wording; the merchant should confirm them and how such claims apply
+  to services.
+- "Rezervovat" links to `/content/contact` until a booking provider is chosen.
+- Missing content is marked `[doplnit]` in `storefront/src/content/site.ts`:
+  procedures, category texts, brand text, social links, newsletter, cookies
+  page and payment logos. Ceník and Novinky have no pages yet.
+- Values follow agreed facts, not the wireframe: free delivery from 5 000 Kč
+  (wireframe: 1 500), hours from the current contact page (Po–Pá 10–18; the
+  wireframe shows Po–Pá 9–19 · So 9–14). Confirm the hours with the merchant.
+- Not built: account link (the account area is disabled), EN switch, floating
+  contact dialog (screen 09 B), newsletter sign-up (needs a provider and
+  consent record).
+
 ## Access and decisions still needed
 
 | Item | State |
@@ -47,7 +85,8 @@ The owner confirmed the old instance's setup for launch:
 | Actual shipping methods / pickup payment rules | Decided 2026-09-24 (above); merchant acceptance at launch |
 | Gift-packaging variant mapping | Set after data import/seed |
 | Tax rates, merchant identity, invoice numbering and Money S3 settings | Verify with merchant/accountant |
-| Resend sender/domain, storage and required live integrations | Confirm ownership/access |
+| Media storage | Decided 2026-09-28: S3 in production; dev keeps the Docker `uploads` volume. Choose the S3 provider/bucket and set up credentials |
+| Resend sender/domain and required live integrations | Confirm ownership/access |
 | Product/customer/order migration and redirects | Rehearse on copies |
 | Price capture | Enable and observe in new backend; track actual start/coverage |
 | Cookie consent | New shared component in storefront kit; not implemented in this starter slice |

@@ -1,4 +1,5 @@
 const path = require("path")
+const tokens = require("./src/modules/design-system/tokens")
 
 module.exports = {
   darkMode: "class",
@@ -21,7 +22,7 @@ module.exports = {
         padding: "padding-top padding-right padding-bottom padding-left",
       },
       colors: {
-        gold: "#D7B46B",
+        ...tokens.colors,
         grey: {
           0: "#FFFFFF",
           5: "#F9FAFB",
@@ -43,6 +44,7 @@ module.exports = {
         rounded: "8px",
         large: "16px",
         circle: "9999px",
+        ...tokens.borderRadius,
       },
       maxWidth: {
         "8xl": "100rem",
@@ -59,9 +61,7 @@ module.exports = {
       fontSize: {
         "3xl": "2rem",
       },
-      fontFamily: {
-        sans: ["quiche-sans"],
-      },
+      fontFamily: tokens.fontFamily,
       keyframes: {
         breathe: {
           "0%, 100%": { transform: "scale(1)" },

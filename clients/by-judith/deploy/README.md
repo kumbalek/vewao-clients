@@ -112,7 +112,8 @@ For application rollback, inspect the prior file in `releases/`, then call
 checking schema compatibility. The script never automatically restores a database.
 A migration rollback is not an image rollback. Backups remain under `backups/`;
 copy them off-server and test pg_restore into an isolated database before importing
-valuable data. Uploaded files are in the `uploads` volume and need separate backup.
+valuable data. Uploaded files are in the `uploads` volume and need separate backup
+(dev only: production stores media in S3).
 Do not delete volumes or backup history as part of deployment.
 
 The CAX11 has limited RAM/disk. Memory limits leave room for the OS, and builds run

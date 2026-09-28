@@ -12,17 +12,20 @@ import PaginatedProducts from "./paginated-products"
 const StoreTemplate = ({
   sortBy,
   page,
+  query,
   countryCode,
   collections,
 }: {
   sortBy?: SortOptions
   page?: string
+  query?: string
   countryCode: string
   collections: HttpTypes.StoreCollection[]
 }) => {
   const pageNumber = page ? parseInt(page) : 1
   const sort = sortBy || "created_at"
   const t = useTranslations("product")
+  const tSearch = useTranslations("search")
 
   return (
     <div
@@ -42,7 +45,9 @@ const StoreTemplate = ({
       {/* <RefinementList sortBy={sort} /> */}
       <div className="w-full">
         <div className="mb-8 text-2xl flex flex-col justify-between small:flex-row small:items-center">
-          <h1 data-testid="store-page-title">{t("allProducts")}</h1>
+          <h1 data-testid="store-page-title">
+            {query ? tSearch("title", { query }) : t("allProducts")}
+          </h1>
           {collections.length > 0 && (
             <div className="flex gap-1 small:gap-2 text-xl">
               {`${t("collection")}: `}
@@ -63,6 +68,7 @@ const StoreTemplate = ({
           <PaginatedProducts
             sortBy={sort}
             page={pageNumber}
+            query={query}
             countryCode={countryCode}
           />
         </Suspense>

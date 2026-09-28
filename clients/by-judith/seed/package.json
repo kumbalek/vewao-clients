@@ -9,6 +9,11 @@
   },
   "scripts": {
     "seed:dev": "node --experimental-strip-types seed-dev.ts",
+    "magazin:extract": "node --experimental-strip-types extract-magazin.ts",
+    "magazin:import": "node --experimental-strip-types import-magazin.ts",
+    "clinic:extract": "node --experimental-strip-types extract-clinic.ts",
+    "clinic:import": "node --experimental-strip-types import-clinic.ts",
+    "test": "node --experimental-strip-types --test magazin/*.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

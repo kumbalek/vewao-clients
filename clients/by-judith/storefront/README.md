@@ -21,6 +21,12 @@ The storefront runs on port 8000. SDK/types are pinned to Medusa 2.20.1. Next.js
 The Medusa UI package retains a React 18 peer declaration; this copied React 19
 consumer needs its real interactive flows verified before release.
 
+## Design system
+
+Tokens and components taken from the live site are in `src/modules/design-system`
+(see its README). Build new pages from them. With `pnpm dev`, `/cz/design-system`
+shows them all. It needs no backend and returns 404 in production builds.
+
 ## Verify
 
 ```bash

@@ -1,0 +1,258 @@
+{
+  "source": "https://www.bbclinic.cz",
+  "extracted_at": "2026-09-28",
+  "pages": [
+    {
+      "slug": "o-nas",
+      "title": "O nás",
+      "perex": "Beauty Body Clinic je privátní klinika, která se zcela liší od klasických center krásy. Z původního oboru estetické medicíny se díky propojení s tradiční čínskou medicínou stalo unikátní místo, které vyhledávají jak klienti z dalekého okolí, tak i řada celebrit a významných osobností.",
+      "body": "Co to znamená v praxi? Z obou směrů medicíny používáme ty nejefektivnější a nejúčinnější metody. Tisíci léty osvědčená akupunktura a fytoterapie klientům pomáhá se zdravotními problémy stejně tak, jako nejmodernější K-laser či chiropraxe nebo viscerální terapie. Naší naprostou doménou je léčba akné, atopického ekzému, alopecie, pohybového aparátu nebo ženských potíží. I na samotnou krásu pohlížíme z jiného úhlu pohledu. Pouze zdravé tělo může být krásné, a proto je jedním ze základních stavebních kamenů speciální dietetika dle TCM. V BBC vám pomůžeme udržet co nejpřirozenější efekt mladé a svěží pleti např. díky tělu vlastní kyselině hyaluronové nebo mezoterapii. Vrásky odstraňujeme frakčním K-laserem, který skvěle funguje i na odstranění žilek, pigmentů či jizviček. Naprostou novinkou v naší nabídce je originální mikrojehličkovací pero, Dermapen™ 4, které si spolu s revoluční domácí péčí DP Dermaceuticals dokáže poradit s jakýmkoliv problémem pleti.",
+      "image": {
+        "url": "https://cdn.sanity.io/images/sfqldr6j/production/cec8d9d0d7b10e7c2e9120eb263a5bf9ae40d785-900x600.jpg",
+        "alt": "interiér kliniky, diamanty",
+        "width": 900,
+        "height": 600
+      },
+      "gallery": [
+        {
+          "url": "https://cdn.sanity.io/images/sfqldr6j/production/2463b81b8d1a4398909031f93c193dc8eb94595a-1100x733.jpg",
+          "alt": "recepce kliniky",
+          "width": 1100,
+          "height": 733
+        },
+        {
+          "url": "https://cdn.sanity.io/images/sfqldr6j/production/a3cfe495edbf12f879a3cbcf7f2978e34cb91557-734x486.png",
+          "alt": "interiér kliniky, recepce, vstup, vystavení výrobků",
+          "width": 734,
+          "height": 486
+        }
+      ],
+      "source_url": "https://www.bbclinic.cz/o-nas/"
+    }
+  ],
+  "team": [
+    {
+      "slug": "mgr-judita-halvova",
+      "title": "Mgr. Judita Halvová",
+      "role": "majitelka",
+      "letter": "J",
+      "body": "Majitelka Beauty Body Clinic je vizionářka. Když otevírala kliniku estetické medicíny, již několik let studovala čínskou medicínu a přemýšlela, jak propojit sílu medicíny západní s tradicí medicíny východní.  V roce 2022 se jí povedlo zrealizovat velký sen a otevřít novou část kliniky, nazvanou BALANCE BODY CLINIC, kde se spolu se svým týmem věnuje diagnostice nemocí podle tradiční čínské medicíny a následné léčbě pomocí bylinné fytoterapie a akupunktury. Mezi její klienty patří jak pacienti z blízkého okolí tak i ti, kteří přijíždí z různých koutů nejen naší republiky, ale i Evropy. Pro jedinečný přístup, efektivní výsledky a nadstandardní péči je vyhledávanou akupunkturistkou řady významných osobností.\n\nJejím největším přáním je, aby se i klasičtí lékaři dívali na pacienty komplexně a dokázali přijmout i jiný pohled, než ten, který mají vystudovaný. Sama absolvovala nespočet stáží a kurzů. Jako jediná žena se stala oficiální studentkou MUDr. Penga, specialisty TCM a  legendárního fytoterapeuta a diagnostika, který působí    na Zhongfang Pure Chinese Medicine Complex v daleké Číně a již několkrát za sebou u něj absolvovala stáž zakončenou mezinárodní  certifikací.",
+      "image": {
+        "url": "https://cdn.sanity.io/images/sfqldr6j/production/62c8e6241cdff7d9b84400db25f59f0b1c441d20-933x1400.jpg",
+        "alt": "Judita Halvová",
+        "width": 933,
+        "height": 1400
+      },
+      "order": 1,
+      "source_url": "https://www.bbclinic.cz/o-nas/"
+    },
+    {
+      "slug": "mudr-boris-jegorov",
+      "title": "MUDr. Boris Jegorov",
+      "role": "vedoucí lékař",
+      "letter": "B",
+      "body": "Již od roku 2021 si srdce našich klientek při estetických procedurách získává svým pečlivým přístupem sympatický MUDr. Boris Jegorov. Absolvent Lékařské fakulty v Hradci Králové zde aplikuje výplňové materiály a provádí liftingové ošetření. Na konci roku 2023 úspěšně složil atestaci v oboru plastická chirurgie a od poloviny roku 2024 rozšířil své portfolio o tyto zákroky i u nás na klinice. Mezi jeho doménu patří blepharoplastika horních víček a chirurgické excize kožních útvarů. Zkušenosti z tohoto oboru má více než bohaté. Již několik let pracuje jako lékař plastické chirurgie ve FN Bulovka, kde provádí rekonstrukce prsou nebo například onkochirurgické rekonstrukce obličeje. Praxi zároveň získával na soukromé klinice pod vedením vyhlášeného plastického chirurga MUDr. Martina Skály. I nyní se neustále vzdělává a účastní se kurzů a stáží od předních výrobců materiálu a školí se od největších odborníků na danou problematiku. Ve volném čase se rád potápí a již dvakrát absolvoval misi v Zambii a Keni.",
+      "image": {
+        "url": "https://cdn.sanity.io/images/sfqldr6j/production/414c5d0080b9399c252ccd456c809cdafb8396ba-1667x2500.jpg",
+        "alt": "MUDr. Boris Jegorov",
+        "width": 1667,
+        "height": 2500
+      },
+      "order": 2,
+      "source_url": "https://www.bbclinic.cz/o-nas/"
+    },
+    {
+      "slug": "mudr-hana-sulcova",
+      "title": "MUDr. Hana Šulcová",
+      "role": "odborný garant kliniky",
+      "letter": "H",
+      "body": "",
+      "image": null,
+      "order": 3,
+      "source_url": "https://www.bbclinic.cz/o-nas/"
+    },
+    {
+      "slug": "lucka-kokesova",
+      "title": "Lucka Kokešová",
+      "role": "Brand manager",
+      "letter": "L",
+      "body": "",
+      "image": null,
+      "order": 4,
+      "source_url": "https://www.bbclinic.cz/o-nas/"
+    },
+    {
+      "slug": "lucka-dubska",
+      "title": "Lucka Dubská",
+      "role": "Terapeutka TCM",
+      "letter": "L",
+      "body": "",
+      "image": null,
+      "order": 5,
+      "source_url": "https://www.bbclinic.cz/o-nas/"
+    },
+    {
+      "slug": "petra-janochova",
+      "title": "Petra Janochová",
+      "role": "sálová sestra",
+      "letter": "P",
+      "body": "",
+      "image": null,
+      "order": 6,
+      "source_url": "https://www.bbclinic.cz/o-nas/"
+    },
+    {
+      "slug": "stepanka-ocenasova",
+      "title": "Štěpánka Očenášová",
+      "role": "recepční",
+      "letter": "Š",
+      "body": "",
+      "image": null,
+      "order": 7,
+      "source_url": "https://www.bbclinic.cz/o-nas/"
+    }
+  ],
+  "categories": [
+    {
+      "slug": "akupunktura",
+      "title": "Akupunktura",
+      "body": "Již od nepaměti se lidstvo snaží vypátrat klíč k dlouhověkosti a stabilnímu zdraví. Zcela právem je za tento pomyslný klíč považována tradiční čínská medicína, metoda stará tisíce let pocházející od mistrů, předávaná v Číně dodnes z generace na generaci. Pojďte s naší pomocí nalézt pramen zdraví, pohody a relaxace, který zde klinice Beauty Body Clinic nabízí se svým týmem Judita Halvová. Žena, která stála za vznikem jedinečného centra kde se “Snoubí západ s východem.”, jinými slovy to nejefektivnější z medicíny západní spolu se staletími prověřenými metodami medicíny východní. Díky dlouholetému studiu TCM a následným stážím přímo v čínské nemocnici Zhongfang Pure Chinese Medicine Complex, vybudovala Judita Halvová unikátní místo, které poskytuje svým klientům nadstandardní služby v oblasti diagnostiky zdravotních problémů, po samotnou léčbu pomocí čínských bylinných odvarů spolu s jedinečnou kombinací akupunktury s nejmodernějšími metodami jako jsou lasery, mezoterapie či karboxyterapie. Díky těmto nejefektivnějším postupům dosahujeme v Beauty Body Clinic výrazných výsledků v léčbě atopického ekzému, alopecie, akné a spousty dalších mnohdy pro západní lékaře neřešitelných diagnóz. Vítejte ve světě, kde na nemoci a bolest známe přirozený lék.\n\n## Na co se zaměřujeme?\n\nS čím vám můžeme pomoci\n\n### Dermatologie\n\natopický ekzém, akné, alopecie totalis, lupénka, kopřivka, seboroická dermatitida\n\n### Pohybový aparát\n\nbolesti kloubů, bolesti páteře, poúrazové stavy, pooperační rekonvalescence\n\n### Gynekologie\n\nPMS, bolestivá menstruace, nepravidelná menstruace, endometrioza amenorea, neplodnost, těhotenská akupunktura, výtoky a záněty, hormonální nerovnováha\n\n### Vnitřní (interní) lékařství\n\nonemocnění vnitřních orgánů, onemocnění srdce a cév, Crohnova choroba, dráždivý tračník, trávicí potíže, hemeroidy\n\n### Chronická onemocnění\n\nastma, alergie, revmatologické zánětlivé onemocnění, migrény\n\n### Další onemocnění\n\núnavový syndrom, syndrom vyhoření, poruchy imunity, psychické potíže",
+      "image": {
+        "url": "https://cdn.sanity.io/images/sfqldr6j/production/1494a00627570ad55b2b0333c0a556f27876cdc7-1000x1500.jpg",
+        "alt": "aplikace akupunktury",
+        "width": 1000,
+        "height": 1500
+      },
+      "order": 1,
+      "source_url": "https://www.bbclinic.cz/tradicni-cinska-medicina/"
+    }
+  ],
+  "procedures": [
+    {
+      "slug": "diagnostika-judity-halvove",
+      "title": "Diagnostika Judity Halvové",
+      "category": "akupunktura",
+      "body": "Základem úspěšné léčby a řešení zdravotních potíží je přesná diagnostika. Ta se v TCM provádí jednak pomocí dotazování, odebráním pulzu a dále se stanovuje dle obrazu jazyka. Ten je totiž podle mistrů čínské medicíny obrazem stavu našeho zdraví.\n\nDiagnostiku na naší klinice provádí paní majitelka Judita, která během buď osobního nebo online rozhovoru rozklíčuje příčinu vašich problémů. Následně navrhne dle svých zkušeností a vašich možností postup léčby, kterou buď absolvujete přímo u ní nebo u kolegyň, které pracují dle jejího osvědčeného postupu.",
+      "price": null,
+      "price_list": [
+        {
+          "title": "Osobní konzultace (45 minut)",
+          "price": "Akce 1.500 Kč místo 3.000 Kč"
+        }
+      ],
+      "image": {
+        "url": "https://cdn.sanity.io/images/sfqldr6j/production/0de5a1086028af89e1ec91961f22cc3483b19da5-2500x1667.jpg",
+        "alt": "Diagnostika",
+        "width": 2500,
+        "height": 1667
+      },
+      "booking_url": "https://shop.bbclinic.cz/konzultace",
+      "order": 1,
+      "source_url": "https://www.bbclinic.cz/tradicni-cinska-medicina/"
+    },
+    {
+      "slug": "fytoterapie",
+      "title": "Fytoterapie",
+      "category": "akupunktura",
+      "body": "Fytoterapie neboli léčba bylinnými odvary je stěžejním prvkem pro léčbu nemocí a harmonizaci organismu. Ty jsou předepisovány každému klientovi na míru dle diagnostiky TCM. Odvary které předepisuje Judita Halvová vycházejí z originálních čínských receptur a kombinují v sobě původní čínské byliny, které jsou zpracovávány v certifikovaném centru.",
+      "price": "Cena bylinných odvarů je individuální.",
+      "price_list": [],
+      "image": {
+        "url": "https://cdn.sanity.io/images/sfqldr6j/production/38b350a53b328426b17474a732aeda3ac4e5eb9d-5616x3744.jpg",
+        "alt": "fytoterapie, čínské byliny, goji, zázvor, čínské psaní",
+        "width": 5616,
+        "height": 3744
+      },
+      "booking_url": null,
+      "order": 2,
+      "source_url": "https://www.bbclinic.cz/tradicni-cinska-medicina/"
+    },
+    {
+      "slug": "akupunktura-aurikuloterapie",
+      "title": "Akupunktura, Aurikuloterapie",
+      "category": "akupunktura",
+      "body": "Stejně jako byliny je akupunktura považována za základní pilíř při léčbě dle tradiční čínské medicíny. Jehličky tenké jako lidský vlas se aplikují do přesných bodů meridiánových drah, kde vznikají blokády, které způsobují zdravotní potíže. V případě chronických zdravotních potíží je doporučovaná aplikace nejprve v intenzivnější kůře, posléze dochází klient na tzv. balanční či udržovací akupunkturu po delším čase. Klientům nabízíme buď možnost terapeuta na úrovni **master**, kdy je ošetřován přímo paní Halvovou nebo nabízíme možnost **senior** či **junior** **terapeuta**, který provádí akupunkturu dle doporučení paní majitelky. Součástí terapie je provádění moxování, použití laseru či aurikuloterapie zdarma, dle druhu onemocnění.",
+      "price": null,
+      "price_list": [
+        {
+          "title": "Akupunktura Judity Halvové praktikovaná senior terapeutem",
+          "price": "3.500 Kč | Akce 5x sezení 10.000 Kč"
+        },
+        {
+          "title": "Akupunktura Judita Halvová exclusiv",
+          "price": "4.500 Kč / 5 sezení 20.000 Kč"
+        }
+      ],
+      "image": {
+        "url": "https://cdn.sanity.io/images/sfqldr6j/production/7dbdcb16b8c3c2604c468b701d54060c35341b95-6000x4000.jpg",
+        "alt": "Akupunktura",
+        "width": 6000,
+        "height": 4000
+      },
+      "booking_url": "https://www.bbclinic.cz/konzultace/",
+      "order": 3,
+      "source_url": "https://www.bbclinic.cz/tradicni-cinska-medicina/"
+    },
+    {
+      "slug": "permanentni-akupunktura",
+      "title": "Permanentní akupunktura",
+      "category": "akupunktura",
+      "body": "Řešením pro zaneprázdnění klienty či klienty, kteří k nám dojíždí z velké dálky nabízí spolu s užíváním odvarů i tzv. permanentní akupunktura. Jedná se o aplikaci malinkých nitek ze zdravotnického materiálů, do bodů v těle, kde působí intenzivně po dobu 60 dnů, než se vstřebají do těla. Jedná se o bezpečný, inovativní způsob, jak odstranit z těla dlouhodobé blokády.",
+      "price": "od 10.000 Kč",
+      "price_list": [],
+      "image": null,
+      "booking_url": "https://www.bbclinic.cz/konzultace/",
+      "order": 4,
+      "source_url": "https://www.bbclinic.cz/tradicni-cinska-medicina/"
+    },
+    {
+      "slug": "hubnouci-permanentni-akupunktura",
+      "title": "Hubnoucí permanentní akupunktura",
+      "category": "akupunktura",
+      "body": "Jedná se o metodu, kdy se pod kůži aplikují malé nitky, do bodů, které jsou podle TCM vhodné ke zrychlení metabolismu a k omezení pocitu hladu. Intenzivní stimulací těchto bodů po dobu cca 2 měsíců, než dojde k přirozenému vstřebání biologického materiálu, dochází k žádoucímu úbytku váhy. Součástí této jedinečné hubnoucí procedury je i přesná diagnostika tělesného složení pomocí přístroje InBody a doporučení stravovacích návyků dle čínské dietetiky.",
+      "price": "20.000 Kč",
+      "price_list": [],
+      "image": null,
+      "booking_url": "https://www.bbclinic.cz/konzultace/",
+      "order": 5,
+      "source_url": "https://www.bbclinic.cz/tradicni-cinska-medicina/"
+    }
+  ],
+  "faq": [
+    {
+      "slug": "faq-boli-akupunktura",
+      "title": "Bolí akupunktura?",
+      "body": "Při akupunktuře se aplikují jehličky o síle lidského vlasu, není třeba se obávat bolesti. Někdo necítí vůbec nic, někteří klienti cítí mírné mravenčení či lehké píchnutí. Akupunktura je pro většinu klientů nebolestivá relaxační metoda při které není problém usnout.",
+      "category": "akupunktura",
+      "order": 1
+    },
+    {
+      "slug": "faq-je-akupunktura-bezpecna",
+      "title": "Je akupunktura bezpečná?",
+      "body": "Z rukou našich terapeutů ano. Všichni jsou absolventy škol TCM a nejedná se o žádné kurzisty. Používáme sterilně balené jehličky, které jsou jednorázové. Velmi dbáme na bezpečnost a sterilní prostředí.",
+      "category": "akupunktura",
+      "order": 2
+    },
+    {
+      "slug": "faq-je-dulezita-fytoterapie",
+      "title": "Je důležitá fytoterapie?",
+      "body": "Ano, je jedním ze základních stavebních kamenů TCM a spolu s akupunkturou jsou klíčem k uzdravení. V některých případech je fytoterapie samostatně dostatečná pro výrazný ústup nemoci.",
+      "category": "akupunktura",
+      "order": 3
+    },
+    {
+      "slug": "faq-kolik-osetreni-je-zapotrebi",
+      "title": "Kolik ošetření je zapotřebí?",
+      "body": "Tato odpověď je velice individuální, obecně lze říci, že u chronických onemocnění doporučujeme pět po týdnu následujících aplikací akupunktury a posléze udržovací méně častější návštěvy. U akutních potíží dochází k úlevě po cca třetí aplikaci.",
+      "category": "akupunktura",
+      "order": 4
+    },
+    {
+      "slug": "faq-je-akupunktura-ci-fytoterapie-vhodna-pro-deti",
+      "title": "Je akupunktura či fytoterapie vhodná pro děti?",
+      "body": "Na dětskou akupunkturu se používají speciální kratší jehličky. Dítě vpich v podstatě necítí a můžeme říci, že dětský organismus reaguje velice rychle zlepšením, proto není zapotřebí tolik opakování jako u dospělých klientů. Odvary či bylinné tablety jsou individuální kvůli schopnosti dítěte je polknout, ale od 3 let věku při upraveném dávkování nevadí.",
+      "category": "akupunktura",
+      "order": 5
+    }
+  ]
+}

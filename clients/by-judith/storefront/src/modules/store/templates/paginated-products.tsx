@@ -1,5 +1,8 @@
+import { getTranslations } from "next-intl/server"
+
 import { listProductsWithSort } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
+import { ArrowLink, Text } from "@modules/design-system"
 import ProductPreview from "@modules/products/components/product-preview"
 import { Pagination } from "@modules/store/components/pagination"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
@@ -12,11 +15,13 @@ type PaginatedProductsParams = {
   category_id?: string[]
   id?: string[]
   order?: string
+  q?: string
 }
 
 export default async function PaginatedProducts({
   sortBy,
   page,
+  query,
   collectionId,
   categoryId,
   productsIds,
@@ -24,6 +29,8 @@ export default async function PaginatedProducts({
 }: {
   sortBy?: SortOptions
   page: number
+  /** Full-text product search, passed to Medusa as `q`. */
+  query?: string
   collectionId?: string
   categoryId?: string
   productsIds?: string[]
@@ -31,6 +38,10 @@ export default async function PaginatedProducts({
 }) {
   const queryParams: PaginatedProductsParams = {
     limit: 12,
+  }
+
+  if (query) {
+    queryParams["q"] = query
   }
 
   if (collectionId) {
@@ -76,6 +87,20 @@ export default async function PaginatedProducts({
     // Return true to KEEP the product if it is NOT the gift product
     return !isGiftProduct
   })
+
+  if (query && filteredProducts.length === 0) {
+    const [t, tLayout] = await Promise.all([
+      getTranslations("search"),
+      getTranslations("layout"),
+    ])
+
+    return (
+      <div className="flex flex-col items-start gap-4 py-12" data-testid="search-empty">
+        <Text tone="subtle">{t("empty", { query })}</Text>
+        <ArrowLink href="/store">{tLayout("allProducts")}</ArrowLink>
+      </div>
+    )
+  }
 
   return (
     <>
