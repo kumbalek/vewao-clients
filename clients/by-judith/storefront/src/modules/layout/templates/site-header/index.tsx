@@ -122,12 +122,12 @@ export default function SiteHeader({
             className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink"
           >
             <Image
-              src="/logo.webp"
+              src="/logo_gold.svg"
               alt={t("logoAlt")}
-              width={180}
-              height={62}
+              width={160}
+              height={202}
               priority
-              className="h-10 w-auto medium:h-12"
+              className="h-11 w-auto medium:h-14"
             />
           </LocalizedClientLink>
 

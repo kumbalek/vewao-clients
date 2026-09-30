@@ -65,12 +65,15 @@ export function ProceduresPanel({ categories }: { categories: ProcedureCategory[
   )
 }
 
-/** Shop collections from the catalogue, plus the full product list. */
+/** The e-shop's front page, its collections from the catalogue and the full product list. */
 export function ShopPanel({ collections }: { collections: MenuCollection[] }) {
   const t = useTranslations("layout")
 
   return (
     <Container width="page" className="flex flex-col gap-4 py-8">
+      <ArrowLink href="/shop" className="text-sm">
+        {t("shopHome")}
+      </ArrowLink>
       {collections.length > 0 && (
         <>
           <Text as="span" size="xs" tone="subtle" className="uppercase tracking-widest">

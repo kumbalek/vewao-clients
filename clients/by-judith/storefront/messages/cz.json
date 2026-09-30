@@ -1,7 +1,9 @@
 {
   "metadata": {
     "homeTitle": "JuditH",
-    "homeDescription": "Vítejte na e-shopu značky by JuditH, ve světě bylinných doplňků stravy, které v sobě snoubí starověkou tradici fytoterapie a potřeby moderního životního stylu.",
+    "homeDescription": "Snoubíme západ s východem: akupunktura a TCM diagnostika, lasery, injekční ošetření a péče o pleť. Rezervujte si proceduru v Beauty Body Clinic.",
+    "shopTitle": "Shop",
+    "shopDescription": "Vítejte na e-shopu značky by JuditH, ve světě bylinných doplňků stravy, které v sobě snoubí starověkou tradici fytoterapie a potřeby moderního životního stylu.",
     "checkoutTitle": "Objednávka",
     "404Title": "404",
     "404Description": "Něco se pokazilo",
@@ -246,6 +248,7 @@
     "procedures": "Procedury",
     "shop": "Shop",
     "collections": "Kolekce",
+    "shopHome": "Úvod e-shopu",
     "allProducts": "Všechny produkty",
     "showMore": "Zobrazit více",
     "book": "Rezervovat",

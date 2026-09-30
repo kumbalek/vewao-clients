@@ -10,6 +10,7 @@ export default function CheckoutLayout({
   children: React.ReactNode
 }) {
   const t = useTranslations("checkout")
+  const tLayout = useTranslations("layout")
 
   return (
     <div className="w-full bg-white relative small:min-h-screen">
@@ -34,10 +35,11 @@ export default function CheckoutLayout({
             data-testid="store-link"
           >
             <Image
-              src={"/logo.webp"}
-              alt="JuditH Logo"
-              width={180}
-              height={62}
+              src="/logo_gold.svg"
+              alt={tLayout("logoAlt")}
+              width={160}
+              height={202}
+              className="h-11 w-auto"
             />
           </LocalizedClientLink>
           <div className="flex-1 basis-0" />

@@ -80,6 +80,31 @@ kept. The owner chose to build in steps:
   contact dialog (screen 09 B), newsletter sign-up (needs a provider and
   consent record).
 
+## Landing page — 2026-09-30
+
+The home page is the new landing hero: a scroll-driven frame sequence of the
+lead doctor, imported from the legacy repo's `new-hp` branch (staged work on
+`df902c9`). Details and frame regeneration are in
+`storefront/src/modules/landing/README.md`.
+
+- The former home page (hero, product rails, reviews, about) is now `/shop`,
+  linked as "Úvod e-shopu" from the header's Shop menu.
+- The logo is the new gold diamond (`logo_gold.svg`) in the site header, mobile
+  menu and checkout header. Only the footer keeps the JuditH wordmark.
+- Only the default take (`judita_web_1.m4v`) is imported, as 11 MB of WebP
+  frames. The second take (`Movie.mov`) stays in the legacy repo.
+- Adapted to this site: the stage sits below the real sticky header, not
+  under the demo's mock header. The two category links go to
+  `/procedury/beauty` and `/procedury/akupunktura`. The closing CTA uses the
+  header's "Rezervovat" and contact page. The demo used "Objednat konzultaci"
+  and a `/rezervace` page that does not exist here.
+- To confirm with the merchant: the landing copy, including "Lasery" in the
+  Beauty link (the imported Beauty examples have no laser procedure), and the
+  home page's meta description, which is composed from the claims.
+- Not built: the rest of wireframe screen 01 below the hero (service tiles,
+  offers, about, statistics, reviews, products, magazine, contact). The hero
+  releases straight into the footer.
+
 ## Access and decisions still needed
 
 | Item | State |

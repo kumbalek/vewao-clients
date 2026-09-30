@@ -85,7 +85,8 @@ test("the mobile header opens a full-screen menu", async ({ page, isMobile }) =>
   test.skip(!isMobile, "mobile layout")
   await page.goto("/cz")
 
-  await expect(page.getByRole("link", { name: "Rezervovat" })).toBeVisible()
+  // The booking bar under the header; the landing hero has its own further down.
+  await expect(page.getByRole("link", { name: "Rezervovat" }).first()).toBeVisible()
   const overflows = await page.evaluate(
     () => document.documentElement.scrollWidth > document.documentElement.clientWidth
   )

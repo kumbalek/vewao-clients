@@ -63,17 +63,29 @@ async function payWithComgate(page: Page) {
   await page.getByRole("link", { name: "Zpět do obchodu" }).click()
 }
 
-test("keeps the Czech homepage and its original branding", async ({
+test("keeps the Czech homepage and the brand's logos", async ({
   page,
 }, testInfo) => {
   await page.goto("/cz")
   await expect(page.locator("html")).toHaveAttribute("lang", "cs")
-  await expect(page.locator('img[src*="logo.webp"]').first()).toBeVisible()
+  // The diamond in the header; the footer keeps the JuditH wordmark.
+  await expect(page.getByRole("banner").locator('img[src="/logo_gold.svg"]')).toBeVisible()
+  await expect(page.getByRole("contentinfo").locator('img[src*="logo.webp"]')).toBeVisible()
   await expect(page.locator("main")).toBeVisible()
   await page.screenshot({
     path: testInfo.outputPath("homepage.png"),
     fullPage: true,
   })
+})
+
+test("checkout shows the diamond logo, leading home", async ({ page }) => {
+  await page.goto("/cz/checkout?step=payment")
+  const logo = page.getByTestId("store-link")
+  await expect(logo).toHaveAttribute("href", "/cz")
+  await expect(logo.getByRole("img", { name: "JuditH – úvodní stránka" })).toHaveAttribute(
+    "src",
+    "/logo_gold.svg"
+  )
 })
 
 test("keeps non-production hosts out of search results", async ({ page }) => {

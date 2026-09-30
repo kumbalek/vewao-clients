@@ -67,7 +67,9 @@ export default function MobileMenu({
         <DialogPanel
           transition
           data-testid="nav-menu-popup"
-          onClick={(event) => {
+          // Capture phase: Next's Link prevents the click's default to navigate
+          // client-side, and Headless UI skips handlers for prevented events.
+          onClickCapture={(event) => {
             if ((event.target as Element).closest("a")) close()
           }}
           onSubmit={close}
@@ -77,11 +79,11 @@ export default function MobileMenu({
           <div className="flex h-16 flex-none items-center justify-between border-b border-line px-6">
             <LocalizedClientLink href="/">
               <Image
-                src="/logo.webp"
+                src="/logo_gold.svg"
                 alt={t("logoAlt")}
-                width={140}
-                height={48}
-                className="h-10 w-auto"
+                width={160}
+                height={202}
+                className="h-11 w-auto"
               />
             </LocalizedClientLink>
             <button
@@ -135,6 +137,11 @@ export default function MobileMenu({
                 <li>
                   <Section title={t("shop")}>
                     <ul>
+                      <li>
+                        <LocalizedClientLink href="/shop" className={subLinkClasses}>
+                          {t("shopHome")}
+                        </LocalizedClientLink>
+                      </li>
                       <li>
                         <LocalizedClientLink href="/store" className={subLinkClasses}>
                           {t("allProducts")}
