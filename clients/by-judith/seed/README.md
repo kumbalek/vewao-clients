@@ -75,25 +75,32 @@ admin → Content → Magazín.
 
 ## Clinic content (Content plugin)
 
-`clinic.json` is a snapshot of bbclinic.cz's O nás page, its team, and the
-**Akupunktura** service as the first procedure category with its procedures and
-FAQ. The other services are deliberately not copied because the new procedures
-will differ. `import-clinic.ts` creates these collections, all editable in admin
+`clinic.json` is a snapshot of bbclinic.cz's O nás page and its team. It also
+holds the **Akupunktura** service as a procedure category with its procedures and
+FAQ, and a **Beauty** category with three services as examples: Modelace rtů,
+Plastická chirurgie and Ultherapy® Prime. The other services are deliberately not
+copied because the new procedures will differ. `import-clinic.ts` creates these collections, all editable in admin
 → Content:
 
 | Collection | Items | Notes |
 | --- | --- | --- |
 | `stranky` (Stránky) | page texts; `o-nas` | Markdown; perex, image, gallery |
 | `tym` (Tým) | team members | plain text bio; role, qualification, photo, monogram letter, order |
-| `kategorie-procedur` | `akupunktura` | Markdown intro plus "## Na co se zaměřujeme?" sections; menu perex, image, order |
-| `procedury` | 5 Akupunktura procedures | Markdown; category (select), price summary, duration, price list, image, booking URL, order |
-| `faq` (Časté dotazy) | 5 questions | plain text answer; category (select), order |
+| `kategorie-procedur` | `akupunktura`, `beauty` | Markdown intro plus "## Na co se zaměřujeme?" sections; menu perex, image, order |
+| `procedury` | 5 Akupunktura and 3 Beauty procedures | Markdown; category (select), card perex, price summary, duration, price list, image, booking URL, order |
+| `faq` (Časté dotazy) | 5 Akupunktura and 2 Plastická chirurgie questions | plain text answer; category (select), procedure (select; empty = whole category), order |
 
 - **Order:** display order is the "Pořadí" field, not creation order.
 - **Price list ("Ceník"):** one row per line, `Název — Cena` (em dash).
 - **New categories:** add the category's slug to the "Kategorie" select in `procedury` and `faq` (collection settings), then pick it on the items.
 - **Unique slugs:** the storefront's detail route finds items by slug across all collections, so slugs must be unique site-wide. Both imports check this before writing.
 - **Kept but unused:** the old site's booking links are stored in `rezervace_url`. The storefront still books via the contact page.
+- **Images in text:** images inside a Markdown body are uploaded with the item, and the body points at the copies.
+- **Beauty sources:**
+  - Prices come from the old Ceník page; rows it hides (Modelace rtů's) are left out.
+  - Plastická chirurgie includes its two sub-procedures (Blefaroplastika, Chirurgická excize) as sections, and their FAQs.
+  - Ultherapy® Prime's content lives in the old page template, not in Sanity. It is converted from `/ultherapy/` (the old menu's `/ultherapy-prime/` link is dead), without the celebrity testimonial.
+  - The Beauty category has no text on the old site.
 - **Not copied:** dates, the service's studio and before/after galleries, and procedure durations (the source has none).
 
 ```sh

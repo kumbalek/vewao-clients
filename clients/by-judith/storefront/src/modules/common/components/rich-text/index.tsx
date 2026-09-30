@@ -12,7 +12,7 @@ const prose = [
   "[&_h3+p]:mt-2",
   "[&_ul]:mt-6 [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:mt-6 [&_ol]:list-decimal [&_ol]:pl-6",
   "[&_blockquote]:mt-6 [&_blockquote]:border-l [&_blockquote]:border-line [&_blockquote]:pl-6",
-  "[&_img]:mt-6 [&_img]:rounded-card",
+  "[&_img]:mt-6 [&_img]:h-auto [&_img]:w-full [&_img]:rounded-card",
 ].join(" ")
 
 /**

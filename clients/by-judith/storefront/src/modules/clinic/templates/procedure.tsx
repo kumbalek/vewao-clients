@@ -1,3 +1,4 @@
+import { clx } from "@medusajs/ui"
 import Image from "next/image"
 import { getTranslations } from "next-intl/server"
 
@@ -25,7 +26,10 @@ export default async function ProcedureTemplate({
   category: ProcedureCategory
 }) {
   const t = await getTranslations("procedures")
-  const [siblings, faq] = await Promise.all([listProcedures(category.slug), listFaq(category.slug)])
+  const [siblings, faq] = await Promise.all([
+    listProcedures(category.slug),
+    listFaq(category.slug, procedure.slug),
+  ])
   const related = siblings.filter((p) => p.slug !== procedure.slug).slice(0, 3)
   const image = contentImage(procedure)
   const prices = parsePriceList(procedure.metadata?.cenik)
@@ -33,6 +37,9 @@ export default async function ProcedureTemplate({
     { label: t("price"), value: procedure.metadata?.cena },
     { label: t("duration"), value: procedure.metadata?.delka },
   ].filter((fact) => fact.value)
+  // A pinned box taller than the screen would hide its lower rows until the
+  // article ends; long price lists scroll with the page instead.
+  const pinBox = prices.length <= 6
 
   return (
     <>
@@ -47,7 +54,10 @@ export default async function ProcedureTemplate({
 
       <Section spacing="md">
         <div className="grid items-start gap-10 small:grid-cols-[3fr_2fr] small:gap-16">
-          <Card tone="outline" className="small:sticky small:top-28 small:order-last">
+          <Card
+            tone="outline"
+            className={clx("small:order-last", pinBox && "small:sticky small:top-28")}
+          >
             <Heading level={1} size="lg">
               {procedure.title}
             </Heading>
@@ -61,8 +71,16 @@ export default async function ProcedureTemplate({
                 ))}
               </dl>
             )}
+            <div className="mt-8 flex flex-col items-center gap-3">
+              <ButtonLink href={bookingPath} size="lg" fullWidth>
+                {t("bookProcedure")}
+              </ButtonLink>
+              <Placeholder compact className="text-sm">
+                {t("voucher")}
+              </Placeholder>
+            </div>
             {prices.length > 0 && (
-              <div className="mt-6">
+              <div className="mt-8">
                 <Heading level={2} size="sm">
                   {t("priceList")}
                 </Heading>
@@ -76,14 +94,6 @@ export default async function ProcedureTemplate({
                 </dl>
               </div>
             )}
-            <div className="mt-8 flex flex-col items-center gap-3">
-              <ButtonLink href={bookingPath} size="lg" fullWidth>
-                {t("bookProcedure")}
-              </ButtonLink>
-              <Placeholder compact className="text-sm">
-                {t("voucher")}
-              </Placeholder>
-            </div>
           </Card>
 
           <div className="flex flex-col gap-10">

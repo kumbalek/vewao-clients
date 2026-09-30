@@ -49,6 +49,8 @@ test("a category lists its procedures, what it treats and its FAQ", async ({ pag
   await expect(faq.getByText("Většinou vůbec ne.")).toBeHidden()
   await faq.getByText("Bolí to?").click()
   await expect(faq.getByText("Většinou vůbec ne.")).toBeVisible()
+  // A question tied to one procedure stays on that procedure's page.
+  await expect(faq.locator("summary")).toHaveText([/^Bolí to\?/])
 })
 
 test("a procedure shows its price list, booking and related procedures", async ({ page }) => {
@@ -65,10 +67,16 @@ test("a procedure shows its price list, booking and related procedures", async (
   await expect(page.getByText("Koupit jako poukaz")).toHaveAttribute("data-placeholder", "")
   await expect(page.getByRole("heading", { level: 2, name: "Přínosy" })).toBeVisible()
 
-  await expect(page.getByTestId("faq")).toContainText("Bolí to?")
+  // The category's questions, then this procedure's own.
+  await expect(page.getByTestId("faq").locator("summary")).toHaveText([/^Bolí to\?/, /^Jak dlouho to trvá\?/])
   const related = page.getByRole("region", { name: "Související procedury" })
   await expect(related.getByTestId("procedure-card")).toHaveCount(1)
   await expect(related).toContainText("Druhá procedura")
+})
+
+test("another procedure shows only the category's questions", async ({ page }) => {
+  await page.goto("/cz/procedury/akupunktura/druha-procedura")
+  await expect(page.getByTestId("faq").locator("summary")).toHaveText([/^Bolí to\?/])
 })
 
 test("unknown categories and procedures outside their category are 404", async ({ page }) => {

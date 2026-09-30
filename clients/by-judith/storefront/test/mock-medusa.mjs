@@ -76,7 +76,10 @@ const clinic = {
     },
     { slug: "cizi-procedura", title: "Cizí procedura", body: "Jinde.", body_html: "<p>Jinde.</p>", metadata: { kategorie: "beauty", poradi: 1 } },
   ],
-  faq: [{ slug: "faq-boli-to", title: "Bolí to?", body: "Většinou vůbec ne.", metadata: { kategorie: "akupunktura", poradi: 1 } }],
+  faq: [
+    { slug: "faq-boli-to", title: "Bolí to?", body: "Většinou vůbec ne.", metadata: { kategorie: "akupunktura", poradi: 1 } },
+    { slug: "faq-testovaci-procedura-jak-dlouho", title: "Jak dlouho to trvá?", body: "Asi hodinu.", metadata: { kategorie: "akupunktura", procedura: "testovaci-procedura", poradi: 2 } },
+  ],
 }
 const contentCollections = { magazin: articles, ...clinic }
 for (const [slug, items] of Object.entries(contentCollections)) {

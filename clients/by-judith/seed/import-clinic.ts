@@ -9,6 +9,7 @@ import type { ClinicSnapshot } from "./extract-clinic.ts"
  * procedure categories, procedures and FAQ. Additive and idempotent: an item
  * whose slug exists is left alone so admin edits survive. published_at stays
  * empty. Display order comes from the "poradi" field, not creation order.
+ * Images inside a Markdown body are uploaded too and the body points at them.
  */
 
 const snapshot = JSON.parse(
@@ -74,18 +75,40 @@ const FAQ: CollectionDef = {
   label: "Časté dotazy",
   slug: "faq",
   format: "text",
-  fields: [category, order],
+  fields: [
+    category,
+    {
+      name: "procedura",
+      label: "Procedura (prázdné = celá kategorie)",
+      field_type: "select",
+      options: { values: snapshot.procedures.map((p) => p.slug) },
+    },
+    order,
+  ],
 }
 
 const content = connect()
 
 type Item = { slug: string; title: string; body: string }
+type Upload = (image: SnapshotImage, name: string) => Promise<string>
+
+/** Upload the images a Markdown body references and point it at the copies. */
+async function withUploadedImages(markdown: string, name: string, upload: Upload): Promise<string> {
+  let result = markdown
+  let index = 0
+  for (const [, alt, url] of markdown.matchAll(/!\[([^\]]*)\]\((https?:\/\/[^)\s]+)\)/g)) {
+    index += 1
+    const copy = await upload({ url, alt: alt || null, width: null, height: null }, `${name}-obrazek-${index}`)
+    result = result.replace(`](${url})`, `](${copy})`)
+  }
+  return result
+}
 
 /** Create the collection's missing items; images upload only for new items. */
 async function importItems<T extends Item>(
   def: CollectionDef,
   items: T[],
-  metadata: (item: T, upload: (image: SnapshotImage, name: string) => Promise<string>) => Promise<object>
+  metadata: (item: T, upload: Upload) => Promise<object>
 ) {
   const collectionId = await content.ensureCollection(def)
   const existing = await content.itemSlugs(collectionId)
@@ -97,22 +120,19 @@ async function importItems<T extends Item>(
       log("exists", `${def.slug}/${item.slug}`)
       continue
     }
-    const upload = (image: SnapshotImage, name: string) => content.upload(collectionId, image, name)
+    const upload: Upload = (image, name) => content.upload(collectionId, image, name)
+    const body = def.format === "md" ? await withUploadedImages(item.body, item.slug, upload) : item.body
     await content.createItem(collectionId, {
       title: item.title,
       slug: item.slug,
-      body: item.body || null,
+      body: body || null,
       metadata: await metadata(item, upload),
     })
     log("created", `${def.slug}/${item.slug}`)
   }
 }
 
-const imageFields = async (
-  picture: SnapshotImage | null,
-  name: string,
-  upload: (image: SnapshotImage, name: string) => Promise<string>
-) => ({
+const imageFields = async (picture: SnapshotImage | null, name: string, upload: Upload) => ({
   image: picture ? await upload(picture, name) : null,
   image_alt: picture?.alt ?? null,
   image_width: picture?.width ?? null,
@@ -156,7 +176,7 @@ async function main() {
 
   await importItems(PROCEDURES, snapshot.procedures, async (procedure, upload) => ({
     kategorie: procedure.category,
-    perex: null,
+    perex: procedure.perex,
     cena: procedure.price,
     delka: null,
     cenik: procedure.price_list.map((row) => `${row.title} — ${row.price}`).join("\n") || null,
@@ -168,6 +188,7 @@ async function main() {
 
   await importItems(FAQ, snapshot.faq, async (question) => ({
     kategorie: question.category,
+    procedura: question.procedure,
     poradi: question.order,
   }))
 

@@ -1,6 +1,6 @@
 {
   "source": "https://www.bbclinic.cz",
-  "extracted_at": "2026-09-28",
+  "extracted_at": "2026-09-30",
   "pages": [
     {
       "slug": "o-nas",
@@ -125,6 +125,14 @@
       },
       "order": 1,
       "source_url": "https://www.bbclinic.cz/tradicni-cinska-medicina/"
+    },
+    {
+      "slug": "beauty",
+      "title": "Beauty",
+      "body": "",
+      "image": null,
+      "order": 2,
+      "source_url": null
     }
   ],
   "procedures": [
@@ -133,6 +141,7 @@
       "title": "Diagnostika Judity Halvové",
       "category": "akupunktura",
       "body": "Základem úspěšné léčby a řešení zdravotních potíží je přesná diagnostika. Ta se v TCM provádí jednak pomocí dotazování, odebráním pulzu a dále se stanovuje dle obrazu jazyka. Ten je totiž podle mistrů čínské medicíny obrazem stavu našeho zdraví.\n\nDiagnostiku na naší klinice provádí paní majitelka Judita, která během buď osobního nebo online rozhovoru rozklíčuje příčinu vašich problémů. Následně navrhne dle svých zkušeností a vašich možností postup léčby, kterou buď absolvujete přímo u ní nebo u kolegyň, které pracují dle jejího osvědčeného postupu.",
+      "perex": null,
       "price": null,
       "price_list": [
         {
@@ -155,6 +164,7 @@
       "title": "Fytoterapie",
       "category": "akupunktura",
       "body": "Fytoterapie neboli léčba bylinnými odvary je stěžejním prvkem pro léčbu nemocí a harmonizaci organismu. Ty jsou předepisovány každému klientovi na míru dle diagnostiky TCM. Odvary které předepisuje Judita Halvová vycházejí z originálních čínských receptur a kombinují v sobě původní čínské byliny, které jsou zpracovávány v certifikovaném centru.",
+      "perex": null,
       "price": "Cena bylinných odvarů je individuální.",
       "price_list": [],
       "image": {
@@ -172,6 +182,7 @@
       "title": "Akupunktura, Aurikuloterapie",
       "category": "akupunktura",
       "body": "Stejně jako byliny je akupunktura považována za základní pilíř při léčbě dle tradiční čínské medicíny. Jehličky tenké jako lidský vlas se aplikují do přesných bodů meridiánových drah, kde vznikají blokády, které způsobují zdravotní potíže. V případě chronických zdravotních potíží je doporučovaná aplikace nejprve v intenzivnější kůře, posléze dochází klient na tzv. balanční či udržovací akupunkturu po delším čase. Klientům nabízíme buď možnost terapeuta na úrovni **master**, kdy je ošetřován přímo paní Halvovou nebo nabízíme možnost **senior** či **junior** **terapeuta**, který provádí akupunkturu dle doporučení paní majitelky. Součástí terapie je provádění moxování, použití laseru či aurikuloterapie zdarma, dle druhu onemocnění.",
+      "perex": null,
       "price": null,
       "price_list": [
         {
@@ -198,6 +209,7 @@
       "title": "Permanentní akupunktura",
       "category": "akupunktura",
       "body": "Řešením pro zaneprázdnění klienty či klienty, kteří k nám dojíždí z velké dálky nabízí spolu s užíváním odvarů i tzv. permanentní akupunktura. Jedná se o aplikaci malinkých nitek ze zdravotnického materiálů, do bodů v těle, kde působí intenzivně po dobu 60 dnů, než se vstřebají do těla. Jedná se o bezpečný, inovativní způsob, jak odstranit z těla dlouhodobé blokády.",
+      "perex": null,
       "price": "od 10.000 Kč",
       "price_list": [],
       "image": null,
@@ -210,12 +222,141 @@
       "title": "Hubnoucí permanentní akupunktura",
       "category": "akupunktura",
       "body": "Jedná se o metodu, kdy se pod kůži aplikují malé nitky, do bodů, které jsou podle TCM vhodné ke zrychlení metabolismu a k omezení pocitu hladu. Intenzivní stimulací těchto bodů po dobu cca 2 měsíců, než dojde k přirozenému vstřebání biologického materiálu, dochází k žádoucímu úbytku váhy. Součástí této jedinečné hubnoucí procedury je i přesná diagnostika tělesného složení pomocí přístroje InBody a doporučení stravovacích návyků dle čínské dietetiky.",
+      "perex": null,
       "price": "20.000 Kč",
       "price_list": [],
       "image": null,
       "booking_url": "https://www.bbclinic.cz/konzultace/",
       "order": 5,
       "source_url": "https://www.bbclinic.cz/tradicni-cinska-medicina/"
+    },
+    {
+      "slug": "modelace-rtu",
+      "title": "Modelace rtů",
+      "category": "beauty",
+      "body": "Aplikací kyseliny hyaluronové se vyplní mezibuněčné prostory a tím dochází k zvětšení a modelaci tvaru rtů. Kyselina hyaluronová se aplikuje v malém množství drobnou jehlou nebo kanylou. Před aplikací lze oblast ošetřit znecitlivujícím gelem. Efekt po aplikaci nastává prakticky okamžitě.\n\nKaždá klientka má o výsledném efektu svoji představu, kterou se lékař snaží vždy naplnit. Klientce je individuálně doporučen použitý materiál. Mezi naše oblíbené dodavatele patří německá firma Merz Aestetics, výrobce nejkvalitnějších materiálů Etermis nebo Belotero,nebo kvalitní švýcarské výplně Neuvia.",
+      "perex": null,
+      "price": null,
+      "price_list": [],
+      "image": {
+        "url": "https://cdn.sanity.io/images/sfqldr6j/production/e7ae634777d8f3f3e1c3cddfedf7608d6196aa3d-3909x2449.jpg",
+        "alt": "krásné rty",
+        "width": 3909,
+        "height": 2449
+      },
+      "booking_url": null,
+      "order": 1,
+      "source_url": "https://www.bbclinic.cz/modelace-rtu/"
+    },
+    {
+      "slug": "plasticka-chirurgie",
+      "title": "Plastická chirurgie",
+      "category": "beauty",
+      "body": "S prvními zmínkami o oboru plastická chirurgie se můžeme setkat již v opisu ze Staroegyptské říše, kdy byla provedena první oprava zlomeného nosu. Také starořímští lékaři prováděli první opravy například uší. Za otce moderní plastické chirurgie je považován Harold Gillies, který prováděl první rekonstrukce obličeje vojákům zraněným za 1.světové války. V dnešní době se s plastickou chirurgií setkáváme jako s metodou opravování a tvarování lidského těla buď po úrazech, popáleninách nebo vážných onkologických operacích či z kosmetických důvodů.\n\nAť už se rozhodnete pro zákrok z estetických či zdravotních důvodů, vždy by jej měl provádět atestovaný zkušený odborník, který s vámi vše do detailu probere, odpoví na všechny vaše dotazy, upozorní na možná rizika či komplikace a upřesní všechny vaše očekávání tak, aby výsledný efekt byl ke spokojenosti jak vaší, tak operatérovy. Přesně takový přístup propaguje MUDr. Boris Jegorov, lékař plastické chirurgie, který u nás provádí blefaroplastika horních víček a chirurgické excize patologických útvarů, znamének či odstraňování špatně zhojených jizev. Na konzultaci, která vám bude v případě zákroku odečtena, se můžete objednat zde.\n\n## Blefaroplastika\n\n![Blefaroplastika](https://cdn.sanity.io/images/sfqldr6j/production/79414479b036bfcacd396f8c324b73301d21feaa-2867x1911.jpg)\n\nPřipadá vám váš výraz v zrcadle v poslední době unavený, i přesto, že jste dobře vyspalí máte pocit těžkých víček? Pak blefaroplastika může být to to správné řešení právě pro vás.\n\nJedná se o plastickou operaci, při které je odstraněna přebytečná kůže z horních víček, která postupem času ztrácí na elasticitě. Kůže kolem očí je velice jemná a tenká, proto je na ní velice rychle znát sebemenší únava. Vznikají nevzhledné převisy, samotný pokles víčka (ptóza) a zvýrazňují se jemné linky kolem očí. Samotnému zákroku předchází podrobná konzultace s operatérem, atestovaným plastickým chirurgem MUDr. Borisem Jegorovem, který s vámi probere vhodnost tohoto výkonu, vysvětlí postup co vás během operace čeká, upozorní na detaily pozákrokové péče a pokud se shodnete, vyberete vhodné datum pro výkon. Konzultace je zpoplatněna, částka se vám v případě provedení ošetření odečte.\n\n## Chirurgická excize\n\n![Chirurgická excize](https://cdn.sanity.io/images/sfqldr6j/production/19c40a2338edde256b97e469bb44db69658d7dd8-5713x3809.jpg)\n\nPokud vás trápí na těle znaménka či kožní útvary, popřípadě vám dermatolog navrhnul odstranění a následné histologické vyšetření, ale bojíte se jizev či špatného hojení, doporučujeme odstranit tyto útvary mimo klasické chirurgické ambulance, kde se na výslednou estetickou stránku příliš nedbá. Z toho důvodu nabízíme možnost svěřit se do péče MUDr. Borise Jegorova, atestovaného plastického chirurga. Pan doktor s vámi nejdříve pečlivě zkonzultuje postup, samotný výkon v lokální anestezii provede tak, aby minimalizoval velikost řezu a tím vznik minimalizoval trvalé poškození. Samozřejmostí pro nás je soukromí privátní kliniky, naprostá sterilita na sále, zajištění histologického vyšetření, doporučení nejefektevnější pozákrokové péče a případná online pooperační konzultace mimo pracovní hodiny pro váš klid a pohodlí.",
+      "perex": "Ať už se rozhodnete pro zákrok z estetických či zdravotních důvodů, vždy by jej měl provádět atestovaný zkušený odborník, který s vámi vše do detailu probere, odpoví na všechny vaše dotazy, upozorní na možná rizika či komplikace a upřesní všechny vaše očekávání tak, aby výsledný efekt byl ke spokojenosti jak vaší, tak operatérovy. Přesně takový přístup propaguje MUDr. Boris Jegorov, lékař plastické chirurgie, který u nás provádí blefaroplastika horních víček a chirurgické excize patologických útvarů, znamének či odstraňování špatně zhojených jizev.",
+      "price": null,
+      "price_list": [
+        {
+          "title": "Blefaroplastika – Standardní cena",
+          "price": "17.000 Kč"
+        },
+        {
+          "title": "Chirurgická excize",
+          "price": "od 2.500 Kč | dle rozsahu"
+        }
+      ],
+      "image": {
+        "url": "https://cdn.sanity.io/images/sfqldr6j/production/3e0c125dec874a93a95fabbd9e0d9d883306ff4a-1667x2500.jpg",
+        "alt": "Plastická chirurgie",
+        "width": 1667,
+        "height": 2500
+      },
+      "booking_url": "https://shop.bbclinic.cz/p/osobni-konzultace-s-mudr-jegorovem",
+      "order": 2,
+      "source_url": "https://www.bbclinic.cz/plasticka-chirurgie/"
+    },
+    {
+      "slug": "ultherapy-prime",
+      "title": "Ultherapy® Prime",
+      "category": "beauty",
+      "body": "## Ultherapy® Prime: Budoucnost liftingu bez skalpelu!\n\n### Zastavte čas s nejpřesnější a nejbezpečnější technologií současnosti.\n\nObjevte Ultherapy® Prime – jediné neinvazivní ošetření s FDA certifikací, které díky cílenému působení mikro fokusovaného ultrazvuku viditelně zpevňuje a pozvedá pleť tak, jak to bylo dříve možné jen chirurgicky.\n\nUltherapy® je již léta zlatým standardem v estetické medicíně. Verze Prime však posouvá hranice ještě dál. Je to inteligentnější, rychlejší a komfortnější cesta k omlazení, která nevyžaduje ani jeden řez, vpich, žádnou narkózu a nulový čas na zotavenou.\n\n## Proč zvolit právě Ultherapy® Prime?\n\n![Ultherapy Prime technologie](https://www.bbclinic.cz/static/ultherapy_3-6f1f25d13b23d6a3f21504ee49360d06.jpg)\n\n- **Chirurgická hloubka bez skalpelu**: Jako jediná technologie na světě působí Ultherapy Prime v hloubce až 4,5 mm – tedy přímo v tkáňové vrstvě SMAS, se kterou pracují plastičtí chirurgové při klasickém faceliftu.\n- **Ultrazvukové „oči\" pro vaši bezpečnost**: Díky unikátní technologii DeepSEE™ vidíme pod vaši kůži v reálném čase. Každý impulz energie cílíme s chirurgickou přesností tam, kde přinese největší efekt, a vyhýbáme se kosti či cévám.\n- **Aktivace vlastního mládí**: Nejde o výplň ani cizorodou látku. Ultherapy Prime „restartuje\" vaše buňky. Masivní produkce nového kolagenu zajistí, že výsledek je přirozený a váš obličej neztrácí svou mimiku.\n- **Jedno ošetření, dlouhotrvající efekt**: Na rozdíl od jiných metod stačí u Ultherapy Prime obvykle pouze jedna návštěva. Výsledky se postupně vyvíjejí a gradují v průběhu 2–3 měsíců, přičemž efekt přetrvává rok i déle.\n- **Maximální komfort (Nová generace 2026)**: Verze Prime byla navržena tak, aby byl zákrok rychlejší a pocitově příjemnější. Žádná omezení po ošetření – z kliniky můžete jít rovnou na pracovní schůzku nebo na večeři.\n\n## Jaké oblasti dokáže Ultherapy Prime ošetřit?\n\n- **Lower Face**: Zpevnění povislých tváří a vyrýsování linie dolní čelisti\n- **Brow Lift**: Přirozený lifting obočí a vyhlazení vrásek kolem očí\n- **Facelift**: Efektivní zpevnění tváří, vyrýsování čelisti, eliminace podbradku. Kompletní ošetření obličeje.\n- **Neck Lift**: Vyhlazení vějířkovitých vrásek v oblasti krku a hrudníku.\n- **Chin Lift**: Zpevnění podbradku a vyrýsování kontur brady.\n\n![Oblasti ošetření Ultherapy Prime](https://www.bbclinic.cz/static/ultherapy_2-902342c503c8407c8af73b8e5dc3499b.jpg)\n\n## Pro koho je ošetření ideální?\n\nUltherapy Prime je perfektní volbou pro muže i ženy, kteří pozorují první známky povadlosti pleti, ale nejsou připraveni na operaci, nebo pro ty, kteří chtějí proces stárnutí proaktivně a diskrétně zpomalit.\n\nFakta místo slibů:\n\nUltherapy Prime má za sebou více než 50 klinických studií a miliony spokojených pacientů po celém světě, což z ní dělá nejbezpečnější volbu na trhu.\n\n## Historie Ultherapy\n\nHistorie Ultherapy je fascinujícím příběhem o tom, jak se technologie původně určená k diagnostice proměnila v nejúčinnější neinvazivní „skalpel\" v estetické medicíně.\n\n- **Před rokem 2004**: Koncept HIFU (High-Intensity Focused Ultrasound) byl původně vyvíjen pro léčbu nádorů. Vědci ze společnosti Ulthera, Inc. si uvědomili, že přesně kalibrovaná energie může místo destrukce vyvolat v kůži řízenou regeneraci.\n- **2009 – Revoluční rok**: Ultherapy se stala prvním a jediným přístrojem na světě, který získal prestižní americkou certifikaci FDA pro neinvazivní lifting obočí. Jako první směla oficiálně používat slovo „lifting\".\n- **2012 – 2014**: Ultherapy získala schválení FDA pro lifting kůže na krku, podbradku a pro vyhlazení vrásek v oblasti dekoltu. Německá firma Merz Aesthetics akvírovala Ulthera, Inc. za přibližně 600 milionů dolarů.\n- **HIFU fenomén**: Díky úspěchu Ultherapy se trh zaplavil levnými kopiemi z Asie. Ultherapy však zůstává jediným systémem kombinujícím léčebný ultrazvuk se zobrazovacím (DeepSEE™) – lékař vidí na monitoru přesně kam střílí.\n- **2024 – 2026 – Ultherapy Prime**: Největší technologická modernizace v historii značky. Ošetření je o 20 % rychlejší, komfortnější díky pokročilejším algoritmům přenosu energie. K roku 2026 provedeno více než 2,5 milionu ošetření po celém světě.\n\nHistorie Ultherapy dokazuje, že nejde o „módní výstřelek\", ale o technologii prověřenou více než 15 lety klinických studií. Zatímco jiné metody přicházejí a odcházejí, Ultherapy zůstává pro rok 2026 měřítkem, ke kterému se všechny ostatní neinvazivní liftingy přirovnávají.",
+      "perex": "Zastavte čas s nejpřesnější a nejbezpečnější technologií současnosti.",
+      "price": null,
+      "price_list": [
+        {
+          "title": "Brow lift",
+          "price": "6.000 Kč"
+        },
+        {
+          "title": "Brow lift a oční okolí",
+          "price": "12.000 Kč"
+        },
+        {
+          "title": "Lower face",
+          "price": "22.000 Kč"
+        },
+        {
+          "title": "Horní část krku/podbradek",
+          "price": "15.000 Kč"
+        },
+        {
+          "title": "Facelift (tváře+horní čast krku/podbradek)",
+          "price": "35.000 Kč"
+        },
+        {
+          "title": "Full facelift ( facelift s browliftem)",
+          "price": "40.000 Kč"
+        },
+        {
+          "title": "Krk",
+          "price": "15.000 Kč"
+        },
+        {
+          "title": "Dekolt",
+          "price": "17.000 Kč"
+        },
+        {
+          "title": "Ultherapy® Prime Plus – Brow lift PLUS",
+          "price": "9.000 Kč"
+        },
+        {
+          "title": "Ultherapy® Prime Plus – BROW lift  a oční okolí PLUS",
+          "price": "18.000 Kč"
+        },
+        {
+          "title": "Ultherapy® Prime Plus – Lower face PLUS",
+          "price": "38.000 Kč"
+        },
+        {
+          "title": "Ultherapy® Prime Plus – Horní část krku/podbradek PLUS",
+          "price": "24.000 Kč"
+        },
+        {
+          "title": "Ultherapy® Prime Plus – Facelift  PLUS (lower face+horní část krku/podbradek)",
+          "price": "50.000 Kč"
+        },
+        {
+          "title": "Ultherapy® Prime Plus – Full Facelift PLUS",
+          "price": "55.000 Kč"
+        },
+        {
+          "title": "Ultherapy® Prime Plus – Krk PLUS",
+          "price": "22.000 Kč"
+        },
+        {
+          "title": "Ultherapy® Prime Plus – Dekolt PLUS",
+          "price": "24.000 Kč"
+        }
+      ],
+      "image": {
+        "url": "https://www.bbclinic.cz/static/ultherapy_1-f5befbc3a2001502bd7248f646965d27.jpg",
+        "alt": "Ultherapy Prime ošetření",
+        "width": null,
+        "height": null
+      },
+      "booking_url": null,
+      "order": 3,
+      "source_url": "https://www.bbclinic.cz/ultherapy/"
     }
   ],
   "faq": [
@@ -224,6 +365,7 @@
       "title": "Bolí akupunktura?",
       "body": "Při akupunktuře se aplikují jehličky o síle lidského vlasu, není třeba se obávat bolesti. Někdo necítí vůbec nic, někteří klienti cítí mírné mravenčení či lehké píchnutí. Akupunktura je pro většinu klientů nebolestivá relaxační metoda při které není problém usnout.",
       "category": "akupunktura",
+      "procedure": null,
       "order": 1
     },
     {
@@ -231,6 +373,7 @@
       "title": "Je akupunktura bezpečná?",
       "body": "Z rukou našich terapeutů ano. Všichni jsou absolventy škol TCM a nejedná se o žádné kurzisty. Používáme sterilně balené jehličky, které jsou jednorázové. Velmi dbáme na bezpečnost a sterilní prostředí.",
       "category": "akupunktura",
+      "procedure": null,
       "order": 2
     },
     {
@@ -238,6 +381,7 @@
       "title": "Je důležitá fytoterapie?",
       "body": "Ano, je jedním ze základních stavebních kamenů TCM a spolu s akupunkturou jsou klíčem k uzdravení. V některých případech je fytoterapie samostatně dostatečná pro výrazný ústup nemoci.",
       "category": "akupunktura",
+      "procedure": null,
       "order": 3
     },
     {
@@ -245,6 +389,7 @@
       "title": "Kolik ošetření je zapotřebí?",
       "body": "Tato odpověď je velice individuální, obecně lze říci, že u chronických onemocnění doporučujeme pět po týdnu následujících aplikací akupunktury a posléze udržovací méně častější návštěvy. U akutních potíží dochází k úlevě po cca třetí aplikaci.",
       "category": "akupunktura",
+      "procedure": null,
       "order": 4
     },
     {
@@ -252,7 +397,24 @@
       "title": "Je akupunktura či fytoterapie vhodná pro děti?",
       "body": "Na dětskou akupunkturu se používají speciální kratší jehličky. Dítě vpich v podstatě necítí a můžeme říci, že dětský organismus reaguje velice rychle zlepšením, proto není zapotřebí tolik opakování jako u dospělých klientů. Odvary či bylinné tablety jsou individuální kvůli schopnosti dítěte je polknout, ale od 3 let věku při upraveném dávkování nevadí.",
       "category": "akupunktura",
+      "procedure": null,
       "order": 5
+    },
+    {
+      "slug": "faq-plasticka-chirurgie-prubeh-operace",
+      "title": "Průběh operace",
+      "body": "Jedná se o výkon v lokální anestezii, kdy je celá oblast znecitlivěná, tím pádem se nemusíte bát žádné bolesti. Následně se skalpelem odstraňuje přebytečná kůže podle předchozího nákresu. Speciální podkožní steh umístění řezu v záhybu zaručí, že jizvička nebude po zhojení vidět. Celý výkon trvá přibližně 60 minut. Poté je oblast přelepena sterilními náplastmi, které se ponechávají až do vytažení stehů, které je cca týden po výkonu.",
+      "category": "beauty",
+      "procedure": "plasticka-chirurgie",
+      "order": 1
+    },
+    {
+      "slug": "faq-plasticka-chirurgie-rekonvalescence",
+      "title": "Rekonvalescence",
+      "body": "Po důkladném poučení o rekonvalescenci odcházíte v doprovodu blízké osoby domů. Zde si připravte chladící polštářky a počítejte s klidovým režimem cca 5 až 7 dní. Zamezí se tak vzniku otoků či modřin. V případě, že vám nebude cokoliv jasné,  máte k dispozici kontakt na managerku kliniky, která kdykoliv odpoví popř. zajistí odbornou konzultaci s lékařem i mimo pracovní dobu. Po odstranění stehů můžete okolí ošetřovat krémy proti vzniku jizev, vhodné je promazávání neparfémovanými produkty. Již v tento okamžik uvidíte první změnu vzhledu, kdy se výsledný efekt ustálý cca po 12 týdnech od zákroku. Po celou dobu hojení je nutné chránit oční okolí před silným slunečním zářením a vyhnout se intenzivní fyzické zátěži po dobu cca 4 týdnů aby nedošlo k rozestupu jizvy. O dalších podrobných krocích péče budete informováni lékařem osobně. Jak po estetické tak zdravotní stránce budete velmi překvapeni tím, jak rychle se uleví unaveným očím a váš pohled získá znovu na svěžím půvabu.",
+      "category": "beauty",
+      "procedure": "plasticka-chirurgie",
+      "order": 2
     }
   ]
 }

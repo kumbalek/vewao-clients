@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server"
 import { listFaq, listProcedures, type ProcedureCategory } from "@lib/data/clinic"
 import { contentImage } from "@lib/data/content"
 import { splitAtFirstHeading } from "@lib/util/clinic"
+import { Placeholder } from "@modules/common/components/placeholder"
 import { RichText } from "@modules/common/components/rich-text"
 import { Heading, MediaFrame, Section, Text } from "@modules/design-system"
 import FaqList from "@modules/clinic/components/faq-list"
@@ -27,7 +28,13 @@ export default async function ProcedureCategoryTemplate({ category }: { category
             <Heading level={1} size="display">
               {category.title}
             </Heading>
-            {intro && <RichText html={intro} className="mt-6" />}
+            {intro.trim() ? (
+              <RichText html={intro} className="mt-6" />
+            ) : (
+              <Text className="mt-6">
+                <Placeholder>úvod kategorie</Placeholder>
+              </Text>
+            )}
           </div>
           {image && (
             <MediaFrame ratio="portrait" className="mx-auto max-w-md">

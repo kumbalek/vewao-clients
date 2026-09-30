@@ -59,12 +59,16 @@ kept. The owner chose to build in steps:
   from the Content plugin. The content was copied from bbclinic.cz with
   `seed/import-clinic.ts` (see `seed/README.md`): O nás, 7 team members, and the
   Akupunktura service as the first category with 5 procedures and 5 FAQ.
+  Added 2026-09-30: a Beauty category with Modelace rtů, Plastická chirurgie
+  and Ultherapy® Prime, and FAQs that can belong to one procedure.
   Imported on local and dev. Marked `[doplnit]` until supplied: category menu
   perex, procedure benefits/steps/therapist, vouchers. Not built: reviews
   (needs C4 authenticity handling) and "Rezervovat u" per team member.
   Procedure prices were copied as the old site shows them, including "Akce …
   místo …" wording; the merchant should confirm them and how such claims apply
-  to services.
+  to services. The Ultherapy text repeats manufacturer claims ("jediné …
+  s FDA certifikací", "nejbezpečnější volba na trhu"); these also need the
+  merchant's review.
 - "Rezervovat" links to `/content/contact` until a booking provider is chosen.
 - Missing content is marked `[doplnit]` in `storefront/src/content/site.ts`:
   procedures, category texts, brand text, social links, newsletter, cookies

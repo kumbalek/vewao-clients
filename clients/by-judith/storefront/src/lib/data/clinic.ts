@@ -33,7 +33,7 @@ export type Procedure = ContentItem<
       rezervace_url?: string | null
     }
 >
-export type Faq = ContentItem<Ordered & { kategorie?: string | null }>
+export type Faq = ContentItem<Ordered & { kategorie?: string | null; procedura?: string | null }>
 
 type Meta<T extends ContentItem<object>> = NonNullable<T["metadata"]>
 
@@ -57,9 +57,17 @@ export const listProcedures = async (category: string) =>
 
 export const getProcedure = (slug: string) => getContentItem<Meta<Procedure>>("procedury", slug)
 
-export const listFaq = async (category: string) =>
+/**
+ * A category's questions. Without a procedure: only those for the whole
+ * category; with one: those plus the procedure's own.
+ */
+export const listFaq = async (category: string, procedure?: string) =>
   byOrder(
-    (await listContentItems<Meta<Faq>>("faq")).filter((f) => f.metadata?.kategorie === category)
+    (await listContentItems<Meta<Faq>>("faq")).filter(
+      (f) =>
+        f.metadata?.kategorie === category &&
+        (!f.metadata?.procedura || f.metadata.procedura === procedure)
+    )
   )
 
 export const procedureHref = (procedure: Procedure) =>

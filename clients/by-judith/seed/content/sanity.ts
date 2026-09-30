@@ -11,7 +11,8 @@ const SANITY_IMAGES = "https://cdn.sanity.io/images/sfqldr6j/production"
 export const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
 export type SanityImage = { alt?: string | null; asset?: { _id: string } | null }
-export type SnapshotImage = { url: string; alt: string | null; width: number; height: number }
+/** Dimensions are unknown for images that come from rendered pages. */
+export type SnapshotImage = { url: string; alt: string | null; width: number | null; height: number | null }
 
 async function get(url: string): Promise<Response> {
   const response = await fetch(url)
