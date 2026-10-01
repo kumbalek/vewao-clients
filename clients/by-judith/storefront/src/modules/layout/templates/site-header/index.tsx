@@ -16,6 +16,7 @@ import { ButtonLink, Container } from "@modules/design-system"
 import { PhoneIcon } from "@modules/design-system/components/icons"
 import CartDropdown from "@modules/layout/components/cart-dropdown"
 import HeaderMenu from "@modules/layout/components/header-menu"
+import HeaderShell from "@modules/layout/components/header-shell"
 import {
   ProceduresPanel,
   ShopPanel,
@@ -25,12 +26,21 @@ import MobileMenu from "@modules/layout/components/mobile-menu"
 import SearchForm from "@modules/layout/components/search-form"
 
 const linkClasses =
-  "text-sm text-ink transition-colors duration-150 hover:text-ink-subtle focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink"
+  "text-sm text-ink transition-colors duration-150 hover:text-ink-subtle focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink overlay:text-white overlay:hover:text-white/80 overlay:focus-visible:outline-white"
+
+/** The booking button turns white over a dark hero. */
+const bookOverlayClasses =
+  "overlay:bg-white overlay:text-ink overlay:hover:bg-surface-hover overlay:focus-visible:outline-white"
 
 /**
  * Global header (wireframe 00 · A/B). The full desktop bar needs about 1 200px,
  * so it starts at `medium` (1280px); narrower screens get the menu button,
  * centred logo and cart, with "Rezervovat" below the bar.
+ *
+ * Over a dark hero the header and booking bar are transparent with light text
+ * (the `overlay:` variant, see HeaderShell). The hero then starts under them:
+ * 114px on `medium` (service bar 33 + bar 81), 129px below it (bar 65 +
+ * booking bar 64).
  */
 export default function SiteHeader({
   countryCode,
@@ -47,7 +57,7 @@ export default function SiteHeader({
   const cartCount = cart?.items?.reduce((sum, item) => sum + item.quantity, 0) ?? 0
 
   return (
-    <>
+    <HeaderShell>
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[70] focus:rounded-full focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:outline focus:outline-2 focus:outline-ink"
@@ -56,11 +66,11 @@ export default function SiteHeader({
       </a>
 
       {/* The service bar (2rem + its 1px border) scrolls away; the main bar stays pinned. */}
-      <header className="sticky top-0 z-50 border-b border-line bg-white medium:-top-[33px]">
-        <div className="hidden border-b border-line bg-surface medium:block">
+      <header className="sticky top-0 z-50 border-b border-line bg-white transition-colors duration-300 medium:-top-[33px] overlay:border-transparent overlay:bg-transparent">
+        <div className="hidden border-b border-line bg-surface transition-colors duration-300 medium:block overlay:border-transparent overlay:bg-transparent">
           <Container
             width="page"
-            className="flex h-8 items-center justify-end gap-3 text-xs text-ink-subtle"
+            className="flex h-8 items-center justify-end gap-3 text-xs text-ink-subtle overlay:text-white/85"
           >
             <span data-testid="free-delivery-note">
               {t("freeDelivery", {
@@ -70,7 +80,7 @@ export default function SiteHeader({
             <span aria-hidden="true">·</span>
             <a
               href={contact.phone.href}
-              className="flex items-center gap-1 hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-ink"
+              className="flex items-center gap-1 hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-ink overlay:hover:text-white overlay:focus-visible:outline-white"
             >
               <PhoneIcon size={14} />
               {contact.phone.label}
@@ -119,7 +129,7 @@ export default function SiteHeader({
           <LocalizedClientLink
             href="/"
             data-testid="nav-store-link"
-            className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink"
+            className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink overlay:focus-visible:outline-white"
           >
             <Image
               src="/logo_gold.svg"
@@ -134,18 +144,23 @@ export default function SiteHeader({
           <div className="flex h-full items-center justify-end gap-5">
             <SearchForm countryCode={countryCode} className="hidden w-48 medium:flex" />
             <CartDropdown cart={cart} />
-            <ButtonLink href={bookingPath} className="hidden medium:inline-flex">
+            <ButtonLink href={bookingPath} className={`hidden medium:inline-flex ${bookOverlayClasses}`}>
               {t("book")}
             </ButtonLink>
           </div>
         </Container>
       </header>
 
-      <Container className="py-3 medium:hidden">
-        <ButtonLink href={bookingPath} fullWidth className="mx-auto flex max-w-md">
+      {/* Positioned so a hero pulled up under it does not cover it. */}
+      <Container className="relative z-40 py-3 medium:hidden">
+        <ButtonLink
+          href={bookingPath}
+          fullWidth
+          className={`mx-auto flex max-w-md ${bookOverlayClasses}`}
+        >
           {t("book")}
         </ButtonLink>
       </Container>
-    </>
+    </HeaderShell>
   )
 }

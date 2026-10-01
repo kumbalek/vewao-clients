@@ -60,8 +60,8 @@ const EXIT_RANGE = 0.3
  * One pass over the claims: which one is nearest the trigger line, and how far
  * each sits from it as a fraction of the stage height.
  *
- * Measured against the stage rather than the viewport, because the stage sits
- * below the sticky site header. Shared rather than inlined so the read that
+ * Measured against the stage rather than the viewport, so the choreography
+ * holds whatever the stage's size. Shared rather than inlined so the read that
  * decides where the sequence opens and the read the loop does every frame can
  * never disagree about which beat the page is on.
  */

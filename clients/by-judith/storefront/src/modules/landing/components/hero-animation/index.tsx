@@ -22,13 +22,20 @@ import { useFrameSequence } from "./use-frame-sequence"
 import { readBeats, useHeroMotion } from "./use-hero-motion"
 
 /**
- * The stage fills the viewport below the sticky site header: 64px bar plus its
- * border, and on `medium` the 80px bar once the service bar has scrolled away
- * (see layout/templates/site-header). `--stage` is the height everything in
- * the choreography is measured in.
+ * The hero starts at the top of the page, under the site header and mobile
+ * booking bar, which turn transparent over it (`data-header-overlay`, see
+ * layout/templates/site-header for the heights). The stage fills the viewport;
+ * `--stage` is the height everything in the choreography is measured in.
  */
-const stageVars =
-  "[--site-header:65px] medium:[--site-header:81px] [--stage:calc(100svh_-_var(--site-header))]"
+const underHeader = "-mt-[129px] medium:-mt-[114px] [--stage:100svh]"
+
+/** Keeps the header's light text legible over the top of the frame. */
+const HeaderScrim = () => (
+  <div
+    aria-hidden="true"
+    className="pointer-events-none absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/60 via-black/25 to-transparent medium:h-32"
+  />
+)
 
 /** The claim sits in the third of the frame she is looking into. */
 const channelClass = (beat: Beat) => {
@@ -175,7 +182,12 @@ const HeroAnimation = () => {
   // only honest way to keep the gaze doing its work without any motion.
   if (reducedMotion) {
     return (
-      <section data-testid="landing-hero" data-motion="reduced" className="bg-black">
+      <section
+        data-testid="landing-hero"
+        data-motion="reduced"
+        data-header-overlay=""
+        className={`relative bg-black ${underHeader}`}
+      >
         {BEATS.map((beat, index) => (
           <div key={beat.id}>
             <div className="relative aspect-[16/9] w-full overflow-hidden">
@@ -186,6 +198,7 @@ const HeroAnimation = () => {
                 className="absolute inset-0 h-full w-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
+              {index === 0 && <HeaderScrim />}
             </div>
 
             <div className="mx-auto w-full max-w-8xl px-6 py-16 small:px-12 small:py-24">
@@ -205,13 +218,14 @@ const HeroAnimation = () => {
       ref={sectionRef}
       data-testid="landing-hero"
       data-motion="full"
-      className={`relative bg-black ${stageVars}`}
+      data-header-overlay=""
+      className={`relative bg-black ${underHeader}`}
     >
       {/* The stage. The only thing that is pinned. */}
       <div
         ref={stageRef}
         data-testid="landing-stage"
-        className="sticky top-[var(--site-header)] h-[var(--stage)] w-full overflow-hidden"
+        className="sticky top-0 h-[var(--stage)] w-full overflow-hidden"
       >
         <div
           style={{ transitionDuration: `${FADE_MS}ms` }}
@@ -246,6 +260,8 @@ const HeroAnimation = () => {
           className="absolute inset-0 bg-[#9fc4dd] mix-blend-overlay transition-opacity duration-1000"
           style={{ opacity: direction === "west" ? 0.09 : 0 }}
         />
+
+        <HeaderScrim />
 
         {/* Mobile scrim: long and multi-stop, so it never reads as a video player. */}
         <div
@@ -308,7 +324,7 @@ const HeroAnimation = () => {
               <div
                 ref={setBeatRef(index)}
                 className={`${
-                  isResolve ? "sticky top-[var(--site-header)] h-[var(--stage)]" : ""
+                  isResolve ? "sticky top-0 h-[var(--stage)]" : ""
                 } flex items-end pb-[140px] small:items-center small:pb-0`}
                 style={isResolve ? undefined : { height: `calc(var(--stage) * ${BEAT_GAP})` }}
               >

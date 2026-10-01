@@ -1,4 +1,5 @@
 const path = require("path")
+const plugin = require("tailwindcss/plugin")
 const tokens = require("./src/modules/design-system/tokens")
 
 module.exports = {
@@ -155,5 +156,16 @@ module.exports = {
       },
     },
   },
-  plugins: [require("tailwindcss-radix")()],
+  plugins: [
+    require("tailwindcss-radix")(),
+    // `overlay:` styles the site header and its menus while they float over a
+    // dark hero: the page has a [data-header-overlay] element and the header
+    // has not scrolled past it (see layout/components/header-shell).
+    plugin(({ addVariant }) => {
+      addVariant(
+        "overlay",
+        'body:has([data-header-overlay]) .site-header:not([data-past-hero="true"]) &'
+      )
+    }),
+  ],
 }

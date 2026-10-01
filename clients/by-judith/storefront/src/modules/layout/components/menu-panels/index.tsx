@@ -8,7 +8,11 @@ import { ArrowLink, Container, Text } from "@modules/design-system"
 export type MenuCollection = { id: string; handle: string; title: string }
 
 const pillClasses =
-  "block rounded-full border border-line bg-white px-4 py-2 text-sm text-ink transition-colors hover:bg-surface-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+  "block rounded-full border border-line bg-white px-4 py-2 text-sm text-ink transition-colors hover:bg-surface-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink overlay:border-white/30 overlay:bg-transparent overlay:text-white overlay:hover:bg-white/10 overlay:focus-visible:outline-white"
+
+/** Inverted colours for the panels while the header is over a dark hero. */
+const overlayArrow = "overlay:text-white overlay:hover:text-white/80 overlay:focus-visible:outline-white"
+const overlayLabel = "overlay:text-white/70"
 
 /** Procedure categories side by side: description on the left, procedures on the right. */
 export function ProceduresPanel({ categories }: { categories: ProcedureCategory[] }) {
@@ -27,17 +31,22 @@ export function ProceduresPanel({ categories }: { categories: ProcedureCategory[
       {categories.map((category) => (
         <div
           key={category.title}
-          className="grid grid-cols-2 gap-6 border-line small:border-l small:pl-10 small:first:border-l-0 small:first:pl-0"
+          className="grid grid-cols-2 gap-6 border-line small:border-l small:pl-10 small:first:border-l-0 small:first:pl-0 overlay:border-white/20"
         >
           <div className="flex flex-col items-start gap-3">
-            <Text as="span" size="xs" tone="subtle" className="uppercase tracking-widest">
+            <Text
+              as="span"
+              size="xs"
+              tone="subtle"
+              className={`uppercase tracking-widest ${overlayLabel}`}
+            >
               {category.title}
             </Text>
-            <Text size="sm" tone="subtle">
+            <Text size="sm" tone="subtle" className="overlay:text-white/85">
               <CopyText value={category.description} />
             </Text>
             {category.href ? (
-              <ArrowLink href={category.href} className="text-sm">
+              <ArrowLink href={category.href} className={`text-sm ${overlayArrow}`}>
                 {t("showMore")}
               </ArrowLink>
             ) : (
@@ -52,7 +61,7 @@ export function ProceduresPanel({ categories }: { categories: ProcedureCategory[
                     <CopyText value={procedure.title} />
                   </LocalizedClientLink>
                 ) : (
-                  <span className="block rounded-full border border-line px-4 py-2 text-sm">
+                  <span className="block rounded-full border border-line px-4 py-2 text-sm overlay:border-white/30 overlay:text-white">
                     <CopyText value={procedure.title} />
                   </span>
                 )}
@@ -71,12 +80,17 @@ export function ShopPanel({ collections }: { collections: MenuCollection[] }) {
 
   return (
     <Container width="page" className="flex flex-col gap-4 py-8">
-      <ArrowLink href="/shop" className="text-sm">
+      <ArrowLink href="/shop" className={`text-sm ${overlayArrow}`}>
         {t("shopHome")}
       </ArrowLink>
       {collections.length > 0 && (
         <>
-          <Text as="span" size="xs" tone="subtle" className="uppercase tracking-widest">
+          <Text
+            as="span"
+            size="xs"
+            tone="subtle"
+            className={`uppercase tracking-widest ${overlayLabel}`}
+          >
             {t("collections")}
           </Text>
           <ul className="flex flex-wrap gap-2">
@@ -93,7 +107,7 @@ export function ShopPanel({ collections }: { collections: MenuCollection[] }) {
           </ul>
         </>
       )}
-      <ArrowLink href="/store" className="text-sm">
+      <ArrowLink href="/store" className={`text-sm ${overlayArrow}`}>
         {t("allProducts")}
       </ArrowLink>
     </Container>

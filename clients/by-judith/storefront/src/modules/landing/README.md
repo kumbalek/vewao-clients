@@ -25,10 +25,12 @@ driven by scroll. Four claims scroll past her as ordinary content:
   the sequence to its beat.
 - With `prefers-reduced-motion: reduce` it renders a static layout: each claim
   under the still it would rest on.
-- The stage sits below the sticky site header, so the choreography is measured
-  in `--stage` (the viewport minus the header), not in `vh`. The header's
-  height is repeated in `hero-animation/index.tsx`; an e2e test checks the two
-  agree.
+- The hero starts at the top of the page, under the site header, which is
+  transparent with light text while it is over the hero (the `overlay:`
+  Tailwind variant, `layout/components/header-shell`), and so are its menus'
+  panels (dark and see-through). It turns white once the hero has scrolled
+  out from under it. The hero repeats the
+  header's height to start under it; an e2e test checks the two agree.
 
 Copy and category links are in `hero-animation/config.ts`. The category links
 use Content plugin slugs; renaming a category breaks its link.
@@ -36,15 +38,17 @@ use Content plugin slugs; renaming a category breaks its link.
 ## Frames
 
 ```
-public/assets/landing/frames/wide/frame-000.webp … frame-175.webp      3200x1800
-public/assets/landing/frames/portrait/frame-000.webp … frame-175.webp  1215x1620
+public/assets/landing/frames/movie/wide/frame-000.webp … frame-175.webp      3200x1800
+public/assets/landing/frames/movie/portrait/frame-000.webp … frame-175.webp  1215x1620
 ```
 
-Cut from `judita_web_1.m4v` (3840x2160, 50fps, 8.18s). The clip is not stored
-in this repository: it is in the legacy repository's
-`bbc-ng-storefront/public/assets/landing/`, beside a second take (`Movie.mov`)
-that was not imported. The two takes were shot to the same marks, so swapping
-takes only means replacing the frames.
+Cut from `Movie.mov` (3840x2160 ProRes, 25fps, 7.16s), the take the legacy
+demo played at `/landing-demo2`; the owner chose it over `judita_web_1.m4v` as
+the smoother one (2026-09-30). Neither clip is stored in this repository: both
+are in the legacy repository's `bbc-ng-storefront/public/assets/landing/`. The
+takes were shot to the same marks, so the beats fit either. Give any other
+take its own frame directory rather than extracting over these; mixing two
+extractions makes the shoots appear to cut into each other.
 
 The clip contains a cut between two shoots (different hair and light) between
 the 3s and 5s marks. That is in the footage; the page plays one run of frames.
@@ -62,8 +66,8 @@ slow push-in.
 ### Why frames and these sizes
 
 Browsers decode video forwards only; scrubbing back through a `<video>` seeks
-per frame and stutters. Frames step both ways at the same cost. 31MB of
-source became 6.9MB (wide) + 4.4MB (portrait) of WebP.
+per frame and stutters. Frames step both ways at the same cost. 187MB of
+ProRes became 7.1MB (wide) + 4.4MB (portrait) of WebP.
 
 The canvas is DPR-scaled up to 2, so a 1512px Retina laptop asks for about
 3000 device pixels. 3200 wide covers that. Above it the limit is decode memory,
@@ -71,21 +75,21 @@ not bytes: 176 frames at 3200x1800 are about 3.9GB decoded.
 
 ### Regenerating
 
-`-map 0:v:0` matters: the file carries an attached cover image as a second video
-stream.
+The clip is already 25fps, so frames are taken one for one. `-map 0:v:0` picks
+the footage if the file also carries a cover image as a second video stream.
 
 ```sh
 # Desktop stage
-ffmpeg -i judita_web_1.m4v -map 0:v:0 -an \
+ffmpeg -i Movie.mov -map 0:v:0 -an \
   -vf "fps=25,scale=3200:-2" -frames:v 176 -start_number 0 \
   -c:v libwebp -quality 80 -preset picture \
-  frames/wide/frame-%03d.webp
+  frames/movie/wide/frame-%03d.webp
 
 # Mobile: 3:4 centre crop, a little wider than what is displayed
-ffmpeg -i judita_web_1.m4v -map 0:v:0 -an \
+ffmpeg -i Movie.mov -map 0:v:0 -an \
   -vf "fps=25,crop=1620:2160:(iw-1620)/2:0,scale=1215:1620" -frames:v 176 -start_number 0 \
   -c:v libwebp -quality 80 -preset picture \
-  frames/portrait/frame-%03d.webp
+  frames/movie/portrait/frame-%03d.webp
 ```
 
 If the timing changes, `FPS`, `CLIP.frameCount` and each beat's `seconds` in

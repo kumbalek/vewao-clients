@@ -91,11 +91,15 @@ lead doctor, imported from the legacy repo's `new-hp` branch (staged work on
   linked as "Úvod e-shopu" from the header's Shop menu.
 - The logo is the new gold diamond (`logo_gold.svg`) in the site header, mobile
   menu and checkout header. Only the footer keeps the JuditH wordmark.
-- Only the default take (`judita_web_1.m4v`) is imported, as 11 MB of WebP
-  frames. The second take (`Movie.mov`) stays in the legacy repo.
-- Adapted to this site: the stage sits below the real sticky header, not
-  under the demo's mock header. The two category links go to
-  `/procedury/beauty` and `/procedury/akupunktura`. The closing CTA uses the
+- The frames are from the second take (`Movie.mov`, the demo's
+  `/landing-demo2`), which the owner chose as the smoother one: 11.5 MB of
+  WebP. The clips stay in the legacy repo.
+- Over the hero the header, service bar and mobile booking bar are
+  transparent with light text, and the Procedury and Shop panels are dark and
+  see-through. Past the hero they are the usual white header. The cart
+  dropdown and the mobile menu stay white.
+- Adapted to this site: the real header replaces the demo's mock one. The two
+  category links go to `/procedury/beauty` and `/procedury/akupunktura`. The closing CTA uses the
   header's "Rezervovat" and contact page. The demo used "Objednat konzultaci"
   and a `/rezervace` page that does not exist here.
 - To confirm with the merchant: the landing copy, including "Lasery" in the

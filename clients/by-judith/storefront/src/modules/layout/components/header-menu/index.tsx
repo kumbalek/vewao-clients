@@ -24,7 +24,7 @@ export default function HeaderMenu({
     <div {...rootProps} className="flex h-full items-center">
       <button
         {...triggerProps}
-        className="flex items-center gap-1 text-sm text-ink transition-colors duration-150 hover:text-ink-subtle focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink"
+        className="flex items-center gap-1 text-sm text-ink transition-colors duration-150 hover:text-ink-subtle focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink overlay:text-white overlay:hover:text-white/80 overlay:focus-visible:outline-white"
       >
         {label}
         <ChevronIcon
@@ -39,6 +39,8 @@ export default function HeaderMenu({
         }}
         className={clx(
           "absolute inset-x-0 top-full border-y border-line bg-white transition-[opacity,visibility] duration-200 motion-reduce:transition-none",
+          // Over a dark hero the panel stays dark and see-through, like the bar.
+          "overlay:border-white/15 overlay:bg-black/50 overlay:backdrop-blur-md",
           open ? "visible opacity-100" : "invisible opacity-0"
         )}
       >

@@ -13,7 +13,11 @@ export type Beat = {
   /** Second of the clip this beat rests on. Converted to a frame index below. */
   seconds: number
   eyebrow: string
-  /** Display line. Mobile gets its own so the desktop line never orphans. */
+  /**
+   * Display line. Mobile gets its own so the desktop line never orphans. A
+   * one-letter preposition is bound to the next word (\u00a0), as Czech
+   * typesetting requires.
+   */
   title: string
   mobileTitle: string
   /** Secondary action. Always a real anchor, present at load. */
@@ -25,17 +29,17 @@ export type Beat = {
 export const FPS = 25
 
 /**
- * One shoot, one sequence, cut from `judita_web_1.m4v` (see ../../README.md).
- * The cut between the two halves is baked into the footage, so the stage is a
- * single canvas playing a single run of frames: 176 of them, 0s..7.0s at FPS.
- * She is to camera at 1s, turned west at 3s, east at 5s and back at 7s.
+ * One shoot, one sequence, cut from `Movie.mov` (see ../../README.md). The cut
+ * between the two halves is baked into the footage, so the stage is a single
+ * canvas playing a single run of frames: 176 of them, 0s..7.0s at FPS. She is
+ * to camera at 1s, turned west at 3s, east at 5s and back at 7s.
  */
 export const CLIP = {
   frameCount: 176,
   /** Two crops: the stage on desktop, a tighter one on mobile. */
   sets: {
-    wide: "/assets/landing/frames/wide",
-    portrait: "/assets/landing/frames/portrait",
+    wide: "/assets/landing/frames/movie/wide",
+    portrait: "/assets/landing/frames/movie/portrait",
   },
 }
 
@@ -53,8 +57,8 @@ export const BEATS: Beat[] = [
     direction: "center",
     seconds: 1.6,
     eyebrow: "Klinika",
-    title: "Snoubíme západ s východem",
-    mobileTitle: "Snoubíme západ\ns východem",
+    title: "Snoubíme západ s\u00a0východem",
+    mobileTitle: "Snoubíme západ\ns\u00a0východem",
   },
   {
     id: "west",
@@ -73,8 +77,8 @@ export const BEATS: Beat[] = [
     direction: "east",
     seconds: 5,
     eyebrow: "Východ",
-    title: "Revoluce v akupunktuře",
-    mobileTitle: "Revoluce\nv akupunktuře",
+    title: "Revoluce v\u00a0akupunktuře",
+    mobileTitle: "Revoluce\nv\u00a0akupunktuře",
     action: {
       label: "TCM diagnostika · akupunktura",
       href: "/procedury/akupunktura",

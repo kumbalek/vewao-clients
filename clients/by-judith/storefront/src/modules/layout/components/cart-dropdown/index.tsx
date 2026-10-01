@@ -83,17 +83,17 @@ const CartDropdown = ({
         href="/cart"
         data-testid="nav-cart-link"
         aria-label={tLayout("cartWithCount", { count: totalItems })}
-        className="relative flex flex-col items-center gap-0.5 text-ink hover:text-ink-subtle focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink"
+        className="relative flex flex-col items-center gap-0.5 text-ink hover:text-ink-subtle focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink overlay:text-white overlay:hover:text-white/80 overlay:focus-visible:outline-white"
       >
         <BagIcon size={24} />
         <span
           aria-hidden="true"
           data-testid="nav-cart-count"
-          className="absolute -right-2 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-action px-1 text-[10px] leading-none text-white"
+          className="absolute -right-2 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-action px-1 text-[10px] leading-none text-white overlay:bg-white overlay:text-ink"
         >
           {totalItems}
         </span>
-        <span aria-hidden="true" className="hidden text-xs text-ink-subtle medium:block">
+        <span aria-hidden="true" className="hidden text-xs text-ink-subtle medium:block overlay:text-white/85">
           {tLayout("cart")}
         </span>
       </LocalizedClientLink>

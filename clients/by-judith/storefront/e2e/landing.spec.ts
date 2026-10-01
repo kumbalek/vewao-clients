@@ -1,6 +1,24 @@
-import { expect, test, type Page } from "@playwright/test"
+import { expect, test, type Locator, type Page } from "@playwright/test"
 
 const SHOP = "http://127.0.0.1:8101"
+
+const TRANSPARENT = "rgba(0, 0, 0, 0)"
+const WHITE = "rgb(255, 255, 255)"
+const INK = "rgb(24, 24, 27)"
+
+const background = (locator: Locator) =>
+  locator.evaluate((element) => getComputedStyle(element).backgroundColor)
+const color = (locator: Locator) => locator.evaluate((element) => getComputedStyle(element).color)
+
+// Server-rendered controls ignore input until React hydrates them.
+async function waitForHydration(page: Page, control: Locator) {
+  await expect(control).toBeVisible()
+  await page.waitForFunction(
+    (element) =>
+      !!element && Object.keys(element).some((key) => key.startsWith("__reactFiber")),
+    await control.elementHandle()
+  )
+}
 
 test.beforeEach(async ({ context }) => {
   await context.addCookies([
@@ -38,32 +56,78 @@ test("the home page is the clinic landing, its links present at load", async ({ 
 
 test("the hero loads the crop for the viewport, opening run first", async ({ page, isMobile }) => {
   const crop = isMobile ? "portrait" : "wide"
-  const first = page.waitForRequest(new RegExp(`/assets/landing/frames/${crop}/frame-000\\.webp$`))
+  const first = page.waitForRequest(new RegExp(`/assets/landing/frames/movie/${crop}/frame-000\\.webp$`))
   await page.goto("/cz")
   await first
-  // Revealed once the opening run is in memory.
+  // Revealed once the opening run (41 large frames) is decoded; CI runners are slow.
   await expect(page.getByTestId("landing-stage").locator("canvas").locator("..")).toHaveClass(
-    /opacity-100/
+    /opacity-100/,
+    { timeout: 20_000 }
   )
 })
 
-test("the stage pins right below the sticky header", async ({ page }) => {
+test("the header floats over the hero, then turns white past it", async ({ page, isMobile }) => {
   await page.goto("/cz")
-  const stage = page.getByTestId("landing-stage")
-  await expect(stage).toBeVisible()
-  await page.evaluate(() => window.scrollTo(0, window.innerHeight))
+  const header = page.getByRole("banner")
 
-  // The hero repeats the header's height; this fails if the two drift apart.
-  await expect
-    .poll(async () => {
-      const header = await page.getByRole("banner").boundingBox()
-      const box = await stage.boundingBox()
-      return Math.round(box!.y - (header!.y + header!.height))
-    })
-    .toBe(0)
-  // It fills the rest of the viewport.
-  const box = await stage.boundingBox()
-  expect(Math.round(box!.y + box!.height)).toBe(page.viewportSize()!.height)
+  // The hero starts at the top of the page, under the header. It repeats the
+  // header's height; this fails if the two drift apart.
+  expect(Math.round((await page.getByTestId("landing-hero").boundingBox())!.y)).toBe(0)
+  expect(Math.round((await page.getByTestId("landing-stage").boundingBox())!.height)).toBe(
+    page.viewportSize()!.height
+  )
+
+  // Transparent, with light text and a white booking button.
+  const text = isMobile
+    ? header.getByRole("button", { name: "Otevřít menu" })
+    : header.getByRole("link", { name: "Kontakt" })
+  const book = isMobile
+    ? page.getByRole("link", { name: "Rezervovat" }).first()
+    : header.getByRole("link", { name: "Rezervovat" })
+  await expect.poll(() => background(header)).toBe(TRANSPARENT)
+  await expect.poll(() => color(text)).toBe(WHITE)
+  await expect.poll(() => background(book)).toBe(WHITE)
+  if (!isMobile) {
+    await expect.poll(() => background(header.getByTestId("free-delivery-note").locator(".."))).toBe(
+      TRANSPARENT
+    )
+    await expect.poll(() => color(header.getByTestId("free-delivery-note"))).toBe(
+      "rgba(255, 255, 255, 0.85)"
+    )
+  }
+
+  // On desktop the footer alone is too short to scroll the hero out from under
+  // the header; stand in for the sections that will follow it.
+  await page.evaluate(() =>
+    document.querySelector("main")!.insertAdjacentHTML("beforeend", '<div style="height:150vh"></div>')
+  )
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight))
+  await expect.poll(() => background(header)).toBe(WHITE)
+  await expect.poll(() => color(text)).toBe(INK)
+})
+
+test("an open menu stays dark and see-through over the hero", async ({ page, isMobile }) => {
+  test.skip(isMobile, "desktop menus")
+  await page.goto("/cz")
+  const header = page.getByRole("banner")
+  const procedures = header.getByRole("button", { name: "Procedury" })
+  await waitForHydration(page, procedures)
+
+  await procedures.hover()
+  await expect(procedures).toHaveAttribute("aria-expanded", "true")
+  const panel = page.locator(`[id="${await procedures.getAttribute("aria-controls")}"]`)
+  await expect(panel).toBeVisible()
+  await expect.poll(() => background(header)).toBe(TRANSPARENT)
+  await expect.poll(() => background(panel)).toBe("rgba(0, 0, 0, 0.5)")
+  const procedure = panel.getByRole("link", { name: "Testovací procedura" })
+  await expect.poll(() => color(procedure)).toBe(WHITE)
+  await expect.poll(() => background(procedure)).toBe(TRANSPARENT)
+  await expect.poll(() => color(header.getByRole("link", { name: "Kontakt" }))).toBe(WHITE)
+})
+
+test("pages without a dark hero keep the white header", async ({ page }) => {
+  await page.goto("/cz/shop")
+  await expect.poll(() => background(page.getByRole("banner"))).toBe(WHITE)
 })
 
 test.describe("with reduced motion", () => {
@@ -83,7 +147,7 @@ test.describe("with reduced motion", () => {
     await expect(hero.locator("img")).toHaveCount(4)
     await expect(hero.locator("img").nth(2)).toHaveAttribute(
       "src",
-      "/assets/landing/frames/wide/frame-125.webp"
+      "/assets/landing/frames/movie/wide/frame-125.webp"
     )
     await expectLandingLinks(page)
   })
@@ -103,12 +167,7 @@ test("the former home page is the e-shop's front page", async ({ page, isMobile 
 
   if (isMobile) {
     const open = page.getByRole("button", { name: "Otevřít menu" })
-    await expect(open).toBeVisible()
-    await page.waitForFunction(
-      (element) =>
-        !!element && Object.keys(element).some((key) => key.startsWith("__reactFiber")),
-      await open.elementHandle()
-    )
+    await waitForHydration(page, open)
     await open.click()
     const menu = page.getByRole("dialog", { name: "Menu" })
     await menu.getByText("Shop", { exact: true }).click()
@@ -119,6 +178,7 @@ test("the former home page is the e-shop's front page", async ({ page, isMobile 
     const shop = page.getByRole("navigation", { name: "Hlavní navigace" }).getByRole("button", {
       name: "Shop",
     })
+    await waitForHydration(page, shop)
     await shop.hover()
     await page.getByRole("link", { name: "Úvod e-shopu" }).click()
   }

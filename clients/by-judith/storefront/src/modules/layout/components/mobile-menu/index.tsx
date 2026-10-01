@@ -59,7 +59,7 @@ export default function MobileMenu({
         aria-expanded={open}
         onClick={() => setOpen(true)}
         data-testid="nav-menu-button"
-        className="-ml-2 flex h-10 w-10 items-center justify-center rounded-full text-ink hover:bg-surface-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-ink"
+        className="-ml-2 flex h-10 w-10 items-center justify-center rounded-full text-ink hover:bg-surface-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-ink overlay:text-white overlay:hover:bg-white/10 overlay:focus-visible:outline-white"
       >
         <MenuIcon size={24} />
       </button>
