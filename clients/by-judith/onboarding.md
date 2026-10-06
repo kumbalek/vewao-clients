@@ -1,5 +1,8 @@
 # By Judith — MVP onboarding
 
+Agreed facts and decisions for this client. Open tasks and their status live on
+the [project board](https://github.com/users/kumbalek/projects/1), not here.
+
 ## Storefront baseline — 2026-09-08
 
 Copied `bbc-ng/bbc-ng-storefront` from the read-only legacy repo at revision
@@ -22,8 +25,8 @@ no legacy price observations or fabricated historical coverage.
   identifiers against new data and verify behaviour with the platform backend.
 - Czech copy, legal pages, imagery and styles were retained. Legal text needs
   merchant approval/current review before launch.
-- Money S3 and invoices are merchant requirements from the audit; backend
-  implementation and accountant verification remain open.
+- Money S3 and invoices are merchant requirements from the audit
+  (vewao-platform#15).
 - Inherited analytics is disabled until the shared consent integration is ready.
 
 ## Launch methods — decided 2026-09-24
@@ -61,24 +64,18 @@ kept. The owner chose to build in steps:
   Akupunktura service as the first category with 5 procedures and 5 FAQ.
   Added 2026-09-30: a Beauty category with Modelace rtů, Plastická chirurgie
   and Ultherapy® Prime, and FAQs that can belong to one procedure.
-  Imported on local and dev. Marked `[doplnit]` until supplied: category menu
-  perex, procedure benefits/steps/therapist, vouchers. Not built: reviews
-  (needs C4 authenticity handling) and "Rezervovat u" per team member.
-  Procedure prices were copied as the old site shows them, including "Akce …
-  místo …" wording; the merchant should confirm them and how such claims apply
-  to services. The Ultherapy text repeats manufacturer claims ("jediné …
-  s FDA certifikací", "nejbezpečnější volba na trhu"); these also need the
-  merchant's review.
-- "Rezervovat" links to `/content/contact` until a booking provider is chosen.
-- Missing content is marked `[doplnit]` in `storefront/src/content/site.ts`:
-  procedures, category texts, brand text, social links, newsletter, cookies
-  page and payment logos. Ceník and Novinky have no pages yet.
+  Imported on local and dev. Missing procedure content is marked `[doplnit]`.
+  Procedure prices (incl. "Akce … místo …") and the Ultherapy manufacturer
+  claims were copied as-is and await merchant review (vewao-workspace#21).
+- "Rezervovat" links to `/content/contact` until a booking provider is chosen
+  (vewao-workspace#30).
+- Missing site content is marked `[doplnit]` in `storefront/src/content/site.ts`
+  (vewao-clients#11). Ceník and Novinky have no pages yet (vewao-clients#20).
 - Values follow agreed facts, not the wireframe: free delivery from 5 000 Kč
   (wireframe: 1 500), hours from the current contact page (Po–Pá 10–18; the
-  wireframe shows Po–Pá 9–19 · So 9–14). Confirm the hours with the merchant.
-- Not built: account link (the account area is disabled), EN switch, floating
-  contact dialog (screen 09 B), newsletter sign-up (needs a provider and
-  consent record).
+  wireframe shows Po–Pá 9–19 · So 9–14).
+- Not built: account, EN switch, floating contact dialog, newsletter
+  (vewao-clients#21); reviews need C4 authenticity handling.
 
 ## Landing page — 2026-09-30
 
@@ -102,46 +99,19 @@ lead doctor, imported from the legacy repo's `new-hp` branch (staged work on
   category links go to `/procedury/beauty` and `/procedury/akupunktura`. The closing CTA uses the
   header's "Rezervovat" and contact page. The demo used "Objednat konzultaci"
   and a `/rezervace` page that does not exist here.
-- To confirm with the merchant: the landing copy, including "Lasery" in the
-  Beauty link (the imported Beauty examples have no laser procedure), and the
-  home page's meta description, which is composed from the claims.
-- Not built: the rest of wireframe screen 01 below the hero (service tiles,
-  offers, about, statistics, reviews, products, magazine, contact). The hero
-  releases straight into the footer.
+- Landing copy, incl. "Lasery" in the Beauty link (no imported laser
+  procedure) and the composed meta description, awaits merchant review
+  (vewao-workspace#21).
+- The hero releases straight into the footer; the rest of screen 01 is
+  vewao-clients#19.
 
-## Access and decisions still needed
+## Access, merchant confirmations and open decisions
 
-| Item | State |
-|---|---|
-| Local/test backend + CZ region + publishable key | Set up and seed; `.env.example` contains placeholders only |
-| Comgate sandbox/production account ownership and callback URLs | Owner adding dev test credentials; separate dev shop connection, return URL `/cz/checkout/payment-return` |
-| Actual shipping methods / pickup payment rules | Decided 2026-09-24 (above); merchant acceptance at launch |
-| Gift-packaging variant mapping | Set after data import/seed |
-| Tax rates, merchant identity, invoice numbering and Money S3 settings | Verify with merchant/accountant |
-| Media storage | Decided 2026-09-28: S3 in production; dev keeps the Docker `uploads` volume. Choose the S3 provider/bucket and set up credentials |
-| Resend sender/domain and required live integrations | Confirm ownership/access |
-| Product/customer/order migration and redirects | Rehearse on copies |
-| Price capture | Enable and observe in new backend; track actual start/coverage |
-| Cookie consent | New shared component in storefront kit; not implemented in this starter slice |
-
-## Integration limits
-
-The browser fixture verifies storefront rendering and payment-session selection,
-not real authorization, webhook idempotency, order creation, refund or fulfilment.
-The inherited Comgate completion/redirect flow still needs to be verified against
-the new provider. Do not deploy this starter as a finished shop.
-
-## Verification — 2026-09-10
-
-Strict typecheck and lint pass. Five unit tests and six desktop/mobile Playwright
-tests pass, including keyboard payment selection and terms acknowledgement.
-The copied decorative radio indicator was corrected so it no longer exposes a
-second, permanently checked input. The original visual design is retained.
-
-The homepage still contains inherited promotional copy/prices and product
-references; reconcile those with the new catalogue and actual price-history
-coverage before launch. The fixture tests intentionally do not validate that copy
-or authorize real payments.
+Tracked on the board: account ownership (vewao-workspace#12), merchant identity,
+tax and Money S3 (#13), scope questions (#11), merchant review of imported
+content and claims (#21), S3 media (vewao-platform#18), cookie consent
+(vewao-platform#17), migration trial (vewao-platform#6) and redirects (#25).
+The storefront `.env.example` contains placeholders only.
 
 ## Docker development backend
 
@@ -153,3 +123,38 @@ publishable key to `storefront/.env.local`. See
 `vewao-platform/DEVELOPMENT.md` from the workspace root for ports,
 admin creation, plugin rebuilds and provider limitations. A running Docker
 engine is required.
+
+## Order emails — Resend (2026-10-01)
+
+The platform now implements these Czech customer notifications:
+
+- **Objednávka přijata**: order created.
+- **Objednávka zaplacena**: full payment captured, including Comgate pre-capture.
+- **Objednávka odeslána**: merchant creates the PPL fulfillment, matching the
+  pickup readiness action (owner decision 2026-10-01). Add tracking at this step
+  if it should appear in the email; later shipment creation sends no second email.
+- **Objednávka připravena k vyzvednutí**: merchant creates the clinic pickup
+  fulfillment when its items are ready. Treat this as the readiness action;
+  pickup shipment does not send a second email. Merchant workflow acceptance
+  remains open.
+- **Objednávka zrušena**: the order is canceled; the email does not claim a
+  completed refund.
+- **Nová objednávka ke zpracování**: staff receive one alert per created order,
+  with customer details, contents, delivery method and current payment status.
+  This subscriber is independent of customer email delivery.
+
+Shipping and pickup emails list the specific fulfillment's items, so partial
+fulfillment does not claim the entire order is ready. Admin notification
+suppression is honored. Collecting payment on site requires recording its capture
+in Medusa before the paid email is sent.
+
+`deploy/platform.env.template` contains the client brand and seeded clinic address.
+Confirm the pickup wording/opening hours before activation. Set `FEATURE_SES=false`,
+`FEATURE_RESEND=true`, `RESEND_API_KEY`, a verified `RESEND_FROM` and optional
+`RESEND_REPLY_TO`; set `NOTIFICATION_STAFF_EMAIL` to the staff mailbox and
+`RESEND_TEST_RECIPIENT` to an owned inbox on dev. Keep the
+API key outside git. The template leaves Resend off until these values are ready.
+
+Live acceptance is tracked in vewao-workspace#19. A provider acceptance is not
+proof of inbox delivery. The platform plugin README documents notification
+inspection and guarded operator retries.
