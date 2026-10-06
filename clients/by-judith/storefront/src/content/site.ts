@@ -57,6 +57,8 @@ export const footer = {
   legal: [
     { label: "Ochrana osobních údajů", href: "/content/privacy-policy" },
     { label: "Obchodní podmínky", href: "/content/terms-of-use" },
+    // The withdrawal function must stay easy to find on every page (§ 1830a).
+    { label: "Odstoupit od smlouvy", href: "/odstoupeni-od-smlouvy" },
     { label: "Cookies" },
   ] satisfies NavLink[],
 }

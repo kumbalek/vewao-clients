@@ -26,6 +26,8 @@ const tones: Record<HeadingTone, string> = {
 }
 
 export type HeadingProps = React.HTMLAttributes<HTMLHeadingElement> & {
+  /** React 19 passes refs as props, e.g. to move focus to a step heading. */
+  ref?: React.Ref<HTMLHeadingElement>
   /** Document outline level. Choose it independently of the visual size. */
   level?: 1 | 2 | 3 | 4
   size?: HeadingSize

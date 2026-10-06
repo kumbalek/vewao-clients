@@ -235,6 +235,18 @@ const server = createServer(async (req, res) => {
   if (url.pathname === "/store/customers/me") return send({ message: "Not authenticated" }, 401)
   if (url.pathname === "/store/shipping-options") return send({ shipping_options: shippingOptions })
   if (url.pathname === "/store/payment-providers") return send({ payment_providers: providers })
+  if (url.pathname === "/store/withdrawals" && req.method === "POST") {
+    // Mirrors vewao-platform's withdrawal route: confirmation required, the
+    // statement recorded whether or not the order matches. "500" fails.
+    if (data.confirmed !== true || !data.order_reference || !data.customer_name || !/@/.test(data.email ?? "")) {
+      return send({ type: "invalid_data", message: "Invalid request" }, 400)
+    }
+    if (data.order_reference === "500") return send({ type: "unknown_error", message: "An unknown error occurred." }, 500)
+    const statement = ["Oznamuji, že tímto odstupuji od kupní smlouvy uzavřené na dálku.",
+      `Číslo objednávky: ${data.order_reference}`, `Zboží: ${data.items || "celá objednávka"}`,
+      `Jméno a příjmení: ${data.customer_name}`, `E-mail: ${data.email}`].join("\n")
+    return send({ withdrawal: { id: "wdr_test", statement, submitted_at: "2026-10-06T12:34:56.000Z", email: data.email } }, 201)
+  }
   const orderMatch = url.pathname.match(/^\/store\/orders\/([^/]+)$/)
   if (orderMatch) return orders.has(orderMatch[1]) ? send({ order: orders.get(orderMatch[1]) }) : send({ message: "Order not found" }, 404)
   const cartMatch = url.pathname.match(/^\/store\/carts\/([^/]+)$/)
