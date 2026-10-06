@@ -158,3 +158,32 @@ API key outside git. The template leaves Resend off until these values are ready
 Live acceptance is tracked in vewao-workspace#19. A provider acceptance is not
 proof of inbox delivery. The platform plugin README documents notification
 inspection and guarded operator retries.
+
+## Cancellation, refunds, returns and withdrawal (2026-10-06)
+
+Draft merchant procedure for vewao-platform#16; the merchant has not accepted it yet.
+Use the admin for every step, so that orders, stock and payments stay consistent.
+
+- **Cancel before fulfilment**: *Cancel order*. Reservations are released. A
+  Comgate payment is refunded in full automatically through Comgate. For pay on
+  site, the order is cancelled and an already recorded payment is marked refunded:
+  hand the money back at the clinic. If Comgate rejects the refund, the order stays
+  open and the admin shows the error; retry later rather than refunding in the portal.
+- **After fulfilment (pickup or PPL)**: an order cannot be cancelled. Create a
+  return for the returned items, then *receive* it when the goods arrive; receiving
+  puts them back in stock. Then refund the amount on the order's payment; for
+  Comgate this sends the money back through Comgate. Shipping and partial amounts
+  are entered by hand.
+- **Do not refund in the Comgate portal.** Medusa cannot record that refund and
+  would later try to refund again. Use the portal only to check a refund's status.
+- **Withdrawal (§ 1830a)**: the footer's and order confirmation's "Odstoupit od
+  smlouvy" link opens the online form. The customer gets an acknowledgment by
+  e-mail and staff get an alert; statements whose order number or e-mail did not
+  match are marked in the alert and must be checked. The order page in the admin
+  lists the statements received for that order. Then process the return and refund
+  as above.
+
+Open before launch: merchant-approved return terms in the terms page, including
+any statutory exception that applies to the goods (e.g. sealed goods unsealed after delivery for health reasons), who pays return shipping and the return
+address; the acknowledgment and form copy; merchant acceptance of this procedure;
+a real Comgate test-mode refund on dev.
