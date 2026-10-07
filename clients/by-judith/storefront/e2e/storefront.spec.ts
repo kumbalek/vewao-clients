@@ -279,3 +279,12 @@ test("announces a sale only against the 30-day lowest price", async ({
   await expect(page.getByTestId("reference-product-price")).toHaveCount(0)
   await expect(page.getByTestId("product-price-discount")).toHaveCount(0)
 })
+
+test("emphasises allergens in the ingredients list", async ({ page }) => {
+  await page.goto("/cz/products/akcni-produkt")
+  await page.getByRole("button", { name: "Složení" }).click()
+  const list = page.getByRole("list").filter({ hasText: "Meruňka obecná" })
+  await expect(list.getByRole("listitem")).toHaveCount(2)
+  await expect(list.locator("strong")).toHaveText(["Hořčice"])
+  await expect(list).toContainText("Hořčice setá (extrakt ze semene) 640 mg")
+})

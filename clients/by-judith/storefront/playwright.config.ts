@@ -22,7 +22,10 @@ export default defineConfig({
       reuseExistingServer: false,
     },
     {
-      command: "pnpm exec next dev --hostname 127.0.0.1 --port 8101",
+      // Product fetches use force-cache, and Next keeps that cache on disk
+      // across runs: without clearing it, edits to the mock backend's data
+      // are not seen.
+      command: "rm -rf .next/cache/fetch-cache && pnpm exec next dev --hostname 127.0.0.1 --port 8101",
       url: "http://127.0.0.1:8101/logo.webp",
       timeout: 120_000,
       reuseExistingServer: false,

@@ -630,19 +630,7 @@ export default function TermsPage() {
                       </a>
                       .
                     </p>
-                    <p>
-                      K mimosoudnímu řešení spotřebitelských sporů lze také
-                      využít on-line Platformu pro řešení sporů na webové adrese{" "}
-                      <a
-                        href="http://ec.europa.eu/consumers/odr"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[#85977b] "
-                      >
-                        http://ec.europa.eu/consumers/odr
-                      </a>
-                      .
-                    </p>
+                    {/* The EU ODR platform closed on 20 July 2025 (Regulation (EU) 2024/3228); its link was removed. */}
                     <p>
                       Evropské spotřebitelské centrum Česká republika, se sídlem
                       Štěpánská 567/15, 120 00 Praha 2, webová adresa:{" "}
@@ -654,8 +642,8 @@ export default function TermsPage() {
                       >
                         http://www.evropskyspotrebitel.cz
                       </a>{" "}
-                      je kontaktním místem podle Nařízení Evropského parlamentu
-                      a Rady (EU) č. 524/2013.
+                      pomáhá spotřebitelům při sporech s obchodníky z jiných
+                      členských států EU.
                     </p>
                     <p>
                       Prodávající je oprávněn k prodeji zboží na základě
