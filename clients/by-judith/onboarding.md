@@ -26,7 +26,11 @@ no legacy price observations or fabricated historical coverage.
 - Czech copy, legal pages, imagery and styles were retained. Legal text needs
   merchant approval/current review before launch.
 - Money S3 and invoices are merchant requirements from the audit
-  (vewao-platform#15).
+  (vewao-platform#15). `@vewao/plugin-invoicing` implements them; it stays off
+  (`FEATURE_INVOICING`) until seller identity, VAT status, tax rates, the
+  number series and the Money S3 agenda are confirmed with the accountant
+  (vewao-workspace#13). Continue the legacy series with `INVOICE_FIRST_NUMBER`
+  set to the last legacy number + 1 at cutover.
 - Inherited analytics is disabled until the shared consent integration is ready.
 
 ## Launch methods — decided 2026-09-24
