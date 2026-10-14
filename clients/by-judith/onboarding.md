@@ -27,7 +27,12 @@ no legacy price observations or fabricated historical coverage.
   merchant approval/current review before launch.
 - Money S3 and invoices are merchant requirements from the audit
   (vewao-platform#15).
-- Inherited analytics is disabled until the shared consent integration is ready.
+- Analytics: Google Analytics 4 behind the kit's cookie banner (owner decision
+  2026-10-14, vewao-clients#22). It switches on, with the banner, when the
+  GitHub environment variable `GA_MEASUREMENT_ID` is set; until then the shop
+  sets only necessary cookies. The inherited Vercel Analytics is removed (it
+  records nothing off Vercel). Measurement ID and banner/cookies-page wording
+  await the merchant.
 
 ## Launch methods — decided 2026-09-24
 

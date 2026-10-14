@@ -3,6 +3,8 @@ import { useTranslations } from "next-intl"
 import React from "react"
 
 import { contact, footer } from "content/site"
+import { consentCategories } from "@lib/consent"
+import { CookieSettingsButton } from "@modules/common/components/cookie-consent"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { CopyText, Placeholder } from "@modules/common/components/placeholder"
 import { Container, Heading, Text } from "@modules/design-system"
@@ -126,6 +128,11 @@ export default function SiteFooter({ collections }: { collections: MenuCollectio
                 )}
               </li>
             ))}
+            {consentCategories().length > 0 && (
+              <li>
+                <CookieSettingsButton className={linkClasses} />
+              </li>
+            )}
             <li>{t("copyright", { year: new Date().getFullYear() })}</li>
           </ul>
           <CopyText value={footer.paymentMethods} />
