@@ -12,6 +12,12 @@ type RecordedRequest = { method: string; path: string; body: unknown }
 const MOCK = "http://127.0.0.1:9101"
 const SHOP = "http://127.0.0.1:8101"
 
+// The footer link is followed from the landing page, whose hero animation
+// competes with React for the main thread; the hero has its own spec. The
+// navigation also waits for `next dev` to compile the form on first visit.
+test.use({ reducedMotion: "reduce" })
+const NAVIGATION = { timeout: 15_000 }
+
 // Server-rendered controls ignore input until React hydrates them.
 async function waitForHydration(page: Page, control: Locator) {
   await expect(control).toBeVisible()
@@ -44,7 +50,7 @@ test("footer links to withdrawal page", async ({ page }) => {
   await page.goto("/cz")
   await page.getByRole("contentinfo").getByRole("link", { name: "Odstoupit od smlouvy" }).click()
 
-  await expect(page).toHaveURL(new RegExp("/cz/odstoupeni-od-smlouvy$"))
+  await expect(page).toHaveURL(new RegExp("/cz/odstoupeni-od-smlouvy$"), NAVIGATION)
   await expect(page.getByRole("heading", { name: "Odstoupit od smlouvy" })).toBeVisible()
 })
 
