@@ -2,14 +2,16 @@
 
 import Script from "next/script"
 import { useEffect, useRef } from "react"
+// The components entry, not the package root: the root also exports the
+// Medusa client and checkout, which this client component must not pull in.
 import {
   ConsentGate,
   CookieConsent,
   openCookieSettings,
   useConsent,
   type ConsentCategoryOption,
-  type ConsentRecord,
-} from "@vewao/storefront-kit"
+} from "@vewao/storefront-kit/components"
+import type { ConsentRecord } from "@vewao/storefront-kit"
 
 import { cookieConsent } from "content/site"
 import { CONSENT_VERSION, consentCategories, gaMeasurementId } from "@lib/consent"
