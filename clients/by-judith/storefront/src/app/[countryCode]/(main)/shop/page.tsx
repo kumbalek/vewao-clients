@@ -10,9 +10,6 @@ import { listCollections } from "@lib/data/collections"
 import { getRegion } from "@lib/data/regions"
 import { Heading } from "@medusajs/ui"
 
-// import { retrieveCart } from "@lib/data/cart"
-// import ValentineDiscountProgress from "@modules/cart/components/valentine-promo-progress"
-// import TieredDiscountProgress from "@modules/cart/components/discount-progress"
 
 export async function generateMetadata({ params }: any): Promise<Metadata> {
   const { locale } = await params
@@ -38,8 +35,6 @@ export default async function ShopPage(props: {
   const { collections } = await listCollections({
     fields: "id, handle, title",
   })
-
-  // const cart = await retrieveCart()
 
   if (!collections || !region) {
     return null

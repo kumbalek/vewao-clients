@@ -163,6 +163,22 @@
         "sku": "007",
         "price_czk": 590
       }
+    },
+    {
+      "handle": "darkove-baleni",
+      "title": "Dárkové balení",
+      "subtitle": null,
+      "description": "Dárkové balení objednávky.",
+      "collection": null,
+      "thumbnail": null,
+      "images": [],
+      "metadata": {},
+      "discountable": false,
+      "variant": {
+        "title": "Dárkové balení",
+        "sku": "DARKOVE-BALENI",
+        "price_czk": 199
+      }
     }
   ]
 }

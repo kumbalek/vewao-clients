@@ -9,11 +9,13 @@ import Divider from "@modules/common/components/divider"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import GiftPackagingToggle from "@modules/cart/components/gift-packaging"
 import { HttpTypes } from "@medusajs/types"
+import type { GiftPackaging } from "@lib/data/gift-packaging"
 
 type SummaryProps = {
   cart: HttpTypes.StoreCart & {
     promotions: HttpTypes.StorePromotion[]
   }
+  giftPackaging: GiftPackaging | null
 }
 
 function getCheckoutStep(cart: HttpTypes.StoreCart) {
@@ -26,7 +28,7 @@ function getCheckoutStep(cart: HttpTypes.StoreCart) {
   }
 }
 
-const Summary = ({ cart }: SummaryProps) => {
+const Summary = ({ cart, giftPackaging }: SummaryProps) => {
   const t = useTranslations("cart")
   const step = getCheckoutStep(cart)
 
@@ -38,7 +40,13 @@ const Summary = ({ cart }: SummaryProps) => {
       {/* <DiscountCode cart={cart} /> */}
       <Divider />
       <CartTotals totals={cart} />
-      <GiftPackagingToggle cart={cart} countryCode={"cz"} />
+      {giftPackaging && (
+        <GiftPackagingToggle
+          cart={cart}
+          countryCode={"cz"}
+          giftPackaging={giftPackaging}
+        />
+      )}
       <LocalizedClientLink
         href={"/checkout?step=" + step}
         data-testid="checkout-button"

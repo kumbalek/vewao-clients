@@ -21,8 +21,13 @@ no legacy price observations or fabricated historical coverage.
 - Comgate is the card-payment integration. Stripe is obsolete and removed.
 - The inherited UI supports manual payment on zero-price shipping. Confirm the
   actual pickup/shipping mapping before launch; free delivery is not proof of pickup.
-- Gift packaging and quantity discounts are in the inherited UI. Reconfigure
-  identifiers against new data and verify behaviour with the platform backend.
+- Gift packaging and quantity discounts: native Medusa promotions, decided by
+  the owner on 2026-10-14 (vewao-platform#14). Tiers are automatic promotions
+  on the platform's `discountable_item_count` rule; the cart's progress bar
+  appears while one is active, with texts edited on the promotion in admin.
+  Gift packaging is the `darkove-baleni` product with _Discountable_ off. Tier
+  values and activation await the merchant (vewao-workspace#11); a 10 % tier on
+  a single item discounts every order, so check it against discount-claim rules.
 - Czech copy, legal pages, imagery and styles were retained. Legal text needs
   merchant approval/current review before launch.
 - Money S3 and invoices are merchant requirements from the audit

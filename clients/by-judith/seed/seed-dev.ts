@@ -21,6 +21,8 @@ type CatalogueProduct = {
   thumbnail: string | null
   images: string[]
   metadata: Record<string, unknown>
+  /** False for gift packaging: promotions neither discount nor count it. */
+  discountable?: boolean
   variant: { title: string; sku: string; price_czk: number }
 }
 
@@ -90,6 +92,36 @@ const SHIPPING: ShippingSpec[] = [
     ],
   },
 ]
+
+// Legacy quantity tiers as native automatic promotions. vewao-platform's
+// checkout plugin adds `discountable_item_count` to the promotion context.
+// Created as drafts: values and activation await the merchant (platform#14).
+const TIERS = [
+  {
+    code: "TIER_10",
+    operator: "eq",
+    count: 1,
+    value: 10,
+    message: "🎉 Získáváte slevu 10 %!",
+    teaser: "Kupte 1 balení a získáte 10 % slevu, 2 balení 20 %, 3+ balení 30 %!",
+  },
+  {
+    code: "TIER_20",
+    operator: "eq",
+    count: 2,
+    value: 20,
+    message: "🔥 Získáváte slevu 20 %!",
+    teaser: "Kupte jakýkoliv další produkt a získáte 20 %.",
+  },
+  {
+    code: "TIER_30",
+    operator: "gte",
+    count: 3,
+    value: 30,
+    message: "🏆 Získáváte maximální slevu 30 %!",
+    teaser: "Kupte jakýkoliv další produkt a získáte 30 %.",
+  },
+] as const
 
 function createClient() {
   const baseUrl = process.env.MEDUSA_BACKEND_URL
@@ -281,6 +313,7 @@ async function ensureProducts(
       images: p.images.map((url) => ({ url })),
       collection_id: p.collection ? collections.get(p.collection) : undefined,
       metadata: p.metadata,
+      discountable: p.discountable ?? true,
       sales_channels: [{ id: salesChannelId }],
       shipping_profile_id: shippingProfileId,
       options: [{ title: DEFAULT_OPTION.title, values: [DEFAULT_OPTION.value] }],
@@ -320,6 +353,39 @@ async function ensureStock(catalogue: Catalogue, locationId: string) {
   }
 }
 
+async function ensureTierPromotions() {
+  for (const tier of TIERS) {
+    const { promotions } = await sdk.admin.promotion.list({ code: tier.code })
+    if (promotions.length) {
+      log("exists", `promotion ${tier.code}`)
+      continue
+    }
+    const { promotion } = await sdk.admin.promotion.create({
+      code: tier.code,
+      type: "standard",
+      is_automatic: true,
+      is_tax_inclusive: true,
+      status: "draft",
+      application_method: {
+        type: "percentage",
+        target_type: "items",
+        allocation: "across",
+        value: tier.value,
+      },
+      rules: [
+        { attribute: "discountable_item_count", operator: tier.operator, values: [String(tier.count)] },
+      ],
+    })
+    // Medusa 2.20.1's promotion API takes no metadata; the platform's route
+    // stores the storefront progress-bar texts.
+    await sdk.client.fetch(`/admin/promotion-tiers/${promotion.id}`, {
+      method: "POST",
+      body: { message: tier.message, teaser: tier.teaser },
+    })
+    log("created", `promotion ${tier.code} (draft, ${tier.value} % from ${tier.count} items)`)
+  }
+}
+
 async function main() {
   const catalogue = JSON.parse(
     readFileSync(new URL("./catalogue.json", import.meta.url), "utf8")
@@ -334,6 +400,7 @@ async function main() {
   const collections = await ensureCollections(catalogue)
   await ensureProducts(catalogue, collections, salesChannel.id, shippingProfileId)
   await ensureStock(catalogue, locationId)
+  await ensureTierPromotions()
   console.log("By Judith dev seed complete.")
 }
 

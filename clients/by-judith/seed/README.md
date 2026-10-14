@@ -31,7 +31,13 @@ channel. Keep the secret key out of shell history and git; revoke it when done.
 | Fulfilment | Manual provider; no carrier integration |
 | Payment rule | Pay on site only with clinic pickup (storefront, and backend with `FEATURE_PAY_ON_SITE_PICKUP_ONLY=true`) |
 | Stock | 100 per SKU at Beauty Body Clinic (dev value, not real stock) |
+| Gift packaging | Product `darkove-baleni` (the legacy handle), 199 Kč, _Discountable_ off: promotions neither discount nor count it |
+| Quantity tiers | Automatic promotions `TIER_10`/`TIER_20`/`TIER_30` (10/20/30 % from 1/2/3+ discountable items), created as **draft** with the legacy progress-bar texts; activate them in admin once the merchant confirms values (vewao-platform#14) |
 | Tax | Prices are VAT-inclusive; **no tax rates** until verified with the accountant |
+
+The tiers rely on vewao-platform's checkout plugin (`discountable_item_count`
+rule, `FEATURE_PROMOTION_TIERS`). The seed saves their texts through
+`/admin/promotion-tiers/:id`, only when it creates a promotion.
 
 Launch methods were agreed with the owner on 2026-09-24. The PPL thresholds use
 `lt 5000`/`gt 4999.99` because of a Medusa 2.20.1 pricing bug; see
