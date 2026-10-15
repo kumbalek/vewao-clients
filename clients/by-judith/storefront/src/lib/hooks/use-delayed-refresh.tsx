@@ -1,26 +1,28 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { useState, useCallback } from "react"
+import { useCallback, useState, useTransition } from "react"
 
 export const useDelayedRefresh = () => {
   const router = useRouter()
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [isPending, startTransition] = useTransition()
 
   const delayedRefresh = useCallback(
     async (waitMs = 800) => {
       setIsRefreshing(true)
 
-      // 1. Wait for the backend subscribers/workflows to finish
+      // Wait for the backend subscribers/workflows to finish.
       await new Promise((resolve) => setTimeout(resolve, waitMs))
 
-      // 2. Force Next.js to re-fetch server data (the updated cart)
-      router.refresh()
+      startTransition(() => {
+        router.refresh()
+      })
 
       setIsRefreshing(false)
     },
     [router]
   )
 
-  return { delayedRefresh, isRefreshing }
+  return { delayedRefresh, isRefreshing: isRefreshing || isPending }
 }

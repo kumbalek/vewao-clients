@@ -138,7 +138,7 @@ no host ports and must not be folded into the application deployment. It was
 installed on 2026-09-23 and now provides host metrics, internal probes, scoped
 application logs and required-container state to Grafana Cloud. External checks
 and alert notifications are intentionally deferred for dev; the production work
-is tracked in [`monitoring/PRODUCTION-TODO.md`](monitoring/PRODUCTION-TODO.md).
+is tracked in [vewao-clients#13](https://github.com/kumbalek/vewao-clients/issues/13).
 
 ## Recorded preparation — 2026-09-15
 

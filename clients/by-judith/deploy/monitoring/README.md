@@ -91,7 +91,7 @@ of collector state is explicitly intended.
 
 External synthetic checks and alert notifications are intentionally deferred for
 the dev environment by owner decision on 2026-09-24. They remain required before
-production cutover; follow `PRODUCTION-TODO.md` rather than adding them to dev.
+production cutover; see vewao-clients#13 rather than adding them to dev.
 
 - Add the two dev NPM virtual-host files with parsing, query-string/IP/PII
   minimization and rotation tests; never mount all shared NPM logs.

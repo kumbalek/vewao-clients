@@ -4,7 +4,6 @@ import { Table, Text, clx } from "@medusajs/ui"
 import { updateLineItem } from "@lib/data/cart"
 import { HttpTypes } from "@medusajs/types"
 import CartItemSelect from "@modules/cart/components/cart-item-select"
-import ErrorMessage from "@modules/checkout/components/error-message"
 import DeleteButton from "@modules/common/components/delete-button"
 // import LineItemOptions from "@modules/common/components/line-item-options"
 import LineItemPrice from "@modules/common/components/line-item-price"
@@ -12,7 +11,7 @@ import LineItemUnitPrice from "@modules/common/components/line-item-unit-price"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Spinner from "@modules/common/icons/spinner"
 import Thumbnail from "@modules/products/components/thumbnail"
-import { useState } from "react"
+import { useCallback, useState } from "react"
 
 import { useDelayedRefresh } from "@lib/hooks/use-delayed-refresh"
 
@@ -25,30 +24,38 @@ type ItemProps = {
 }
 
 const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
-  const [updating, setUpdating] = useState(false)
+  const [busyLine, setBusyLine] = useState<"update" | "delete" | null>(null)
   const [error, setError] = useState<string | null>(null)
   const { delayedRefresh, isRefreshing } = useDelayedRefresh()
-  const isGiftPackaging = item.variant_id === GIFT_VARIANT_ID
+  const isGiftPackaging = Boolean(
+    GIFT_VARIANT_ID && item.variant_id === GIFT_VARIANT_ID
+  )
+
+  const isBusy = busyLine !== null || isRefreshing
+  const handleDeleteBusyChange = useCallback((deleteBusy: boolean) => {
+    setBusyLine((current) =>
+      deleteBusy ? "delete" : current === "delete" ? null : current
+    )
+  }, [])
 
   const changeQuantity = async (quantity: number) => {
+    if (isBusy) {
+      return
+    }
+    setBusyLine("update")
     setError(null)
-    setUpdating(true)
 
-    await updateLineItem({
-      lineId: item.id,
-      quantity,
-    }).catch((err) => {
-      setError(err.message)
-    })
-
-    await delayedRefresh()
-
-    setUpdating(false)
+    try {
+      await updateLineItem({ lineId: item.id, quantity })
+      await delayedRefresh()
+    } catch {
+      setError("Aktualizace množství se nepodařila. Zkuste to prosím znovu.")
+    } finally {
+      setBusyLine(null)
+    }
   }
 
-  // TODO: Update this to grab the actual max inventory
-  const maxQtyFromInventory = 10
-  const maxQuantity = item.variant?.manage_inventory ? 10 : maxQtyFromInventory
+  const maxQuantity = Math.max(item.quantity + 10, 20)
 
   return (
     <Table.Row className="w-full" data-testid="product-row">
@@ -89,18 +96,24 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
       {type === "full" && (
         <Table.Cell>
           <div className="flex gap-2 items-center w-28">
-            <DeleteButton id={item.id} data-testid="product-delete-button" />
+            <DeleteButton
+              id={item.id}
+              data-testid="product-delete-button"
+              aria-label={`Odebrat ${item.product_title}`}
+              disabled={isBusy}
+              onBusyChange={handleDeleteBusyChange}
+            />
             <CartItemSelect
               value={item.quantity}
               onChange={(value) => changeQuantity(parseInt(value.target.value))}
               className="w-14 h-10 p-4"
               data-testid="product-select-button"
-              disabled={isGiftPackaging}
+              aria-label={`Množství produktu ${item.product_title}`}
+              disabled={isGiftPackaging || isBusy}
             >
-              {/* TODO: Update this with the v2 way of managing inventory */}
               {Array.from(
                 {
-                  length: Math.min(maxQuantity, 10),
+                  length: maxQuantity,
                 },
                 (_, i) => (
                   <option value={i + 1} key={i}>
@@ -108,14 +121,18 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
                   </option>
                 )
               )}
-
-              <option value={1} key={1}>
-                1
-              </option>
             </CartItemSelect>
-            {(updating || isRefreshing) && <Spinner />}
+            {busyLine === "update" && <Spinner />}
           </div>
-          <ErrorMessage error={error} data-testid="product-error-message" />
+          {error && (
+            <p
+              data-testid="product-error-message"
+              role="alert"
+              className="pt-2 text-rose-500 text-small-regular"
+            >
+              {error}
+            </p>
+          )}
         </Table.Cell>
       )}
 

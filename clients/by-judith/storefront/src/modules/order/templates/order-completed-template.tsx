@@ -3,6 +3,7 @@ import { Heading } from "@medusajs/ui"
 import { getTranslations } from "next-intl/server"
 
 import CartTotals from "@modules/common/components/cart-totals"
+import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Help from "@modules/order/components/help"
 import Items from "@modules/order/components/items"
 // import OnboardingCta from "@modules/order/components/onboarding-cta"
@@ -47,6 +48,14 @@ export default async function OrderCompletedTemplate({
           <ShippingDetails order={order} />
           <PaymentDetails order={order} />
           <Help />
+          <p className="text-small-regular text-ui-fg-subtle">
+            <LocalizedClientLink
+              href={`/odstoupeni-od-smlouvy?objednavka=${order.display_id}`}
+              className="underline hover:text-ui-fg-base"
+            >
+              Odstoupit od smlouvy
+            </LocalizedClientLink>
+          </p>
         </div>
       </div>
     </div>

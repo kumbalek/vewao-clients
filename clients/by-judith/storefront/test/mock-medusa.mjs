@@ -17,6 +17,7 @@ const carts = new Map()
 const orders = new Map()
 const requests = []
 let gatewayOutcome = "PAID"
+const cartControls = { delayMs: 0, status: 200, message: "Košík se nepodařilo aktualizovat." }
 // A product on a sale price list: Medusa's list price 1 890, sale price 1 490.
 const saleProduct = {
   id: "prod_sale", handle: "akcni-produkt", title: "Akční produkt", subtitle: "Testovací akce", description: "Popis produktu",
@@ -103,7 +104,9 @@ function relationsDepth(field) {
 function shippingFor(id) {
   if (id.startsWith("cart_pickup")) return { option: shippingOptions[1], amount: 0 }
   if (id.startsWith("cart_freeppl")) return { option: shippingOptions[0], amount: 0 }
-  return { option: shippingOptions[0], amount: 150 }
+  const itemSubtotal = (carts.get(id)?.items ?? [{ total: 490 }]).reduce((sum, item) => sum + item.total, 0)
+  const amount = itemSubtotal >= 5000 ? 0 : 150
+  return { option: shippingOptions[0], amount }
 }
 function cart(id) {
   if (!carts.has(id)) {
@@ -111,7 +114,7 @@ function cart(id) {
     carts.set(id, {
       id, region_id: region.id, region, currency_code: "czk", email: "test@example.invalid", completed_at: null,
       shipping_address: address, billing_address: address,
-      items: [{ id: "item_test", title: "Testovací produkt", product_title: "Testovací produkt", product_handle: "testovaci-produkt", quantity: 1, unit_price: 490, total: 490, original_total: 490, thumbnail: "/logo.webp", variant: { id: "variant_test", title: "Standard", options: [] }, product: { id: "prod_test", handle: "testovaci-produkt" }, metadata: {} }],
+      items: [{ id: "item_test", variant_id: "variant_test", title: "Testovací produkt", product_title: "Testovací produkt", product_handle: "testovaci-produkt", quantity: 1, unit_price: 490, total: 490, original_total: 490, thumbnail: "/logo.webp", variant: { id: "variant_test", title: "Standard", options: [] }, product: { id: "prod_test", handle: "testovaci-produkt" }, metadata: {} }],
       shipping_methods: [{ id: "sm_test", shipping_option_id: option.id, name: option.name, amount, total: amount }],
       // As in Medusa 2.20: `subtotal` includes shipping; `item_subtotal` does not.
       total: 490 + amount, subtotal: 490 + amount, item_subtotal: 490, item_total: 490, shipping_subtotal: amount, shipping_total: amount,
@@ -120,6 +123,35 @@ function cart(id) {
     })
   }
   return carts.get(id)
+}
+function recalcCart(current) {
+  current.item_subtotal = current.items.reduce((sum, item) => sum + item.total, 0)
+  current.item_total = current.item_subtotal
+  const { option, amount } = shippingFor(current.id)
+  current.shipping_subtotal = amount
+  current.shipping_total = amount
+  current.shipping_methods = [{ id: "sm_test", shipping_option_id: option.id, name: option.name, amount, total: amount }]
+  current.discount_total = current.id.startsWith("cart_discount") ? 100 : 0
+  current.subtotal = current.item_subtotal + amount
+  current.total = current.subtotal - current.discount_total
+  current.original_total = current.subtotal
+}
+function mutateCartLine(method, cartId, lineId, changes) {
+  const current = cart(cartId)
+  const index = current.items.findIndex((item) => item.id === lineId)
+  if (index === -1) {
+    return { status: 404, body: { type: "not_found", message: cartControls.message } }
+  }
+  if (method === "update") {
+    if (!Number.isInteger(changes.quantity) || changes.quantity < 1) {
+      return { status: 400, body: { type: "invalid_data", message: cartControls.message } }
+    }
+    current.items[index] = { ...current.items[index], quantity: changes.quantity, total: changes.quantity * current.items[index].unit_price, original_total: changes.quantity * current.items[index].unit_price }
+  } else {
+    current.items.splice(index, 1)
+  }
+  recalcCart(current)
+  return { status: 200, body: { cart: current } }
 }
 function placeOrder(current, session) {
   const order = {
@@ -143,7 +175,20 @@ const server = createServer(async (req, res) => {
   const data = body ? JSON.parse(body) : {}
   if (url.pathname === "/health") return send({ ok: true })
   if (url.pathname === "/__requests") return send(requests)
-  if (url.pathname === "/__reset") { carts.clear(); orders.clear(); requests.length = 0; gatewayOutcome = "PAID"; priceHistory = { current_amount: 1490, reference_price: 1690, history_complete: true }; return send({ ok: true }) }
+  if (url.pathname === "/__reset") { carts.clear(); orders.clear(); requests.length = 0; gatewayOutcome = "PAID"; Object.assign(cartControls, { delayMs: 0, status: 200, message: "Košík se nepodařilo aktualizovat." }); priceHistory = { current_amount: 1490, reference_price: 1690, history_complete: true }; return send({ ok: true }) }
+  if (url.pathname === "/__cart/seed") {
+    const current = cart(data.cartId)
+    if (data.quantity > 1) {
+      current.items[0] = { ...current.items[0], quantity: data.quantity, total: data.quantity * current.items[0].unit_price, original_total: data.quantity * current.items[0].unit_price }
+    }
+    if (data.items?.length) current.items = data.items
+    recalcCart(current)
+    return send({ cart: current })
+  }
+  if (url.pathname === "/__cart/controls") {
+    Object.assign(cartControls, data)
+    return send({ ok: true })
+  }
   if (url.pathname === "/__price-history") { priceHistory = { ...priceHistory, ...data }; return send({ ok: true }) }
   if (url.pathname === "/__comgate/outcome") { gatewayOutcome = data.status; return send({ ok: true }) }
   if (url.pathname === "/__comgate/pay") {
@@ -190,10 +235,51 @@ const server = createServer(async (req, res) => {
   if (url.pathname === "/store/customers/me") return send({ message: "Not authenticated" }, 401)
   if (url.pathname === "/store/shipping-options") return send({ shipping_options: shippingOptions })
   if (url.pathname === "/store/payment-providers") return send({ payment_providers: providers })
+  if (url.pathname === "/store/withdrawals" && req.method === "POST") {
+    // Mirrors vewao-platform's withdrawal route: confirmation required, the
+    // statement recorded whether or not the order matches. "500" fails.
+    if (data.confirmed !== true || !data.order_reference || !data.customer_name || !/@/.test(data.email ?? "")) {
+      return send({ type: "invalid_data", message: "Invalid request" }, 400)
+    }
+    if (data.order_reference === "500") return send({ type: "unknown_error", message: "An unknown error occurred." }, 500)
+    const statement = ["Oznamuji, že tímto odstupuji od kupní smlouvy uzavřené na dálku.",
+      `Číslo objednávky: ${data.order_reference}`, `Zboží: ${data.items || "celá objednávka"}`,
+      `Jméno a příjmení: ${data.customer_name}`, `E-mail: ${data.email}`].join("\n")
+    return send({ withdrawal: { id: "wdr_test", statement, submitted_at: "2026-10-06T12:34:56.000Z", email: data.email } }, 201)
+  }
   const orderMatch = url.pathname.match(/^\/store\/orders\/([^/]+)$/)
   if (orderMatch) return orders.has(orderMatch[1]) ? send({ order: orders.get(orderMatch[1]) }) : send({ message: "Order not found" }, 404)
   const cartMatch = url.pathname.match(/^\/store\/carts\/([^/]+)$/)
   if (cartMatch) return send({ cart: cart(cartMatch[1]) })
+  const lineItemsMatch = url.pathname.match(/^\/store\/carts\/([^/]+)\/line-items$/)
+  if (lineItemsMatch && req.method === "POST") {
+    const current = cart(lineItemsMatch[1])
+    if (cartControls.status >= 400) return send({ type: "unknown_error", message: cartControls.message }, cartControls.status)
+    if (data.variant_id !== "variant_sale") {
+      return send({ type: "invalid_data", message: "Variantu se nepodařilo najít." }, 404)
+    }
+    const existing = current.items.find((item) => item.id === "item_sale")
+    if (existing) {
+      existing.quantity += data.quantity
+      existing.total = existing.quantity * existing.unit_price
+      existing.original_total = existing.total
+    } else {
+      current.items.push({
+        id: "item_sale", variant_id: "variant_sale", title: saleProduct.title, product_title: saleProduct.title, product_handle: saleProduct.handle,
+        quantity: data.quantity, unit_price: 1490, total: data.quantity * 1490, original_total: data.quantity * 1490,
+        thumbnail: saleProduct.thumbnail, variant: saleProduct.variants[0], product: saleProduct, metadata: {},
+      })
+    }
+    recalcCart(current)
+    return send({ cart: current })
+  }
+  const lineItemMatch = url.pathname.match(/^\/store\/carts\/([^/]+)\/line-items\/([^/]+)$/)
+  if (lineItemMatch) {
+    if (cartControls.status >= 400) return send({ type: "unknown_error", message: cartControls.message }, cartControls.status)
+    if (cartControls.delayMs) await new Promise((resolve) => setTimeout(resolve, cartControls.delayMs))
+    const result = mutateCartLine(req.method === "DELETE" ? "delete" : "update", lineItemMatch[1], lineItemMatch[2], data)
+    return send(result.body, result.status)
+  }
   const completeMatch = url.pathname.match(/^\/store\/carts\/([^/]+)\/complete$/)
   if (completeMatch && req.method === "POST") {
     const current = cart(completeMatch[1])

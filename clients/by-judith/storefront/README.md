@@ -44,7 +44,7 @@ The standalone Next.js output is enabled, but no production deployment is set up
 
 Playwright starts isolated Next.js and mock Medusa servers on ports 8101/9101.
 See `e2e/README.md`. Its tests do not contact a payment gateway or place orders.
-Production Medusa/payment integration remains a separate checklist item.
+Production integration work is tracked on the [project board](https://github.com/users/kumbalek/projects/1).
 
 Stripe dependencies, wrappers, card fields and payment branches are removed.
 Comgate and the existing manual payment branch remain. Analytics is disabled

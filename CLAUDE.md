@@ -1,8 +1,12 @@
 # vewao-clients
 
 Client storefronts, configuration and operational notes. **The current goal is a
-working By Judith shop**, with platform reuse secondary. The workspace docs and
-MVP checklist define scope; the earlier fleet-first policies are superseded.
+working By Judith shop**, with platform reuse secondary. The workspace docs define
+scope; the earlier fleet-first policies are superseded.
+
+Tasks and status live on the [project board](https://github.com/users/kumbalek/projects/1), not in docs. Open storefront, seed and
+deployment issues in this repository under the matching epic; record verification
+evidence in the issue before closing it. See the workspace `CLAUDE.md` for the workflow.
 
 ## Layout
 
@@ -14,8 +18,7 @@ clients/by-judith/
   ...               straightforward configuration/deployment files as needed
 ```
 
-The By Judith entry now exists with the copied client storefront and onboarding
-notes. Backend integration and production launch remain open. A mandatory
+A mandatory
 `instance.yaml`, theme schema, encrypted YAML format or scaffold generator is not
 required. Keep secrets in the deployment environment or a suitable secret store,
 never plaintext in git. SOPS can be added if it helps later.

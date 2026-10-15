@@ -3,6 +3,12 @@ import { expect, test, type Locator, type Page } from "@playwright/test"
 const MOCK = "http://127.0.0.1:9101"
 const SHOP = "http://127.0.0.1:8101"
 
+// These pages start on the landing page, whose hero animation competes with
+// React for the main thread; the hero has its own spec. Navigations also wait
+// for `next dev` to compile the target route on first visit.
+test.use({ reducedMotion: "reduce" })
+const NAVIGATION = { timeout: 15_000 }
+
 // Server-rendered controls ignore input until React hydrates them.
 async function waitForHydration(page: Page, control: Locator) {
   await expect(control).toBeVisible()
@@ -77,7 +83,7 @@ test("the desktop header offers the wireframe navigation", async ({ page, isMobi
   await shop.hover()
   await expect(shop).toHaveAttribute("aria-expanded", "true")
   await page.getByRole("link", { name: "Všechny produkty" }).first().click()
-  await expect(page).toHaveURL(/\/cz\/store$/)
+  await expect(page).toHaveURL(/\/cz\/store$/, NAVIGATION)
   await expect(shop).toHaveAttribute("aria-expanded", "false")
 })
 
@@ -126,7 +132,7 @@ test("header search lists matching products", async ({ page, isMobile, request }
   await search.fill(term)
   await search.press("Enter")
 
-  await expect(page).toHaveURL(new RegExp(`/cz/store\\?q=${term}$`))
+  await expect(page).toHaveURL(new RegExp(`/cz/store\\?q=${term}$`), NAVIGATION)
   await expect(page.getByTestId("store-page-title")).toHaveText(`Výsledky hledání „${term}“`)
   await expect(page.getByTestId("search-empty")).toBeVisible()
 
