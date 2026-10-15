@@ -1,29 +1,34 @@
 import ItemsTemplate from "./items"
 import Summary from "./summary"
 import EmptyCartMessage from "../components/empty-cart-message"
-// import ValentineDiscountProgress from "../components/valentine-promo-progress"
-// import TieredDiscountProgress from "../components/discount-progress"
 // import SignInPrompt from "../components/sign-in-prompt"
 // import Divider from "@modules/common/components/divider"
 import { HttpTypes } from "@medusajs/types"
 import BackButton from "../components/backButton"
+import PromotionProgressBar from "../components/promotion-progress"
+import type { GiftPackaging } from "@lib/data/gift-packaging"
+import type { PromotionTier } from "@lib/util/promotion-progress"
 
 const CartTemplate = ({
   cart,
   customer,
+  promotionTiers = [],
+  giftPackaging = null,
 }: {
   cart: HttpTypes.StoreCart | null
   customer: HttpTypes.StoreCustomer | null
+  promotionTiers?: PromotionTier[]
+  giftPackaging?: GiftPackaging | null
 }) => {
   return (
     <div className="py-12">
       <div className="content-container" data-testid="cart-container">
         <BackButton />
-        {/* {!!cart?.items?.length && (
+        {!!cart?.items?.length && promotionTiers.length > 0 && (
           <div className="mb-6 p-4 flex justify-center">
-            <ValentineDiscountProgress cart={cart} />
+            <PromotionProgressBar cart={cart} tiers={promotionTiers} />
           </div>
-        )} */}
+        )}
         {cart?.items?.length ? (
           <div className="grid grid-cols-1 small:grid-cols-[1fr_360px] gap-x-32">
             {/* Insert the component here, above the items list */}
@@ -41,7 +46,7 @@ const CartTemplate = ({
                 {cart && cart.region && (
                   <>
                     <div className="bg-white py-6">
-                      <Summary cart={cart as any} />
+                      <Summary cart={cart as any} giftPackaging={giftPackaging} />
                     </div>
                   </>
                 )}

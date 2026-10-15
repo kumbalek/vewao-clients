@@ -3,6 +3,7 @@ import { notFound } from "next/navigation"
 import { listProducts } from "@lib/data/products"
 import { getRegion, listRegions } from "@lib/data/regions"
 import ProductTemplate from "@modules/products/templates"
+import { GIFT_PACKAGING_HANDLE } from "@lib/util/gift-packaging"
 
 type Props = {
   params: Promise<{ countryCode: string; handle: string }>
@@ -14,7 +15,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
   const { handle } = params
   const region = await getRegion(params.countryCode)
 
-  if (params.handle === "darkove-baleni") {
+  if (params.handle === GIFT_PACKAGING_HANDLE) {
     notFound()
   }
 

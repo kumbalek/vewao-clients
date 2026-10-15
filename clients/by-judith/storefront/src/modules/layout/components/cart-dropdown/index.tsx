@@ -12,8 +12,8 @@ import Thumbnail from "@modules/products/components/thumbnail"
 import { usePathname } from "next/navigation"
 import { Fragment, useEffect, useRef, useState } from "react"
 import { useTranslations } from "next-intl"
+import { isGiftPackaging as isGift } from "@lib/util/gift-packaging"
 
-const GIFT_VARIANT_ID = process.env.NEXT_PUBLIC_GIFT_PACKAGING_VARIANT_ID
 
 const CartDropdown = ({
   cart: cartState,
@@ -124,8 +124,7 @@ const CartDropdown = ({
                       : 1
                   })
                   .map((item) => {
-                    const isGiftPackaging =
-                      item.variant_id === GIFT_VARIANT_ID
+                    const isGiftPackaging = isGift(item)
                     return (
                       <div
                         className="grid grid-cols-[122px_1fr] gap-x-4"

@@ -29,6 +29,19 @@ const saleProduct = {
     calculated_price: { calculated_amount: 1490, original_amount: 1890, currency_code: "czk", calculated_price: { price_list_type: "sale" }, original_price: { price_list_type: null } },
   }],
 }
+// Gift packaging: Discountable off in admin, so promotions neither discount nor count it.
+const giftProduct = {
+  id: "prod_gift", handle: "darkove-baleni", title: "Dárkové balení", subtitle: null, description: "Dárkové balení objednávky.",
+  thumbnail: null, images: [], collection: null, collection_id: null, tags: [], metadata: {}, type: null, discountable: false,
+  options: saleProduct.options,
+  variants: [{
+    id: "variant_gift", title: "Dárkové balení", sku: "DARKOVE-BALENI", manage_inventory: false, allow_backorder: false, inventory_quantity: 10,
+    options: saleProduct.variants[0].options,
+    calculated_price: { calculated_amount: 199, original_amount: 199, currency_code: "czk", calculated_price: { price_list_type: null }, original_price: { price_list_type: null } },
+  }],
+}
+// Active quantity-tier promotions as vewao-platform's GET /store/promotion-tiers returns them.
+let promotionTiers = []
 // Magazine articles as the Content plugin serves them: newest first, body_html
 // only on the detail route (the plugin renders and sanitises Markdown).
 const photo = { image: "http://localhost:9101/static/dn.webp", image_width: 1200, image_height: 1798, gallery: [] }
@@ -114,7 +127,7 @@ function cart(id) {
     carts.set(id, {
       id, region_id: region.id, region, currency_code: "czk", email: "test@example.invalid", completed_at: null,
       shipping_address: address, billing_address: address,
-      items: [{ id: "item_test", variant_id: "variant_test", title: "Testovací produkt", product_title: "Testovací produkt", product_handle: "testovaci-produkt", quantity: 1, unit_price: 490, total: 490, original_total: 490, thumbnail: "/logo.webp", variant: { id: "variant_test", title: "Standard", options: [] }, product: { id: "prod_test", handle: "testovaci-produkt" }, metadata: {} }],
+      items: [{ id: "item_test", variant_id: "variant_test", title: "Testovací produkt", product_title: "Testovací produkt", product_handle: "testovaci-produkt", quantity: 1, unit_price: 490, total: 490, original_total: 490, is_discountable: true, thumbnail: "/logo.webp", variant: { id: "variant_test", title: "Standard", options: [] }, product: { id: "prod_test", handle: "testovaci-produkt" }, metadata: {} }],
       shipping_methods: [{ id: "sm_test", shipping_option_id: option.id, name: option.name, amount, total: amount }],
       // As in Medusa 2.20: `subtotal` includes shipping; `item_subtotal` does not.
       total: 490 + amount, subtotal: 490 + amount, item_subtotal: 490, item_total: 490, shipping_subtotal: amount, shipping_total: amount,
@@ -175,7 +188,7 @@ const server = createServer(async (req, res) => {
   const data = body ? JSON.parse(body) : {}
   if (url.pathname === "/health") return send({ ok: true })
   if (url.pathname === "/__requests") return send(requests)
-  if (url.pathname === "/__reset") { carts.clear(); orders.clear(); requests.length = 0; gatewayOutcome = "PAID"; Object.assign(cartControls, { delayMs: 0, status: 200, message: "Košík se nepodařilo aktualizovat." }); priceHistory = { current_amount: 1490, reference_price: 1690, history_complete: true }; return send({ ok: true }) }
+  if (url.pathname === "/__reset") { carts.clear(); orders.clear(); requests.length = 0; gatewayOutcome = "PAID"; Object.assign(cartControls, { delayMs: 0, status: 200, message: "Košík se nepodařilo aktualizovat." }); promotionTiers = []; priceHistory = { current_amount: 1490, reference_price: 1690, history_complete: true }; return send({ ok: true }) }
   if (url.pathname === "/__cart/seed") {
     const current = cart(data.cartId)
     if (data.quantity > 1) {
@@ -185,6 +198,8 @@ const server = createServer(async (req, res) => {
     recalcCart(current)
     return send({ cart: current })
   }
+  if (url.pathname === "/__promotion-tiers") { promotionTiers = data.tiers ?? []; return send({ ok: true }) }
+  if (url.pathname === "/store/promotion-tiers") return send({ tiers: promotionTiers })
   if (url.pathname === "/__cart/controls") {
     Object.assign(cartControls, data)
     return send({ ok: true })
@@ -226,6 +241,9 @@ const server = createServer(async (req, res) => {
   if (url.pathname === "/store/product-categories") return send({ product_categories: [], count: 0 })
   if (url.pathname === "/store/products") {
     // The SDK encodes id arrays as id[0]=…; accept any id key.
+    if (url.searchParams.get("handle") === giftProduct.handle) {
+      return send({ products: [giftProduct], count: 1 })
+    }
     const wanted = url.searchParams.get("handle") === saleProduct.handle || [...url.searchParams].some(([key, value]) => key.startsWith("id") && value === saleProduct.id)
     return send(wanted ? { products: [saleProduct], count: 1 } : { products: [], count: 0 })
   }
@@ -255,6 +273,17 @@ const server = createServer(async (req, res) => {
   if (lineItemsMatch && req.method === "POST") {
     const current = cart(lineItemsMatch[1])
     if (cartControls.status >= 400) return send({ type: "unknown_error", message: cartControls.message }, cartControls.status)
+    if (data.variant_id === "variant_gift") {
+      if (!current.items.some((item) => item.id === "item_gift")) {
+        current.items.push({
+          id: "item_gift", variant_id: "variant_gift", title: giftProduct.title, product_title: giftProduct.title, product_handle: giftProduct.handle,
+          quantity: 1, unit_price: 199, total: 199, original_total: 199, is_discountable: false,
+          thumbnail: null, variant: giftProduct.variants[0], product: giftProduct, metadata: {},
+        })
+      }
+      recalcCart(current)
+      return send({ cart: current })
+    }
     if (data.variant_id !== "variant_sale") {
       return send({ type: "invalid_data", message: "Variantu se nepodařilo najít." }, 404)
     }
@@ -266,7 +295,7 @@ const server = createServer(async (req, res) => {
     } else {
       current.items.push({
         id: "item_sale", variant_id: "variant_sale", title: saleProduct.title, product_title: saleProduct.title, product_handle: saleProduct.handle,
-        quantity: data.quantity, unit_price: 1490, total: data.quantity * 1490, original_total: data.quantity * 1490,
+        quantity: data.quantity, unit_price: 1490, total: data.quantity * 1490, original_total: data.quantity * 1490, is_discountable: true,
         thumbnail: saleProduct.thumbnail, variant: saleProduct.variants[0], product: saleProduct, metadata: {},
       })
     }

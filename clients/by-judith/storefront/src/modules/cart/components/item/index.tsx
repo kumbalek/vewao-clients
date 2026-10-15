@@ -14,8 +14,8 @@ import Thumbnail from "@modules/products/components/thumbnail"
 import { useCallback, useState } from "react"
 
 import { useDelayedRefresh } from "@lib/hooks/use-delayed-refresh"
+import { isGiftPackaging as isGift } from "@lib/util/gift-packaging"
 
-const GIFT_VARIANT_ID = process.env.NEXT_PUBLIC_GIFT_PACKAGING_VARIANT_ID
 
 type ItemProps = {
   item: HttpTypes.StoreCartLineItem
@@ -27,9 +27,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
   const [busyLine, setBusyLine] = useState<"update" | "delete" | null>(null)
   const [error, setError] = useState<string | null>(null)
   const { delayedRefresh, isRefreshing } = useDelayedRefresh()
-  const isGiftPackaging = Boolean(
-    GIFT_VARIANT_ID && item.variant_id === GIFT_VARIANT_ID
-  )
+  const isGiftPackaging = isGift(item)
 
   const isBusy = busyLine !== null || isRefreshing
   const handleDeleteBusyChange = useCallback((deleteBusy: boolean) => {

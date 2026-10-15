@@ -6,6 +6,7 @@ import { ArrowLink, Text } from "@modules/design-system"
 import ProductPreview from "@modules/products/components/product-preview"
 import { Pagination } from "@modules/store/components/pagination"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
+import { GIFT_PACKAGING_HANDLE } from "@lib/util/gift-packaging"
 
 const PRODUCT_LIMIT = 12
 
@@ -77,16 +78,10 @@ export default async function PaginatedProducts({
 
   const totalPages = Math.ceil(count / PRODUCT_LIMIT)
 
-  const filteredProducts = products.filter((product) => {
-    // Check if ANY variant in this product matches the hidden ID
-    const isGiftProduct = product.variants?.some(
-      (variant) =>
-        variant.id === process.env.NEXT_PUBLIC_GIFT_PACKAGING_VARIANT_ID
-    )
-
-    // Return true to KEEP the product if it is NOT the gift product
-    return !isGiftProduct
-  })
+  // Gift packaging is offered in the cart, not sold as a product.
+  const filteredProducts = products.filter(
+    (product) => product.handle !== GIFT_PACKAGING_HANDLE
+  )
 
   if (query && filteredProducts.length === 0) {
     const [t, tLayout] = await Promise.all([
