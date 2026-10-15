@@ -13,7 +13,7 @@ import { convertToLocale } from "@lib/util/money"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { Placeholder } from "@modules/common/components/placeholder"
 import { ButtonLink, Container } from "@modules/design-system"
-import { PhoneIcon } from "@modules/design-system/components/icons"
+import { PhoneIcon, UserIcon } from "@modules/design-system/components/icons"
 import CartDropdown from "@modules/layout/components/cart-dropdown"
 import HeaderMenu from "@modules/layout/components/header-menu"
 import HeaderShell from "@modules/layout/components/header-shell"
@@ -143,6 +143,17 @@ export default function SiteHeader({
 
           <div className="flex h-full items-center justify-end gap-5">
             <SearchForm countryCode={countryCode} className="hidden w-48 medium:flex" />
+            <LocalizedClientLink
+              href="/account"
+              data-testid="nav-account-link"
+              aria-label={t("accountLabel")}
+              className="flex flex-col items-center gap-0.5 text-ink hover:text-ink-subtle focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink overlay:text-white overlay:hover:text-white/80 overlay:focus-visible:outline-white"
+            >
+              <UserIcon size={24} />
+              <span aria-hidden="true" className="hidden text-xs text-ink-subtle medium:block overlay:text-white/85">
+                {t("account")}
+              </span>
+            </LocalizedClientLink>
             <CartDropdown cart={cart} />
             <ButtonLink href={bookingPath} className={`hidden medium:inline-flex ${bookOverlayClasses}`}>
               {t("book")}

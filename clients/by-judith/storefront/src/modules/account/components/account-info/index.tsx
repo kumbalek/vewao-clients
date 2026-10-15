@@ -5,6 +5,8 @@ import { useEffect } from "react"
 import useToggleState from "@lib/hooks/use-toggle-state"
 import { useFormStatus } from "react-dom"
 
+import { useTranslations } from "next-intl"
+
 type AccountInfoProps = {
   label: string
   currentInfo: string | React.ReactNode
@@ -22,10 +24,11 @@ const AccountInfo = ({
   isSuccess,
   isError,
   clearState,
-  errorMessage = "An error occurred, please try again",
+  errorMessage,
   children,
   'data-testid': dataTestid
 }: AccountInfoProps) => {
+  const t = useTranslations("account")
   const { state, close, toggle } = useToggleState()
 
   const { pending } = useFormStatus()
@@ -63,7 +66,7 @@ const AccountInfo = ({
             data-testid="edit-button"
             data-active={state}
           >
-            {state ? "Cancel" : "Edit"}
+            {state ? t("cancel") : t("edit")}
           </Button>
         </div>
       </div>
@@ -82,7 +85,7 @@ const AccountInfo = ({
           data-testid="success-message"
         >
           <Badge className="p-2 my-4" color="green">
-            <span>{label} updated succesfully</span>
+            <span>{t("saved")}</span>
           </Badge>
         </Disclosure.Panel>
       </Disclosure>
@@ -101,7 +104,7 @@ const AccountInfo = ({
           data-testid="error-message"
         >
           <Badge className="p-2 my-4" color="red">
-            <span>{errorMessage}</span>
+            <span>{errorMessage ?? t("error")}</span>
           </Badge>
         </Disclosure.Panel>
       </Disclosure>
@@ -126,7 +129,7 @@ const AccountInfo = ({
                 type="submit"
                 data-testid="save-button"
               >
-                Save changes
+                {t("save")}
               </Button>
             </div>
           </div>

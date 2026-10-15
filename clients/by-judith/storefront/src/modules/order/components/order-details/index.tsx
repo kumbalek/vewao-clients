@@ -9,22 +9,19 @@ type OrderDetailsProps = {
 
 const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
   const t = useTranslations("confirm")
-  const formatStatus = (str: string) => {
-    const formatted = str.split("_").join(" ")
-
-    return formatted.slice(0, 1).toUpperCase() + formatted.slice(1)
-  }
+  const tAccount = useTranslations("account")
   return (
     <div>
       <Text>
-        {`${t("detailsSentTo")} `}
+        {/* In the account (showStatus) the confirmation wording would not fit. */}
+        {showStatus ? `${tAccount("orderEmail")}: ` : `${t("detailsSentTo")} `}
         <span
           className="text-ui-fg-medium-plus font-semibold"
           data-testid="order-email"
         >
           {order.email}
         </span>
-        .
+        {showStatus ? "" : "."}
       </Text>
       <Text className="mt-2">
         {`${t("orderDate")}: `}
@@ -43,16 +40,16 @@ const OrderDetails = ({ order, showStatus }: OrderDetailsProps) => {
             <Text>
               {`${t("orderStatus")}: `}
               <span className="text-ui-fg-subtle " data-testid="order-status">
-                {formatStatus(order.fulfillment_status)}
+                {tAccount("fulfillmentStatus", { status: order.fulfillment_status })}
               </span>
             </Text>
             <Text>
               {`${t("paymentStatus")}: `}
               <span
                 className="text-ui-fg-subtle "
-                sata-testid="order-payment-status"
+                data-testid="order-payment-status"
               >
-                {formatStatus(order.payment_status)}
+                {tAccount("paymentStatusValue", { status: order.payment_status })}
               </span>
             </Text>
           </>
