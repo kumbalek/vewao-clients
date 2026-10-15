@@ -8,6 +8,11 @@ import {
 const MOCK = "http://127.0.0.1:9101"
 const SHOP = "http://127.0.0.1:8101"
 
+// A server action that throws is answered only after `next dev` prints the
+// error with its source-mapped code frame, which takes seconds on a loaded CI
+// runner. The error and retry tests wait on such actions.
+const SERVER_ACTION = { timeout: 15_000 }
+
 function cartCookie(value: string) {
   return { name: "_medusa_cart_id", value, url: SHOP, sameSite: "Lax" as const }
 }
@@ -148,16 +153,17 @@ test("shows a Czech error and lets the customer retry a quantity update", async 
   const select = page.getByTestId("product-select-button")
   await select.selectOption("3")
   await expect(page.getByTestId("product-error-message")).toHaveText(
-    "Aktualizace množství se nepodařila. Zkuste to prosím znovu."
+    "Aktualizace množství se nepodařila. Zkuste to prosím znovu.",
+    SERVER_ACTION
   )
   await expect(select).toHaveValue("1")
 
   await setCartControls(request, { status: 200 })
   await select.selectOption("3")
-  await expect(page.getByTestId("product-error-message")).toHaveCount(0)
+  await expect(page.getByTestId("product-error-message")).toHaveCount(0, SERVER_ACTION)
   await expect(
     page.getByTestId("product-row").getByTestId("product-price")
-  ).toHaveText(/1[.\s]?470/)
+  ).toHaveText(/1[.\s]?470/, SERVER_ACTION)
 })
 
 test("shows a Czech error and lets the customer retry a delete", async ({
@@ -173,12 +179,12 @@ test("shows a Czech error and lets the customer retry a delete", async ({
   await page.getByTestId("product-delete-button").click()
   await expect(
     page.getByTestId("cart-container").getByRole("alert")
-  ).toHaveText("Odebrání položky se nepodařilo. Zkuste to prosím znovu.")
+  ).toHaveText("Odebrání položky se nepodařilo. Zkuste to prosím znovu.", SERVER_ACTION)
   await expect(page.getByTestId("product-row")).toHaveCount(1)
 
   await setCartControls(request, { status: 200 })
   await page.getByTestId("product-delete-button").click()
-  await expect(page.getByTestId("empty-cart-message")).toBeVisible()
+  await expect(page.getByTestId("empty-cart-message")).toBeVisible(SERVER_ACTION)
 })
 
 test("keeps quantity and delete controls busy during mutations", async ({
