@@ -57,6 +57,9 @@ export const listProcedures = async (category: string) =>
 
 export const getProcedure = (slug: string) => getContentItem<Meta<Procedure>>("procedury", slug)
 
+/** Every procedure, for the Ceník page. */
+export const listAllProcedures = () => listContentItems<Meta<Procedure>>("procedury")
+
 /**
  * A category's questions. Without a procedure: only those for the whole
  * category; with one: those plus the procedure's own.

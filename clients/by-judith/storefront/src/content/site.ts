@@ -44,8 +44,8 @@ export type ProcedureCategory = {
 /** Top-level navigation after the two menus (Procedury, Shop). */
 export const navigationLinks: NavLink[] = [
   { label: "Magazín", href: "/magazin" },
-  { label: "Ceník" },
-  { label: "Novinky a slevy" },
+  { label: "Ceník", href: "/cenik" },
+  { label: "Novinky a slevy", href: "/novinky" },
   { label: "Kontakt", href: "/content/contact" },
 ]
 

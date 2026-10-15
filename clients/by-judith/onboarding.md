@@ -80,7 +80,15 @@ kept. The owner chose to build in steps:
 - "Rezervovat" links to `/content/contact` until a booking provider is chosen
   (vewao-workspace#30).
 - Missing site content is marked `[doplnit]` in `storefront/src/content/site.ts`
-  (vewao-clients#11). Ceník and Novinky have no pages yet (vewao-clients#20).
+  (vewao-clients#11).
+- Built (2026-10-15, vewao-clients#20): Ceník (`/cenik`) lists every procedure's
+  "Ceník" rows by category, straight from the procedures, so it needs no edits
+  of its own. Novinky a slevy (`/novinky`) shows the posts editors write in
+  admin → Obsah → Novinky a slevy (collection created by
+  `seed/setup-novinky.ts`; optional link, "valid until" date and pin order)
+  and the shop's products currently on sale. Empty until the merchant writes
+  posts. Prices repeat the procedures' "Akce … místo …" wording, which still
+  needs the merchant's review.
 - Values follow agreed facts, not the wireframe: free delivery from 5 000 Kč
   (wireframe: 1 500), hours from the current contact page (Po–Pá 10–18; the
   wireframe shows Po–Pá 9–19 · So 9–14).

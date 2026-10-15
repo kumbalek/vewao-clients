@@ -13,6 +13,7 @@
     "magazin:import": "node --experimental-strip-types import-magazin.ts",
     "clinic:extract": "node --experimental-strip-types extract-clinic.ts",
     "clinic:import": "node --experimental-strip-types import-clinic.ts",
+    "novinky:setup": "node --experimental-strip-types setup-novinky.ts",
     "test": "node --experimental-strip-types --test magazin/*.test.ts content/*.test.ts",
     "typecheck": "tsc --noEmit"
   },

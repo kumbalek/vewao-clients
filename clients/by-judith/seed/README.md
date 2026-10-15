@@ -79,6 +79,25 @@ node --env-file=.env.dev --experimental-strip-types import-magazin.ts
 The storefront reads `/content/magazin/items` (published only). Edit articles in
 admin → Content → Magazín.
 
+## Novinky a slevy (Content plugin)
+
+`setup-novinky.ts` creates the empty `novinky` collection that editors fill in
+admin → Obsah. Run it once per backend, like the imports:
+
+```sh
+MEDUSA_BACKEND_URL=… MEDUSA_ADMIN_API_KEY=sk_… pnpm novinky:setup
+```
+
+| Field | Use |
+| --- | --- |
+| Krátký text | text on the card |
+| Obrázek, Popis obrázku | optional image |
+| Odkaz | `/procedury/…` on this site or `https://…`; empty = no link |
+| Platí do | last day the post is shown (Prague time); empty = until removed |
+| Připnout na pořadí | pinned posts first, in this order; others newest first |
+
+The page `/novinky` also lists the shop's products on a sale price list.
+
 ## Clinic content (Content plugin)
 
 `clinic.json` is a snapshot of bbclinic.cz's O nás page and its team. It also
