@@ -75,13 +75,14 @@ function Field({
  * the order and their details, reviews them and confirms. Only the confirmation
  * submits; the backend records the statement and e-mails an acknowledgment.
  */
-export default function WithdrawalForm({ initialOrder = "" }: { initialOrder?: string }) {
+export default function WithdrawalForm({ initial }: { initial?: Partial<WithdrawalInput> }) {
   const [step, setStep] = useState<Step>("edit")
   const [values, setValues] = useState<WithdrawalInput>({
-    order_reference: initialOrder,
+    order_reference: "",
     customer_name: "",
     email: "",
     items: "",
+    ...initial,
   })
   const [errors, setErrors] = useState<Errors>({})
   const [failure, setFailure] = useState<"invalid" | "error" | null>(null)

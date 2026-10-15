@@ -1,46 +1,62 @@
-"use client"
-
-import { XMark } from "@medusajs/icons"
 import { HttpTypes } from "@medusajs/types"
+import { getTranslations } from "next-intl/server"
+
+import CartTotals from "@modules/common/components/cart-totals"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import { ButtonLink, Card, Heading, Text } from "@modules/design-system"
 import Help from "@modules/order/components/help"
 import Items from "@modules/order/components/items"
 import OrderDetails from "@modules/order/components/order-details"
-import OrderSummary from "@modules/order/components/order-summary"
+import PaymentDetails from "@modules/order/components/payment-details"
 import ShippingDetails from "@modules/order/components/shipping-details"
-import React from "react"
 
 type OrderDetailsTemplateProps = {
   order: HttpTypes.StoreOrder
 }
 
-const OrderDetailsTemplate: React.FC<OrderDetailsTemplateProps> = ({
-  order,
-}) => {
+/** A customer's order in their account, with the way to return it. */
+export default async function OrderDetailsTemplate({ order }: OrderDetailsTemplateProps) {
+  const t = await getTranslations("account")
+
   return (
-    <div className="flex flex-col justify-center gap-y-4">
-      <div className="flex gap-2 justify-between items-center">
-        <h1 className="text-2xl ">Order details</h1>
-        {/* <LocalizedClientLink
+    <div className="flex flex-col gap-y-6" data-testid="order-details-container">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <Heading level={1} size="lg">
+          {t("orderNumber", { number: order.display_id ?? "" })}
+        </Heading>
+        <LocalizedClientLink
           href="/account/orders"
-          className="flex gap-2 items-center text-ui-fg-subtle hover:text-ui-fg-base"
+          className="text-sm text-ink-subtle underline hover:text-ink"
           data-testid="back-to-overview-button"
         >
-          <XMark /> Back to overview
-        </LocalizedClientLink> */}
+          {t("backToOrders")}
+        </LocalizedClientLink>
       </div>
-      <div
-        className="flex flex-col gap-4 h-full bg-white w-full"
-        data-testid="order-details-container"
-      >
-        <OrderDetails order={order} showStatus />
-        <Items order={order} />
-        <ShippingDetails order={order} />
-        <OrderSummary order={order} />
-        <Help />
-      </div>
+      <OrderDetails order={order} showStatus />
+      <Items order={order} />
+      <CartTotals totals={order} />
+      <ShippingDetails order={order} />
+      <PaymentDetails order={order} />
+      {order.status !== "canceled" && (
+        <Card tone="surface" className="flex flex-col gap-3" data-testid="order-return">
+          <Heading level={2} size="sm">
+            {t("returnTitle")}
+          </Heading>
+          <Text size="sm" tone="subtle">
+            {t("returnText")}
+          </Text>
+          <div>
+            <ButtonLink
+              href={`/odstoupeni-od-smlouvy?objednavka=${order.display_id}`}
+              variant="secondary"
+              data-testid="order-return-button"
+            >
+              {t("returnButton")}
+            </ButtonLink>
+          </div>
+        </Card>
+      )}
+      <Help />
     </div>
   )
 }
-
-export default OrderDetailsTemplate

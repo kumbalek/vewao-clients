@@ -2,6 +2,7 @@
 
 import { sdk } from "@lib/config"
 import medusaError from "@lib/util/medusa-error"
+import { MIN_PASSWORD_LENGTH } from "@lib/util/password"
 import { HttpTypes } from "@medusajs/types"
 import { revalidateTag } from "next/cache"
 import { redirect } from "next/navigation"
@@ -99,8 +100,8 @@ export async function signup(_currentState: unknown, formData: FormData) {
     await transferCart()
 
     return createdCustomer
-  } catch (error: any) {
-    return error.toString()
+  } catch {
+    return "registerFailed"
   }
 }
 
@@ -116,14 +117,46 @@ export async function login(_currentState: unknown, formData: FormData) {
         const customerCacheTag = await getCacheTag("customers")
         revalidateTag(customerCacheTag)
       })
-  } catch (error: any) {
-    return error.toString()
+  } catch {
+    return "loginFailed"
   }
 
   try {
     await transferCart()
   } catch (error: any) {
     return error.toString()
+  }
+}
+
+/** Native Medusa reset: the backend e-mails a link only if the account exists. */
+export async function requestPasswordReset(
+  _currentState: unknown,
+  formData: FormData
+): Promise<"sent" | "error"> {
+  const identifier = String(formData.get("email") ?? "").trim()
+  if (!identifier) return "error"
+  try {
+    await sdk.auth.resetPassword("customer", "emailpass", { identifier })
+    return "sent"
+  } catch {
+    return "error"
+  }
+}
+
+/** Redeems the single-use token from the reset e-mail. */
+export async function resetPassword(
+  _currentState: unknown,
+  formData: FormData
+): Promise<"done" | "invalid" | "short" | "error"> {
+  const token = String(formData.get("token") ?? "")
+  const password = String(formData.get("password") ?? "")
+  if (password.length < MIN_PASSWORD_LENGTH) return "short"
+  if (!token) return "invalid"
+  try {
+    await sdk.auth.updateProvider("customer", "emailpass", { password }, token)
+    return "done"
+  } catch (error) {
+    return (error as { status?: number }).status === 401 ? "invalid" : "error"
   }
 }
 

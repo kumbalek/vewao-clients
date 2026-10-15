@@ -1,6 +1,9 @@
 import { Metadata } from "next"
 
 import { contact } from "content/site"
+import { retrieveCustomer } from "@lib/data/customer"
+import { listOrders } from "@lib/data/orders"
+import { withdrawalPrefill } from "@lib/util/withdrawal"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { Container, Heading, Section, Text } from "@modules/design-system"
 import WithdrawalForm from "@modules/withdrawal/components/withdrawal-form"
@@ -22,6 +25,7 @@ type Props = {
 export default async function WithdrawalPage({ searchParams }: Props) {
   const { objednavka } = await searchParams
   const initialOrder = (Array.isArray(objednavka) ? objednavka[0] : objednavka)?.slice(0, 50) ?? ""
+  const initial = { order_reference: initialOrder, ...(await accountPrefill(initialOrder)) }
 
   return (
     <Section spacing="md">
@@ -43,8 +47,18 @@ export default async function WithdrawalPage({ searchParams }: Props) {
             . S dotazy se obraťte na {contact.email} nebo {contact.phone.label}.
           </Text>
         </div>
-        <WithdrawalForm initialOrder={initialOrder} />
+        <WithdrawalForm initial={initial} />
       </Container>
     </Section>
   )
+}
+
+/** A signed-in customer's own order (the account's "Vrátit zboží") fills in the whole form. */
+async function accountPrefill(orderReference: string) {
+  if (!/^\d+$/.test(orderReference)) return {}
+  const customer = await retrieveCustomer().catch(() => null)
+  if (!customer) return {}
+  const orders = (await listOrders(50).catch(() => null)) ?? []
+  const order = orders.find((candidate) => String(candidate.display_id) === orderReference)
+  return order ? withdrawalPrefill(order, customer) : {}
 }

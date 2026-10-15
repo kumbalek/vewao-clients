@@ -258,6 +258,8 @@
     "cart": "košík",
     "cartCount": "Košík ({count})",
     "cartWithCount": "Košík, {count, plural, =0 {prázdný} one {# položka} few {# položky} other {# položek}}",
+    "account": "účet",
+    "accountLabel": "Můj účet",
     "quickLinks": "Rychlé odkazy",
     "contactAndHours": "Kontakt a otevírací doba",
     "newsletter": "Newsletter",
@@ -382,6 +384,9 @@
     "newPasswordInvalid": "Odkaz už neplatí. Požádejte prosím o nový.",
     "backToLogin": "Zpět na přihlášení",
     "loginFailed": "E-mail nebo heslo nesouhlasí.",
-    "registerFailed": "Účet se nepodařilo založit. Pokud už u nás účet máte, přihlaste se nebo si obnovte heslo."
+    "registerFailed": "Účet se nepodařilo založit. Pokud už u nás účet máte, přihlaste se nebo si obnovte heslo.",
+    "orderEmail": "E-mail objednávky",
+    "fulfillmentStatus": "{status, select, not_fulfilled {Přijata} partially_fulfilled {Částečně připravena} fulfilled {Připravena} partially_shipped {Částečně odeslána} shipped {Odeslána} partially_delivered {Částečně doručena} delivered {Doručena} canceled {Zrušena} other {Zpracovává se}}",
+    "paymentStatusValue": "{status, select, not_paid {Nezaplaceno} awaiting {Čeká na platbu} requires_action {Čeká na platbu} authorized {Čeká na úhradu} partially_authorized {Čeká na platbu} captured {Zaplaceno} partially_captured {Částečně zaplaceno} partially_refunded {Částečně vráceno} refunded {Vráceno} canceled {Zrušeno} other {Zpracovává se}}"
   }
 }

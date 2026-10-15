@@ -173,6 +173,11 @@ export default function MobileMenu({
                     )}
                   </li>
                 ))}
+                <li>
+                  <LocalizedClientLink href="/account" className={rowClasses}>
+                    {t("accountLabel")}
+                  </LocalizedClientLink>
+                </li>
               </ul>
             </nav>
           </div>

@@ -9,6 +9,8 @@ import ErrorMessage from "@modules/checkout/components/error-message"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { signup } from "@lib/data/customer"
+import { MIN_PASSWORD_LENGTH } from "@lib/util/password"
+import { Heading, Text } from "@modules/design-system"
 
 type Props = {
   setCurrentView: (view: LOGIN_VIEW) => void
@@ -16,17 +18,20 @@ type Props = {
 
 const Register = ({ setCurrentView }: Props) => {
   const t = useTranslations("signIn")
+  const tAccount = useTranslations("account")
   const [message, formAction] = useActionState(signup, null)
 
   return (
     <div
-      className="max-w-sm flex flex-col items-center"
+      className="max-w-sm w-full flex flex-col items-center"
       data-testid="register-page"
     >
-      <h1 className="text-large  uppercase mb-6">{t("title")}</h1>
-      <p className="text-center text-base-regular text-ui-fg-base mb-4">
+      <Heading level={1} size="lg" className="mb-4 text-center">
+        {t("title")}
+      </Heading>
+      <Text tone="subtle" className="mb-6 text-center">
         {t("text")}
-      </p>
+      </Text>
       <form className="w-full flex flex-col" action={formAction}>
         <div className="flex flex-col w-full gap-y-2">
           <Input
@@ -64,10 +69,14 @@ const Register = ({ setCurrentView }: Props) => {
             required
             type="password"
             autoComplete="new-password"
+            minLength={MIN_PASSWORD_LENGTH}
             data-testid="password-input"
           />
         </div>
-        <ErrorMessage error={message} data-testid="register-error" />
+        <ErrorMessage
+          error={typeof message === "string" ? tAccount(message === "registerFailed" ? "registerFailed" : "error") : null}
+          data-testid="register-error"
+        />
         <span className="text-center text-ui-fg-base text-small-regular mt-6">
           {t("policyText")}{" "}
           <LocalizedClientLink
@@ -92,6 +101,7 @@ const Register = ({ setCurrentView }: Props) => {
       <span className="text-center text-ui-fg-base text-small-regular mt-6">
         {t("alreadyMember")}{" "}
         <button
+          type="button"
           onClick={() => setCurrentView(LOGIN_VIEW.SIGN_IN)}
           className="underline"
         >

@@ -92,7 +92,13 @@ kept. The owner chose to build in steps:
 - Values follow agreed facts, not the wireframe: free delivery from 5 000 Kč
   (wireframe: 1 500), hours from the current contact page (Po–Pá 10–18; the
   wireframe shows Po–Pá 9–19 · So 9–14).
-- Not built: account, EN switch, floating contact dialog, newsletter
+- Built (2026-10-15): customer account at `/account` on Medusa's native
+  customer account (vewao-clients#28): sign-in, registration, password reset
+  by e-mailed link (vewao-platform `plugin-notifications`), profile,
+  addresses, orders and order detail. An order's "Vrátit zboží" opens the
+  withdrawal form filled in from that order; the merchant then creates the
+  return in admin. Gift cards for the account follow vewao-platform#25.
+- Not built: EN switch, floating contact dialog, newsletter
   (vewao-clients#21); reviews need C4 authenticity handling.
 
 ## Landing page — 2026-09-30

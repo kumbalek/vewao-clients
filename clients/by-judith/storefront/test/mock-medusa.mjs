@@ -16,6 +16,13 @@ const providers = [{ id: "pp_comgate_comgate" }, { id: "pp_system_default" }, { 
 const carts = new Map()
 const orders = new Map()
 const requests = []
+// Customer account fixtures: customers keyed by email, bearer tokens by token.
+const customers = new Map()
+const tokens = new Map()
+let lastResetToken = null
+let nextCustomerId = 1
+let nextAddressId = 1
+let nextTokenId = 1
 let gatewayOutcome = "PAID"
 const cartControls = { delayMs: 0, status: 200, message: "Košík se nepodařilo aktualizovat." }
 // A product on a sale price list: Medusa's list price 1 890, sale price 1 490.
@@ -175,6 +182,7 @@ function mutateCartLine(method, cartId, lineId, changes) {
 function placeOrder(current, session) {
   const order = {
     id: `order_${current.id}`, display_id: 1001, created_at: new Date().toISOString(), email: current.email,
+    customer_id: current.customer_id ?? null,
     currency_code: "czk", status: "pending", payment_status: session.provider_id === "pp_system_default" ? "authorized" : "captured",
     fulfillment_status: "not_fulfilled", items: current.items, shipping_address: current.shipping_address,
     shipping_methods: current.shipping_methods, subtotal: current.subtotal, item_subtotal: current.item_subtotal, item_total: current.item_total,
@@ -186,6 +194,24 @@ function placeOrder(current, session) {
   orders.set(order.id, order)
   return order
 }
+function issueToken(email, kind, password) {
+  const token = `tok_${nextTokenId++}`
+  tokens.set(token, { email, kind, password: password ?? null })
+  return token
+}
+function bearer(req) {
+  const match = (req.headers.authorization ?? "").match(/^Bearer (.+)$/)
+  return match ? tokens.get(match[1]) : undefined
+}
+function publicCustomer(customer) {
+  const { password, ...publicFields } = customer
+  return publicFields
+}
+// The session customer for a request, or null when the bearer is not a session token.
+function sessionCustomer(req) {
+  const auth = bearer(req)
+  return auth?.kind === "session" ? customers.get(auth.email) ?? null : null
+}
 const server = createServer(async (req, res) => {
   const url = new URL(req.url, "http://127.0.0.1:9101")
   const send = (body, status = 200) => { res.writeHead(status, { "content-type": "application/json", "cache-control": "no-store" }); res.end(JSON.stringify(body)) }
@@ -194,7 +220,7 @@ const server = createServer(async (req, res) => {
   const data = body ? JSON.parse(body) : {}
   if (url.pathname === "/health") return send({ ok: true })
   if (url.pathname === "/__requests") return send(requests)
-  if (url.pathname === "/__reset") { carts.clear(); orders.clear(); requests.length = 0; gatewayOutcome = "PAID"; Object.assign(cartControls, { delayMs: 0, status: 200, message: "Košík se nepodařilo aktualizovat." }); promotionTiers = []; priceHistory = { current_amount: 1490, reference_price: 1690, history_complete: true }; return send({ ok: true }) }
+  if (url.pathname === "/__reset") { carts.clear(); orders.clear(); requests.length = 0; gatewayOutcome = "PAID"; Object.assign(cartControls, { delayMs: 0, status: 200, message: "Košík se nepodařilo aktualizovat." }); promotionTiers = []; priceHistory = { current_amount: 1490, reference_price: 1690, history_complete: true }; customers.clear(); tokens.clear(); lastResetToken = null; return send({ ok: true }) }
   if (url.pathname === "/__cart/seed") {
     const current = cart(data.cartId)
     if (data.quantity > 1) {
@@ -211,6 +237,31 @@ const server = createServer(async (req, res) => {
     return send({ ok: true })
   }
   if (url.pathname === "/__price-history") { priceHistory = { ...priceHistory, ...data }; return send({ ok: true }) }
+  if (url.pathname === "/__password-reset") return send({ token: lastResetToken })
+  if (url.pathname === "/__customer/seed" && req.method === "POST") {
+    const jana = {
+      id: `cus_${nextCustomerId++}`, email: "jana@example.cz", first_name: "Jana", last_name: "Nováková", phone: "777123456",
+      password: "heslo1234", created_at: "2026-10-01T09:00:00.000Z",
+      addresses: [{ id: "addr_seed", ...address, first_name: "Jana", last_name: "Nováková", is_default_billing: true, is_default_shipping: true }],
+    }
+    customers.set(jana.email, jana)
+    // One fulfilled order in Jana's history, in the shape placeOrder() builds.
+    orders.set("order_account_1", {
+      id: "order_account_1", display_id: 1002, customer_id: jana.id, email: "jana@example.cz", created_at: "2026-10-01T09:30:00.000Z",
+      currency_code: "czk", status: "pending", payment_status: "captured", fulfillment_status: "fulfilled",
+      items: [{
+        id: "item_account_1", variant_id: "variant_sale", title: saleProduct.title, product_title: saleProduct.title, product_handle: saleProduct.handle,
+        quantity: 2, unit_price: 1490, total: 2980, original_total: 2980, is_discountable: true,
+        thumbnail: saleProduct.thumbnail, variant: saleProduct.variants[0], product: saleProduct, metadata: {},
+      }],
+      shipping_address: jana.addresses[0],
+      shipping_methods: [{ id: "sm_account_1", name: "PPL", amount: 150, total: 150 }],
+      subtotal: 2980, item_subtotal: 2980, item_total: 2980, shipping_total: 150, shipping_subtotal: 150,
+      discount_total: 0, tax_total: 0, total: 3130, original_total: 3130,
+      payment_collections: [{ payments: [{ id: "pay_account_1", provider_id: "pp_comgate_comgate", amount: 3130, created_at: "2026-10-01T09:31:00.000Z" }] }],
+    })
+    return send({ customer: publicCustomer(jana), order_id: "order_account_1" })
+  }
   if (url.pathname === "/__comgate/outcome") { gatewayOutcome = data.status; return send({ ok: true }) }
   if (url.pathname === "/__comgate/pay") {
     // A gateway page the customer leaves by clicking, as on Comgate: the return
@@ -259,7 +310,92 @@ const server = createServer(async (req, res) => {
   if (url.pathname === `/store/products/${saleProduct.id}/price-history`) {
     return send({ product_id: saleProduct.id, region_id: region.id, variants: [{ variant_id: "variant_sale", currency_code: "czk", ...priceHistory }] })
   }
-  if (url.pathname === "/store/customers/me") return send({ message: "Not authenticated" }, 401)
+  // --- Customer account: auth, profile, addresses, order history ---
+  if (url.pathname === "/auth/customer/emailpass" && req.method === "POST") {
+    const customer = customers.get(data.email)
+    if (!customer || customer.password !== data.password) return send({ type: "unauthorized", message: "Invalid email or password" }, 401)
+    return send({ token: issueToken(customer.email, "session") })
+  }
+  if (url.pathname === "/auth/customer/emailpass/register" && req.method === "POST") {
+    if (customers.has(data.email)) return send({ type: "unauthorized", message: "Identity with email already exists" }, 401)
+    // The password is pending until POST /store/customers completes registration.
+    return send({ token: issueToken(data.email, "registration", data.password) })
+  }
+  if (url.pathname === "/auth/customer/emailpass/reset-password" && req.method === "POST") {
+    const customer = customers.get(data.identifier)
+    if (customer) lastResetToken = issueToken(customer.email, "reset")
+    res.writeHead(201)
+    return res.end()
+  }
+  if (url.pathname === "/auth/customer/emailpass/update" && req.method === "POST") {
+    const match = (req.headers.authorization ?? "").match(/^Bearer (.+)$/)
+    const auth = match ? tokens.get(match[1]) : undefined
+    const customer = auth?.kind === "reset" ? customers.get(auth.email) : null
+    if (!customer) return send({ type: "unauthorized", message: "Invalid token" }, 401)
+    customer.password = data.password
+    tokens.delete(match[1]) // single use
+    return send({ success: true })
+  }
+  if (url.pathname === "/auth/session" && req.method === "DELETE") return send({ success: true })
+  if (url.pathname === "/store/customers" && req.method === "POST") {
+    const auth = bearer(req)
+    if (auth?.kind !== "registration") return send({ message: "Not authenticated" }, 401)
+    const customer = {
+      id: `cus_${nextCustomerId++}`, email: data.email ?? auth.email, first_name: data.first_name ?? "", last_name: data.last_name ?? "",
+      phone: data.phone ?? "", password: auth.password ?? "", addresses: [], created_at: new Date().toISOString(),
+    }
+    customers.set(customer.email, customer)
+    return send({ customer: publicCustomer(customer) })
+  }
+  if (url.pathname === "/store/customers/me" && req.method === "GET") {
+    const customer = sessionCustomer(req)
+    if (!customer) return send({ message: "Not authenticated" }, 401)
+    return send({ customer: publicCustomer(customer) })
+  }
+  if (url.pathname === "/store/customers/me" && req.method === "POST") {
+    const customer = sessionCustomer(req)
+    if (!customer) return send({ message: "Not authenticated" }, 401)
+    for (const key of ["first_name", "last_name", "phone"]) if (key in data) customer[key] = data[key]
+    return send({ customer: publicCustomer(customer) })
+  }
+  if (url.pathname === "/store/customers/me/addresses" && req.method === "POST") {
+    const customer = sessionCustomer(req)
+    if (!customer) return send({ message: "Not authenticated" }, 401)
+    customer.addresses.push({ id: `addr_${nextAddressId++}`, ...data })
+    return send({ customer: publicCustomer(customer) })
+  }
+  const customerAddressMatch = url.pathname.match(/^\/store\/customers\/me\/addresses\/([^/]+)$/)
+  if (customerAddressMatch) {
+    const customer = sessionCustomer(req)
+    if (!customer) return send({ message: "Not authenticated" }, 401)
+    const index = customer.addresses.findIndex((a) => a.id === customerAddressMatch[1])
+    if (index === -1) return send({ type: "not_found", message: `Address ${customerAddressMatch[1]} not found` }, 404)
+    if (req.method === "POST") {
+      Object.assign(customer.addresses[index], data)
+      return send({ customer: publicCustomer(customer) })
+    }
+    if (req.method === "DELETE") {
+      const [removed] = customer.addresses.splice(index, 1)
+      return send({ id: removed.id, object: "customer_address", deleted: true, parent: publicCustomer(customer) })
+    }
+  }
+  const cartCustomerMatch = url.pathname.match(/^\/store\/carts\/([^/]+)\/customer$/)
+  if (cartCustomerMatch && req.method === "POST") {
+    const customer = sessionCustomer(req)
+    if (!customer) return send({ message: "Not authenticated" }, 401)
+    const current = cart(cartCustomerMatch[1])
+    current.customer_id = customer.id
+    current.email = customer.email
+    return send({ cart: current })
+  }
+  if (url.pathname === "/store/orders" && req.method === "GET") {
+    const customer = sessionCustomer(req)
+    if (!customer) return send({ message: "Not authenticated" }, 401)
+    const list = [...orders.values()]
+      .filter((order) => order.customer_id === customer.id)
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    return send({ orders: list, count: list.length, offset: 0, limit: 10 })
+  }
   if (url.pathname === "/store/shipping-options") return send({ shipping_options: shippingOptions })
   if (url.pathname === "/store/payment-providers") return send({ payment_providers: providers })
   if (url.pathname === "/store/withdrawals" && req.method === "POST") {

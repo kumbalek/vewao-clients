@@ -11,6 +11,8 @@ type ShippingDetailsProps = {
 
 const ShippingDetails = ({ order }: ShippingDetailsProps) => {
   const t = useTranslations("checkout")
+  // Orders created in admin or migrated from the legacy shop may have no shipping method.
+  const shippingMethod = order.shipping_methods?.[0]
 
   return (
     <div>
@@ -63,14 +65,14 @@ const ShippingDetails = ({ order }: ShippingDetailsProps) => {
             {t("shippingMethod")}
           </Text>
           <Text className="txt-medium text-ui-fg-subtle">
-            {(order as any).shipping_methods[0]?.name} (
-            {convertToLocale({
-              amount: order.shipping_methods?.[0].total ?? 0,
-              currency_code: order.currency_code,
-            })
-              .replace(/,/g, "")
-              .replace(/\./g, ",")}
-            )
+            {shippingMethod
+              ? `${shippingMethod.name} (${convertToLocale({
+                  amount: shippingMethod.total ?? 0,
+                  currency_code: order.currency_code,
+                })
+                  .replace(/,/g, "")
+                  .replace(/\./g, ",")})`
+              : "–"}
           </Text>
         </div>
       </div>
