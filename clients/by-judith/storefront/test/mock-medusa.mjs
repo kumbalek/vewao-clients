@@ -95,7 +95,13 @@ const clinic = {
     { slug: "faq-testovaci-procedura-jak-dlouho", title: "Jak dlouho to trvá?", body: "Asi hodinu.", metadata: { kategorie: "akupunktura", procedura: "testovaci-procedura", poradi: 2 } },
   ],
 }
-const contentCollections = { magazin: articles, ...clinic }
+// Editors' news (seed/setup-novinky.ts): pinned, expired and open-ended.
+const novinky = [
+  { slug: "nova-procedura", title: "Nová procedura v nabídce", body: null, metadata: { perex: "Nově nabízíme testovací proceduru.", odkaz: "/procedury/akupunktura/testovaci-procedura", poradi: 1 } },
+  { slug: "stara-akce", title: "Skončená akce", body: null, metadata: { perex: "Už neplatí.", platnost_do: "2020-01-31" } },
+  { slug: "podzimni-sleva", title: "Podzimní sleva", body: null, metadata: { perex: "Sleva na vybrané služby.", odkaz: "https://example.com/akce", platnost_do: "2099-12-31" } },
+]
+const contentCollections = { magazin: articles, ...clinic, novinky }
 for (const [slug, items] of Object.entries(contentCollections)) {
   items.forEach((item, i) => Object.assign(item, {
     id: item.id ?? `ci_${slug}_${i}`, tags: item.tags ?? [], status: "published", published_at: null,
@@ -244,6 +250,9 @@ const server = createServer(async (req, res) => {
     if (url.searchParams.get("handle") === giftProduct.handle) {
       return send({ products: [giftProduct], count: 1 })
     }
+    // An unfiltered listing (Novinky's sale section) holds the sale product.
+    const unfiltered = !url.searchParams.get("handle") && !url.searchParams.get("q") && ![...url.searchParams.keys()].some((key) => key.startsWith("id") || key.startsWith("collection_id") || key.startsWith("category_id"))
+    if (unfiltered) return send({ products: [saleProduct], count: 1 })
     const wanted = url.searchParams.get("handle") === saleProduct.handle || [...url.searchParams].some(([key, value]) => key.startsWith("id") && value === saleProduct.id)
     return send(wanted ? { products: [saleProduct], count: 1 } : { products: [], count: 0 })
   }
