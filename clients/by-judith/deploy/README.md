@@ -52,6 +52,7 @@ Environment variables:
 | MEDUSA_PUBLIC_URL | Clients repo only: `https://judith-api-dev.vewao.link` |
 | STOREFRONT_URL | Clients repo only: `https://judith-dev.vewao.link` |
 | MEDUSA_PUBLISHABLE_KEY | Clients repo only: key created in this dev backend |
+| GA_MEASUREMENT_ID | Clients repo only, optional: GA4 measurement ID (`G-…`). Set it only for the environment that should measure; empty means no analytics and no cookie banner |
 
 Environment secrets in both repos:
 

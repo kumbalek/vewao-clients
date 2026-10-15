@@ -59,6 +59,27 @@ export const footer = {
     { label: "Obchodní podmínky", href: "/content/terms-of-use" },
     // The withdrawal function must stay easy to find on every page (§ 1830a).
     { label: "Odstoupit od smlouvy", href: "/odstoupeni-od-smlouvy" },
-    { label: "Cookies" },
+    { label: "Cookies", href: "/content/cookies" },
   ] satisfies NavLink[],
+}
+
+/**
+ * Cookie banner copy (vewao-clients#22). Shown only while an optional category
+ * is in use; needs the merchant's approval with the cookies page.
+ */
+export const cookieConsent = {
+  copy: {
+    title: "Cookies na tomto webu",
+    body: "Nezbytné cookies potřebujeme pro košík a objednávku. Analytické cookies použijeme jen s vaším souhlasem, abychom viděli, jak web používáte, a mohli ho zlepšovat.",
+    acceptAll: "Přijmout vše",
+    rejectAll: "Odmítnout vše",
+    customize: "Nastavit",
+    save: "Uložit výběr",
+  },
+  policyLabel: "Více o cookies",
+  settingsLabel: "Nastavení cookies",
+  analytics: {
+    label: "Analytické",
+    description: "Google Analytics 4 měří návštěvnost a používání webu. Údaje zpracovává Google Ireland Limited.",
+  },
 }

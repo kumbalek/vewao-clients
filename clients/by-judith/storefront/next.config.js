@@ -9,6 +9,8 @@ checkEnvVariables()
  */
 const nextConfig = {
   reactStrictMode: true,
+  // The vendored kit ships TypeScript source (vendor/README.md).
+  transpilePackages: ["@vewao/storefront-kit"],
   output: "standalone",
   logging: {
     fetches: {

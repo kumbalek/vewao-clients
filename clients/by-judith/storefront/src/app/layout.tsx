@@ -1,6 +1,7 @@
 import { getBaseURL } from "@lib/util/env"
 import { Metadata } from "next"
 import { NextIntlClientProvider } from "next-intl"
+import SiteCookieConsent from "@modules/common/components/cookie-consent"
 import "styles/globals.css"
 
 export const metadata: Metadata = {
@@ -17,6 +18,7 @@ export default function RootLayout(props: { children: React.ReactNode }) {
         <div className="relative">
           <NextIntlClientProvider>{props.children}</NextIntlClientProvider>
         </div>
+        <SiteCookieConsent />
       </body>
     </html>
   )

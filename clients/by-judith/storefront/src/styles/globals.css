@@ -132,6 +132,21 @@
 }
 
 @layer base {
+  /* Theme contract of @vewao/storefront-kit components (the cookie banner),
+     mapped onto the By Judith tokens. */
+  :root {
+    --vw-color-surface: theme("colors.white");
+    --vw-color-text: theme("colors.ink.DEFAULT");
+    --vw-color-text-muted: theme("colors.ink.subtle");
+    --vw-color-border: theme("colors.line");
+    --vw-color-primary: theme("colors.action.DEFAULT");
+    --vw-color-on-primary: theme("colors.white");
+    --vw-color-focus: theme("colors.ink.DEFAULT");
+    --vw-radius-md: 9999px;
+    --vw-radius-lg: theme("borderRadius.popover");
+    --vw-font-body: theme("fontFamily.sans");
+  }
+
   * {
     border-color: theme("colors.line");
   }
@@ -143,4 +158,14 @@
 
 .shadow-elevation-card-rest {
   box-shadow: none;
+}
+
+/* Brand details the kit's variables do not cover: the shop's pill buttons use
+   the regular weight, and its labels the body size. Unlayered and one class
+   more specific than the kit's own unlayered <style>. */
+.vw-cookie-consent .vw-cookie-consent__button {
+  font-weight: 400;
+}
+.vw-cookie-consent .vw-cookie-consent__option label {
+  font-size: inherit;
 }
