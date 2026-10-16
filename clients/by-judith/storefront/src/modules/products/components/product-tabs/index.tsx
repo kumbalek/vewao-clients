@@ -6,6 +6,7 @@ import Refresh from "@modules/common/icons/refresh"
 import { useTranslations } from "next-intl"
 import Accordion from "./accordion"
 import { HttpTypes } from "@medusajs/types"
+import { parseIngredients } from "@lib/util/ingredients"
 
 type ProductTabsProps = {
   product: HttpTypes.StoreProduct
@@ -132,24 +133,31 @@ const ShippingInfoTab = () => {
 }
 
 const IngredientsTab = ({ product }: ProductTabsProps) => {
-  const ingredients = product?.metadata?.ingredients as string
-  const parsedIngredients = JSON.parse(ingredients || "[]")
+  const ingredients = parseIngredients(product?.metadata?.ingredients)
 
   return (
     <div className="text-small-regular py-4">
-      <div className="flex flex-col gap-y-4">
-        {parsedIngredients.map((ingredient: string, index: number) => (
-          <div
+      <ul className="flex flex-col gap-y-4">
+        {ingredients.map((segments, index) => (
+          <li
             key={`ingredient_${index}`}
             className="flex items-start gap-x-2 px-2"
           >
-            {"–"}
+            <span aria-hidden="true">{"–"}</span>
             <span className="font-normal font-sans txt-medium text-ui-fg-subtle whitespace-pre-line">
-              {ingredient}
+              {segments.map((segment, i) =>
+                segment.allergen ? (
+                  <strong key={i} className="font-semibold text-ui-fg-base">
+                    {segment.text}
+                  </strong>
+                ) : (
+                  segment.text
+                )
+              )}
             </span>
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   )
 }
