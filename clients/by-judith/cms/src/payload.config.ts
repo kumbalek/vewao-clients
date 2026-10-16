@@ -16,7 +16,11 @@ import { Users } from './collections/Users'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-const storefront = process.env.STOREFRONT_URL?.replace(/\/+$/, '')
+const serverURL = process.env.PAYLOAD_PUBLIC_SERVER_URL?.replace(/\/+$/, '')
+// Cookie-authenticated requests are accepted only from the admin itself (without
+// it, autosave fails with 403). The storefront reads server-side with an API key
+// and Live Preview talks over postMessage, so neither needs cookie trust.
+const trustedOrigins = serverURL ? [serverURL] : []
 
 export default buildConfig({
   serverURL: process.env.PAYLOAD_PUBLIC_SERVER_URL,
@@ -35,9 +39,8 @@ export default buildConfig({
   collections: [Pages, News, Products, Media, Users],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
-  // The storefront reads over REST from its server; the admin is same-origin.
-  cors: storefront ? [storefront] : [],
-  csrf: storefront ? [storefront] : [],
+  cors: trustedOrigins,
+  csrf: trustedOrigins,
   typescript: { outputFile: path.resolve(dirname, 'payload-types.ts') },
   db: postgresAdapter({ pool: { connectionString: process.env.DATABASE_URL || '' } }),
   sharp,
