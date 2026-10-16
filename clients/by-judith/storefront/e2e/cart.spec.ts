@@ -127,6 +127,9 @@ test("removes the last item and shows the empty cart", async ({ page }) => {
 
 test("adds an item from a product page", async ({ page }) => {
   await page.goto("/cz/products/akcni-produkt")
+  // The disabled Suspense fallback and the streamed actions coexist briefly:
+  // React 19.2 batches reveals of streamed boundaries (Next 16).
+  await expect(page.getByTestId("add-product-button")).toHaveCount(1)
   await page.getByTestId("add-product-button").click()
   await expect(page.getByTestId("add-product-button")).toBeDisabled()
   await expect(page.getByTestId("add-product-button")).toBeEnabled()
