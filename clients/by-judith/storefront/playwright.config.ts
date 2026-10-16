@@ -47,8 +47,9 @@ export default defineConfig({
     {
       // Product fetches use force-cache, and Next keeps that cache on disk
       // across runs: without clearing it, edits to the mock backend's data
-      // are not seen.
-      command: "rm -rf .next/cache/fetch-cache && pnpm exec next dev --hostname 127.0.0.1 --port 8101",
+      // are not seen. Next 16 keeps dev output in .next/dev (15 used .next).
+      command:
+        "rm -rf .next/cache/fetch-cache .next/dev/cache/fetch-cache && pnpm exec next dev --hostname 127.0.0.1 --port 8101",
       url: "http://127.0.0.1:8101/logo.webp",
       timeout: 120_000,
       reuseExistingServer: false,
@@ -58,6 +59,13 @@ export default defineConfig({
         NEXT_PUBLIC_BASE_URL: "http://127.0.0.1:8101",
         NEXT_TELEMETRY_DISABLED: "1",
         NEXT_PUBLIC_GA_MEASUREMENT_ID: TEST_GA_ID,
+        // e2e/cms.spec.ts runs only when a Payload database is configured.
+        ...(process.env.E2E_PAYLOAD_DATABASE_URL
+          ? {
+              PAYLOAD_DATABASE_URL: process.env.E2E_PAYLOAD_DATABASE_URL,
+              PAYLOAD_SECRET: "e2e-payload-secret-not-for-production",
+            }
+          : {}),
       },
     },
   ],

@@ -98,6 +98,10 @@ kept. The owner chose to build in steps:
   addresses, orders and order detail. An order's "Vrátit zboží" opens the
   withdrawal form filled in from that order; the merchant then creates the
   return in admin. Gift cards for the account follow vewao-platform#25.
+- Content editing (D22): Payload CMS runs inside the storefront, admin at
+  `/admin`, with drafts, versions, signed share-preview links and Live Preview
+  (vewao-clients#31). Its pages render at `/cz/cms/<slug>` until the existing
+  content moves over from the Content plugin (vewao-clients#32).
 - Not built: EN switch, floating contact dialog, newsletter
   (vewao-clients#21); reviews need C4 authenticity handling.
 
