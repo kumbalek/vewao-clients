@@ -50,7 +50,11 @@ test.beforeEach(async ({ context, request }) => {
 
 test("footer links to withdrawal page", async ({ page }) => {
   await page.goto("/cz")
-  await page.getByRole("contentinfo").getByRole("link", { name: "Odstoupit od smlouvy" }).click()
+  const link = page.getByRole("contentinfo").getByRole("link", { name: "Odstoupit od smlouvy" })
+  // A click while the app router hydrates is dropped without any request, and
+  // the page stays on /cz (seen on CI; reproducible with CPU throttling).
+  await waitForHydration(page, link)
+  await link.click()
 
   await expect(page).toHaveURL(new RegExp("/cz/odstoupeni-od-smlouvy$"), NAVIGATION)
   await expect(page.getByRole("heading", { name: "Odstoupit od smlouvy" })).toBeVisible()
