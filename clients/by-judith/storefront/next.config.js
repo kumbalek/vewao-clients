@@ -8,6 +8,8 @@ checkEnvVariables()
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
+  // No generated AGENTS.md: the repository has its own agent guidance.
+  agentRules: false,
   reactStrictMode: true,
   // The vendored kit ships TypeScript source (vendor/README.md).
   transpilePackages: ["@vewao/storefront-kit"],
