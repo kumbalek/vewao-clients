@@ -1,5 +1,7 @@
-const checkEnvVariables = require("./check-env-variables")
-const createNextIntlPlugin = require("next-intl/plugin")
+import { withPayload } from "@payloadcms/next/withPayload"
+import createNextIntlPlugin from "next-intl/plugin"
+
+import checkEnvVariables from "./check-env-variables.js"
 
 const withNextIntl = createNextIntlPlugin()
 checkEnvVariables()
@@ -65,4 +67,5 @@ const nextConfig = {
   },
 }
 
-module.exports = withNextIntl(nextConfig)
+// Payload CMS runs inside the storefront (D22): admin at /admin, REST under /api.
+export default withPayload(withNextIntl(nextConfig))

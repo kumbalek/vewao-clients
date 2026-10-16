@@ -1,6 +1,6 @@
 # Landing hero
 
-The home page (`app/[countryCode]/(main)/page.tsx`) is the landing hero from
+The home page (`app/(storefront)/[countryCode]/(main)/page.tsx`) is the landing hero from
 the legacy repository's `new-hp` branch (`bbc-ng`, staged on top of `df902c9`,
 imported 2026-09-30). The design brief it was built to is summarised below. The
 e-shop's former front page is at `/shop`.

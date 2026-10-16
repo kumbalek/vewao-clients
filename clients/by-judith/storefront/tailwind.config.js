@@ -1,10 +1,12 @@
-const path = require("path")
-const plugin = require("tailwindcss/plugin")
-const tokens = require("./src/modules/design-system/tokens")
+import plugin from "tailwindcss/plugin"
+import uiPreset from "@medusajs/ui-preset"
+import tailwindcssRadix from "tailwindcss-radix"
 
-module.exports = {
+import * as tokens from "./src/modules/design-system/tokens.js"
+
+export default {
   darkMode: "class",
-  presets: [require("@medusajs/ui-preset")],
+  presets: [uiPreset],
   content: [
     "./src/app/**/*.{js,ts,jsx,tsx}",
     "./src/pages/**/*.{js,ts,jsx,tsx}",
@@ -157,7 +159,7 @@ module.exports = {
     },
   },
   plugins: [
-    require("tailwindcss-radix")(),
+    tailwindcssRadix(),
     // `overlay:` styles the site header and its menus while they float over a
     // dark hero: the page has a [data-header-overlay] element and the header
     // has not scrolled past it (see layout/components/header-shell).

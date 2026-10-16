@@ -15,18 +15,28 @@
     "analyze": "ANALYZE=true next build",
     "typecheck": "tsc --noEmit",
     "test": "node --experimental-strip-types --test test/*.test.mjs",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "payload": "PAYLOAD_CONFIG_PATH=src/payload.config.ts NODE_OPTIONS=--no-deprecation payload"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
     "@medusajs/icons": "2.20.1",
     "@medusajs/js-sdk": "2.20.1",
     "@medusajs/ui": "4.2.3",
+    "@payloadcms/db-postgres": "3.91.0",
+    "@payloadcms/live-preview-react": "3.91.0",
+    "@payloadcms/next": "3.91.0",
+    "@payloadcms/richtext-lexical": "3.91.0",
+    "@payloadcms/storage-s3": "3.91.0",
+    "@payloadcms/translations": "3.91.0",
+    "@payloadcms/ui": "3.91.0",
     "@radix-ui/react-accordion": "^1.2.1",
     "@vewao/storefront-kit": "file:vendor/vewao-storefront-kit-0.1.0-a9686b2208a9.tgz",
+    "graphql": "^16.14.2",
     "lodash": "^4.17.21",
     "next": "16.4.2",
     "next-intl": "^4.14.9",
+    "payload": "3.91.0",
     "pg": "^8.11.3",
     "qs": "^6.12.1",
     "react": "19.2.9",
@@ -66,5 +76,6 @@
       "@types/react": "19.2.18",
       "@types/react-dom": "19.2.7"
     }
-  }
+  },
+  "type": "module"
 }

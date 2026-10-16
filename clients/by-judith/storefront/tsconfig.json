@@ -26,6 +26,9 @@
       "@modules/*": [
         "modules/*"
       ],
+      "@payload-config": [
+        "payload.config.ts"
+      ],
       "@pages/*": [
         "pages/*"
       ]

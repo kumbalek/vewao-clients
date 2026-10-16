@@ -98,6 +98,38 @@ Both repositories are now configured and deploying; see the 2026-09-24 record be
    automatically. Changes to server Compose/NPM/env files remain an explicit
    manual operation; application images deploy automatically.
 
+## Content CMS (Payload inside the storefront, D22)
+
+The storefront serves the Payload admin at `https://<shop>/admin` and keeps
+content in its own `cms` database on the stack's Postgres. One-time setup
+before deploying a storefront image that contains it (vewao-clients#31):
+
+1. Create the database:
+   `docker compose --env-file .env --env-file images.env exec postgres createdb -U medusa cms`
+2. Copy `storefront.env.template` to `storefront.env` (chmod 600). Set a random
+   `PAYLOAD_SECRET` (e.g. `openssl rand -hex 32`) and the initial admin's
+   e-mail and a strong password.
+3. Deploy the storefront as usual. On start it applies the committed CMS
+   migrations and creates the initial admin while the CMS has no users.
+4. Sign in at `/admin`, then remove `CMS_INITIAL_ADMIN_*` from
+   `storefront.env`. Without them, a CMS with no users lets whoever opens
+   `/admin` first create the admin.
+
+CMS images go to S3 when `CMS_S3_*` is set, otherwise to the `cms-media` volume,
+which needs the same separate backup as `uploads`. Changing `PAYLOAD_SECRET`
+signs everyone out and breaks shared preview links.
+
+Backups:
+- `deploy.sh` dumps Postgres before *backend* migrations.
+- The CMS migrates itself when the storefront starts, so its `cms` database is
+  covered by the server's regular backups but gets no pre-deploy dump.
+- Take one manually before a storefront deploy that changes the CMS schema
+  (`src/cms/migrations`), until `deploy.sh` does it.
+
+Memory: the storefront limit rose from 768 MB to 1 GB for Payload. With
+Postgres 768 MB, Redis 256 MB and Medusa 1792 MB the limits total about 3.8 GB
+on the 4 GB CAX11. Check `docker stats` after the first CMS deploy.
+
 ## Deployment and recovery
 
 Both workflows invoke the same server script with a component and image digest.
