@@ -14,6 +14,21 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    # e2e/cms.spec.ts runs only against a fresh, migrated Payload database.
+    # Throwaway CI-only credentials, not secrets.
+    services:
+      postgres:
+        image: postgres:16.10-bookworm
+        env:
+          POSTGRES_USER: payload
+          POSTGRES_PASSWORD: payload
+          POSTGRES_DB: cms_e2e
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U payload -d cms_e2e"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+    env:
+      E2E_PAYLOAD_DATABASE_URL: postgres://payload:payload@localhost:5432/cms_e2e
     defaults:
       run:
         working-directory: clients/by-judith/storefront
@@ -30,6 +45,10 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck && pnpm lint && pnpm test
       - run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm payload migrate
+        env:
+          PAYLOAD_DATABASE_URL: ${{ env.E2E_PAYLOAD_DATABASE_URL }}
+          PAYLOAD_SECRET: e2e-payload-secret-not-for-production
       - run: pnpm test:e2e
   image:
     needs: test
@@ -69,6 +88,7 @@ jobs:
             NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=${{ vars.MEDUSA_PUBLISHABLE_KEY || 'pk_ci_placeholder' }}
             NEXT_PUBLIC_MEDUSA_BACKEND_URL=${{ vars.MEDUSA_PUBLIC_URL || 'https://api.example.invalid' }}
             NEXT_PUBLIC_BASE_URL=${{ vars.STOREFRONT_URL || 'https://shop.example.invalid' }}
+            NEXT_PUBLIC_GA_MEASUREMENT_ID=${{ vars.GA_MEASUREMENT_ID }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
   deploy:
