@@ -8,6 +8,8 @@ checkEnvVariables()
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
+  // No generated AGENTS.md: the repository has its own agent guidance.
+  agentRules: false,
   reactStrictMode: true,
   // The vendored kit ships TypeScript source (vendor/README.md).
   transpilePackages: ["@vewao/storefront-kit"],
@@ -17,13 +19,16 @@ const nextConfig = {
       fullUrl: true,
     },
   },
-  eslint: {
-    ignoreDuringBuilds: false,
-  },
   typescript: {
     ignoreBuildErrors: false,
   },
   images: {
+    // Next 16 allows only quality 75 by default; thumbnails use 50.
+    qualities: [50, 75],
+    // Next 16 refuses to optimise images from local IPs (SSRF guard). Local dev
+    // and the Playwright mock serve images from 127.0.0.1; production fetches
+    // them from the public backend and S3 domains.
+    dangerouslyAllowLocalIP: process.env.NODE_ENV !== "production",
     remotePatterns: [
       // Files uploaded to Medusa (content and product images) are served from
       // /static. A bare URL would allow only its own path "/", nothing below it.
