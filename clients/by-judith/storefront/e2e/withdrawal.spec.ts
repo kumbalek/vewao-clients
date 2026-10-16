@@ -1,5 +1,5 @@
 import {
-  expect,
+  expect as baseExpect,
   test,
   type APIRequestContext,
   type APIResponse,
@@ -17,6 +17,8 @@ const SHOP = "http://127.0.0.1:8101"
 // navigation also waits for `next dev` to compile the form on first visit.
 test.use({ reducedMotion: "reduce" })
 const NAVIGATION = { timeout: 15_000 }
+// Submitting runs a server action, which is slow under `next dev` on CI runners.
+const expect = baseExpect.configure({ timeout: 15_000 })
 
 // Server-rendered controls ignore input until React hydrates them.
 async function waitForHydration(page: Page, control: Locator) {
