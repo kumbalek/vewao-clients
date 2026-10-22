@@ -131,6 +131,19 @@ function renderNode(node: LexicalNode, key: number): ReactNode {
   }
 }
 
+/** The text alone, blocks and line breaks as spaces: for teasers and descriptions. */
+export function lexicalToPlainText(state: LexicalState): string {
+  const parts: string[] = []
+  const walk = (node: LexicalNode) => {
+    if (node.type === "text" && typeof node.text === "string") parts.push(node.text)
+    else if (node.type === "linebreak") parts.push(" ")
+    node.children?.forEach(walk)
+    if (node.type !== "text" && node.type !== "link" && node.type !== "autolink") parts.push(" ")
+  }
+  if (state?.root) walk(state.root)
+  return parts.join("").replace(/\s+/g, " ").trim()
+}
+
 export function renderLexical(state: LexicalState): ReactNode {
   if (state == null || state.root == null) return null
   return renderNode(state.root, 0)

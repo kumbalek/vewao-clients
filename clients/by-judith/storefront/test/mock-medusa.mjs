@@ -53,26 +53,6 @@ let promotionTiers = []
 // Magazine articles as the Content plugin serves them: newest first, body_html
 // only on the detail route (the plugin renders and sanitises Markdown).
 const photo = { image: "http://localhost:9101/static/dn.webp", image_width: 1200, image_height: 1798, gallery: [] }
-const articles = [
-  {
-    id: "ci_1", slug: "rozhovor-s-testovaci-klientkou", title: "Rozhovor s testovací klientkou",
-    body: "**Jak jste se k nám dostala?**\\\n**A proč právě akupunktura?**\n\nDíky [doporučení](<https://example.com/>).",
-    body_html: '<p><strong>Jak jste se k nám dostala?</strong><br>\n<strong>A proč právě akupunktura?</strong></p>\n<p>Díky <a href="https://example.com/" rel="nofollow noopener noreferrer" target="_blank">doporučení</a>.</p>',
-    tags: [{ id: "tag_1", value: "akupunktura" }],
-    metadata: { ...photo, excerpt: "Perex testovacího rozhovoru.", image_alt: "Testovací fotografie" },
-  },
-  {
-    id: "ci_2", slug: "o-bylinach", title: "O bylinách",
-    body: "Byliny **pomáhají**.", body_html: "<p>Byliny <strong>pomáhají</strong>.</p>",
-    tags: [], metadata: { excerpt: null, image: null, gallery: [] },
-  },
-  {
-    id: "ci_3", slug: "akupunktura-v-praxi", title: "Akupunktura v praxi",
-    body: "Jak probíhá ošetření.", body_html: "<p>Jak probíhá ošetření.</p>",
-    tags: [{ id: "tag_2", value: "akupunktura" }, { id: "tag_3", value: "fytoterapie" }],
-    metadata: { ...photo, excerpt: "Jak probíhá ošetření.", image_alt: "Ošetření" },
-  },
-]
 // Clinic collections (seed/import-clinic.ts): one category, two of its
 // procedures plus one from another category, its FAQ, the team and O nás.
 const clinic = {
@@ -109,7 +89,7 @@ const novinky = [
   { slug: "stara-akce", title: "Skončená akce", body: null, metadata: { perex: "Už neplatí.", platnost_do: "2020-01-31" } },
   { slug: "podzimni-sleva", title: "Podzimní sleva", body: null, metadata: { perex: "Sleva na vybrané služby.", odkaz: "https://example.com/akce", platnost_do: "2099-12-31" } },
 ]
-const contentCollections = { magazin: articles, ...clinic, novinky }
+const contentCollections = { ...clinic, novinky }
 for (const [slug, items] of Object.entries(contentCollections)) {
   items.forEach((item, i) => Object.assign(item, {
     id: item.id ?? `ci_${slug}_${i}`, tags: item.tags ?? [], status: "published", published_at: null,

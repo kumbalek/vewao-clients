@@ -31,7 +31,7 @@ export default async function CmsPage({ params }: Props) {
         </Container>
       </Section>
       <CmsBlocks blocks={page.layout ?? []} context={{ countryCode, draft: Boolean(grant), edit }} />
-      {grant && <PreviewBar path={path} pageId={page.id} edit={edit} />}
+      {grant && <PreviewBar path={path} editHref={`/admin/collections/pages/${page.id}`} edit={edit} />}
     </>
   )
 }

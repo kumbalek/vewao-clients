@@ -20,3 +20,16 @@ crafted return link that must not complete a pay-on-site cart.
 These are storefront contract tests. They do not prove real Comgate
 authorization, webhooks, fulfilment or price-history persistence; verify those
 against the dev backend with Comgate test mode before launch.
+
+The CMS specs (`cms.spec.ts` and the magazine in `magazin.spec.ts`) need Payload's
+own database and are skipped without one. CI runs them against a Postgres
+service; locally, create an empty database, migrate it and point the run at it:
+
+```sh
+createdb cms_e2e   # or any fresh, empty database
+PAYLOAD_DATABASE_URL=postgres://…/cms_e2e PAYLOAD_SECRET=e2e-payload-secret-not-for-production pnpm payload migrate
+E2E_PAYLOAD_DATABASE_URL=postgres://…/cms_e2e pnpm test:e2e
+```
+
+They create their own documents through Payload's REST API and expect to be
+the only content: use a fresh database for each full run.

@@ -14,10 +14,8 @@ export function ArticleMeta({ article, featured = false }: { article: Article; f
   const t = useTranslations("magazin")
   const parts = [
     ...(featured ? [t("featured")] : []),
-    ...article.tags.map((tag) => tagLabel(tag.value)),
-    ...(article.published_at
-      ? [new Date(article.published_at).toLocaleDateString("cs-CZ")]
-      : []),
+    ...article.topics.map(tagLabel),
+    ...(article.publishedAt ? [new Date(article.publishedAt).toLocaleDateString("cs-CZ")] : []),
   ]
 
   return parts.length ? (
