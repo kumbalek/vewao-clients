@@ -1,8 +1,8 @@
 /**
  * By Judith design tokens, measured from the live www.by-judith.com on
  * 2026-09-28. The single source for tailwind.config.js, globals.css (through
- * Tailwind's theme()) and the /design-system page. CommonJS so the Tailwind
- * config can require it.
+ * Tailwind's theme()) and the /design-system page. An ES module, like the
+ * Tailwind config that imports it.
  *
  * Contrast ratios are WCAG 2 against white. Anything below 4.5:1 must not carry
  * body-size text.
@@ -55,4 +55,4 @@ const fontFamily = {
   sans: ["quiche-sans", "ui-sans-serif", "system-ui", "sans-serif"],
 }
 
-module.exports = { colors, borderRadius, fontFamily }
+export { colors, borderRadius, fontFamily }

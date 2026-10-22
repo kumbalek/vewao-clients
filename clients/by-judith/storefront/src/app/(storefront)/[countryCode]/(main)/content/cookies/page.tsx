@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 type CookieRow = { name: string; purpose: string; duration: string }
 
-// What the storefront actually sets (src/lib/data/cookies.ts, middleware.ts,
+// What the storefront actually sets (src/lib/data/cookies.ts, proxy.ts,
 // the kit's consent banner). Keep in step with the code.
 const NECESSARY: CookieRow[] = [
   { name: "_medusa_cart_id", purpose: "Uchovává váš košík.", duration: "7 dní" },

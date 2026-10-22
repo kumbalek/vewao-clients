@@ -9,7 +9,9 @@ const { matchRemotePattern } = require("next/dist/shared/lib/match-remote-patter
 function remotePatterns() {
   process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY ??= "pk_test_config"
   process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL = "https://api.example.test"
-  const config = require("../next.config.js")
+  // next.config.js is an ES module (the storefront is "type": "module").
+  const loaded = require("../next.config.js")
+  const config = loaded.default ?? loaded
   return config.images.remotePatterns.map(({ protocol, hostname, port, pathname, search }) => ({
     protocol: protocol?.replace(/:$/, ""),
     hostname,

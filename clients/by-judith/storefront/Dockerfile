@@ -22,6 +22,8 @@ ENV NODE_ENV=production PORT=8000 HOSTNAME=0.0.0.0 NEXT_TELEMETRY_DISABLED=1
 COPY --from=build --chown=node:node /app/.next/standalone ./
 COPY --from=build --chown=node:node /app/.next/static ./.next/static
 COPY --from=build --chown=node:node /app/public ./public
+# CMS uploads without S3 (CMS_S3_BUCKET unset) go to a volume mounted here.
+RUN mkdir -p /app/media && chown node:node /app/media
 USER node
 EXPOSE 8000
 CMD ["node", "server.js"]
