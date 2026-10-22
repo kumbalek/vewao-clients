@@ -1,16 +1,11 @@
 import { expect as baseExpect, test } from "@playwright/test"
 
-const SHOP = "http://127.0.0.1:8101"
-const ADMIN_EMAIL = "e2e-admin@example.invalid"
-const ADMIN_PASSWORD = "e2e-admin-password-1"
+import { NEEDS_PAYLOAD, SHOP, hasPayload, payloadAuth, type Auth } from "./support/payload"
 
 const expect = baseExpect.configure({ timeout: 15_000 })
 
 // Payload needs a real migrated database; nothing here runs against the mock.
-test.skip(
-  !process.env.E2E_PAYLOAD_DATABASE_URL,
-  "Needs a migrated Payload database (E2E_PAYLOAD_DATABASE_URL)"
-)
+test.skip(!hasPayload, NEEDS_PAYLOAD)
 
 // The tests build on each other: draft, publish, draft over the published
 // page, then share-link checks against the newer draft.
@@ -28,26 +23,14 @@ test.describe("cms publishing", () => {
     test.skip(isMobile, "CMS flow runs once")
   })
 
-  let token = ""
+  let authorization: Auth
   let pageId = ""
   const slug = `e2e-${Date.now()}`
 
-  const auth = () => ({ authorization: `JWT ${token}` })
+  const auth = () => authorization
 
   test.beforeAll(async ({ request }) => {
-    const init = await request.get(`${SHOP}/api/users/init`)
-    const { initialized } = await init.json()
-    if (!initialized) {
-      await request.post(`${SHOP}/api/users/first-register`, {
-        data: { email: ADMIN_EMAIL, password: ADMIN_PASSWORD, roles: ["admin"] },
-      })
-    }
-    const login = await request.post(`${SHOP}/api/users/login`, {
-      data: { email: ADMIN_EMAIL, password: ADMIN_PASSWORD },
-    })
-    // A database that already has other users needs its own e2e admin.
-    expect(login.ok(), "Use a fresh, migrated database for E2E_PAYLOAD_DATABASE_URL").toBe(true)
-    token = (await login.json()).token
+    authorization = await payloadAuth(request)
   })
 
   test("a draft page is not public", async ({ page, request }) => {

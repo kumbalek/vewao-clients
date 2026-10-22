@@ -21,12 +21,34 @@ export type CmsBlock =
   | { blockType: "newsList"; id: string; heading?: string | null; limit?: number | null }
   | { blockType: "productFeature"; id: string; product: { id: number; handle: string; title: string } | number; note?: string | null }
 export type CmsPage = { id: number; title: string; slug: string; layout?: CmsBlock[] | null; _status?: "draft" | "published" | null }
+export type CmsTopic = { id: number; name: string }
+export type CmsArticle = {
+  id: number
+  title: string
+  slug: string
+  publishedAt?: string | null
+  topics?: (CmsTopic | number)[] | null
+  excerpt?: string | null
+  image?: CmsMedia | number | null
+  body?: LexicalState
+  gallery?: (CmsMedia | number)[] | null
+  createdAt: string
+  _status?: "draft" | "published" | null
+}
 export type CmsNews = { id: number; title: string; perex: string; href?: string | null; validUntil?: string | null; image?: CmsMedia | number | null }
 
 /** Fallback if a publish hook could not expire the cache. */
 const MAX_AGE_SECONDS = 300
 
-export const cmsMediaUrl = (media: CmsMedia) => media.url
+/**
+ * Payload prefixes its files with the shop's own origin (serverURL). The shop
+ * serves them itself, so next/image gets the path: a local image, not a remote
+ * host it would have to allow and fetch over the network.
+ */
+export function cmsMediaUrl(media: CmsMedia): string {
+  const origin = process.env.NEXT_PUBLIC_BASE_URL?.replace(/\/+$/, "")
+  return origin && media.url.startsWith(`${origin}/`) ? media.url.slice(origin.length) : media.url
+}
 
 /** The preview grant for this request's path, if draft mode was opened for it. */
 export async function previewGrantFor(path: string): Promise<PreviewGrant | null> {
@@ -73,6 +95,43 @@ export async function listCmsNews(limit: number, draft: boolean): Promise<CmsNew
   if (draft) return findNews(limit, true)
   return unstable_cache(() => findNews(limit, false), ["cms-news", String(limit)], {
     tags: ["cms:news"],
+    revalidate: MAX_AGE_SECONDS,
+  })()
+}
+
+// The magazine is small; it is read whole and filtered in the storefront.
+const MAX_ARTICLES = 500
+
+async function findArticles(draft: boolean, slug?: string): Promise<CmsArticle[]> {
+  const payload = await getPayload({ config })
+  const result = await payload.find({
+    collection: "articles",
+    ...(slug ? { where: { slug: { equals: slug } }, limit: 1 } : { limit: MAX_ARTICLES }),
+    sort: "-createdAt",
+    depth: 1,
+    draft,
+    // Visitors get published articles only; a draft only inside a preview grant.
+    overrideAccess: draft,
+  })
+  if (!slug && result.totalDocs > result.docs.length) {
+    console.warn(`Magazín: ${result.totalDocs} articles, only ${result.docs.length} listed`)
+  }
+  return result.docs as unknown as CmsArticle[]
+}
+
+/** Published articles, newest first. */
+export function listCmsArticles(): Promise<CmsArticle[]> {
+  return unstable_cache(() => findArticles(false), ["cms-articles"], {
+    tags: ["cms:articles"],
+    revalidate: MAX_AGE_SECONDS,
+  })()
+}
+
+/** One article: the latest draft inside a preview grant, else the published version. */
+export async function getCmsArticle(slug: string, draft: boolean): Promise<CmsArticle | null> {
+  if (draft) return (await findArticles(true, slug))[0] ?? null
+  return unstable_cache(async () => (await findArticles(false, slug))[0] ?? null, ["cms-article", slug], {
+    tags: ["cms:articles"],
     revalidate: MAX_AGE_SECONDS,
   })()
 }

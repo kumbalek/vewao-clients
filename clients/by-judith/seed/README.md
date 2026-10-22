@@ -43,7 +43,7 @@ Launch methods were agreed with the owner on 2026-09-24. The PPL thresholds use
 `lt 5000`/`gt 4999.99` because of a Medusa 2.20.1 pricing bug; see
 `docs/MEDUSA-V2-NOTES.md` in the workspace.
 
-## Magazine (Content plugin)
+## Magazine (Content plugin, superseded)
 
 `magazin.json` is a snapshot of the 36 articles on www.bbclinic.cz/magazin,
 taken from the site's public Gatsby page data (Sanity Portable Text, converted to
@@ -76,8 +76,35 @@ MEDUSA_ADMIN_API_KEY=sk_...
 node --env-file=.env.dev --experimental-strip-types import-magazin.ts
 ```
 
-The storefront reads `/content/magazin/items` (published only). Edit articles in
-admin → Content → Magazín.
+Until vewao-clients#39 the storefront read `/content/magazin/items`; it now
+reads the Payload CMS (below). The plugin's `magazin` collection goes with #32.
+
+## Magazine (Payload CMS)
+
+The storefront's magazine comes from the Payload CMS at `/admin` → Magazín, with
+drafts, preview and version history (vewao-clients#39). `import-payload-magazin.ts`
+imports `magazin.json` through Payload's REST API: the topics (Témata), each
+image (at most 1600 px wide) into the CMS media, and the articles, published.
+`payload/markdown-lexical.ts` converts the Markdown bodies to Lexical rich text;
+on 2026-10-22 its output rendered identically to the HTML the Content plugin
+served on dev for all 36 articles. Additive like the other imports: an existing
+article (by slug) is left alone, and articles are created oldest first, which
+is the magazine's order.
+
+Sign in with a CMS account (editor or admin role), or a user's API key in
+`PAYLOAD_API_KEY`, from an ignored env file:
+
+```sh
+# .env.cms — never commit
+PAYLOAD_URL=https://judith-dev.vewao.link
+PAYLOAD_EMAIL=…
+PAYLOAD_PASSWORD=…
+```
+
+```sh
+node --env-file=.env.cms --experimental-strip-types import-payload-magazin.ts --dry-run
+node --env-file=.env.cms --experimental-strip-types import-payload-magazin.ts
+```
 
 ## Novinky a slevy (Content plugin)
 

@@ -6,10 +6,12 @@ import { en } from "@payloadcms/translations/languages/en"
 import path from "path"
 import { buildConfig, type Payload } from "payload"
 
+import { Articles } from "./cms/collections/Articles"
 import { Media } from "./cms/collections/Media"
 import { News } from "./cms/collections/News"
 import { Pages } from "./cms/collections/Pages"
 import { Products } from "./cms/collections/Products"
+import { Topics } from "./cms/collections/Topics"
 import { Users } from "./cms/collections/Users"
 import { migrations } from "./cms/migrations"
 
@@ -58,7 +60,12 @@ export default buildConfig({
   },
   i18n: { supportedLanguages: { cs, en }, fallbackLanguage: "cs" },
   onInit: ensureInitialAdmin,
-  collections: [Pages, News, Products, Media, Users],
+  collections: [Pages, Articles, Topics, News, Products, Media, Users],
+  // Scheduled publishing queues a job; this server runs due jobs every minute.
+  // The cron starts with Payload, on the first request that uses the CMS. A job
+  // runs outside any request, where Next cannot expire cached pages, so a
+  // scheduled publish shows within the 5-minute cache lifetime (lib/cms/client).
+  jobs: { autoRun: [{ cron: "* * * * *", queue: "default" }] },
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",
   cors: trustedOrigins,

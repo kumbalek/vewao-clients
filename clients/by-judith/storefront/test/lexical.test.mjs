@@ -2,7 +2,7 @@ import assert from "node:assert/strict"
 import test from "node:test"
 import { createElement, Fragment } from "react"
 import { renderToStaticMarkup } from "react-dom/server"
-import { renderLexical } from "../src/lib/cms/lexical.ts"
+import { lexicalToPlainText, renderLexical } from "../src/lib/cms/lexical.ts"
 
 const markup = (state) =>
   renderToStaticMarkup(createElement(Fragment, null, renderLexical(state)))
@@ -216,4 +216,23 @@ test("protocol-relative links lose their anchor", () => {
     { type: "link", fields: { url: "/store" }, children: [{ type: "text", text: "c", format: 0 }] },
   ] }] } }
   assert.equal(renderToStaticMarkup(createElement(Fragment, null, renderLexical(state))), '<p>ab<a href="/store">c</a></p>')
+})
+
+test("plain text joins blocks and line breaks with spaces and keeps link text", () => {
+  const text = (value, format = 0) => ({ type: "text", text: value, format })
+  const state = {
+    root: {
+      type: "root",
+      children: [
+        { type: "paragraph", children: [text("Jak jste se k nám dostala?", 1), { type: "linebreak" }, text("A proč?", 1)] },
+        {
+          type: "paragraph",
+          children: [text("Díky "), { type: "link", fields: { url: "https://example.cz" }, children: [text("doporučení")] }, text(".")],
+        },
+        { type: "list", children: [{ type: "listitem", children: [text("Jedna")] }, { type: "listitem", children: [text("dvě")] }] },
+      ],
+    },
+  }
+  assert.equal(lexicalToPlainText(state), "Jak jste se k nám dostala? A proč? Díky doporučení. Jedna dvě")
+  assert.equal(lexicalToPlainText(null), "")
 })

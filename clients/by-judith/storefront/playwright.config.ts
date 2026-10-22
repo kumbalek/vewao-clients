@@ -2,6 +2,8 @@ import { defineConfig, devices } from "@playwright/test"
 
 /** The test build's GA4 ID: analytics, and so the consent banner, are on. */
 export const TEST_GA_ID = "G-TEST000001"
+/** Signs CMS preview links in the test build; the workflow migrates with it too. */
+export const E2E_PAYLOAD_SECRET = "e2e-payload-secret-not-for-production"
 
 // Every context starts with "analytics rejected" so the banner does not cover
 // what other specs click; e2e/cookie-consent.spec.ts starts without it.
@@ -63,7 +65,7 @@ export default defineConfig({
         ...(process.env.E2E_PAYLOAD_DATABASE_URL
           ? {
               PAYLOAD_DATABASE_URL: process.env.E2E_PAYLOAD_DATABASE_URL,
-              PAYLOAD_SECRET: "e2e-payload-secret-not-for-production",
+              PAYLOAD_SECRET: E2E_PAYLOAD_SECRET,
             }
           : {}),
       },

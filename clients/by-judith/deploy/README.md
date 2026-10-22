@@ -109,8 +109,9 @@ before deploying a storefront image that contains it (vewao-clients#31):
 2. Copy `storefront.env.template` to `storefront.env` (chmod 600). Set a random
    `PAYLOAD_SECRET` (e.g. `openssl rand -hex 32`) and the initial admin's
    e-mail and a strong password.
-3. Deploy the storefront as usual. On start it applies the committed CMS
-   migrations and creates the initial admin while the CMS has no users.
+3. Deploy the storefront as usual, then open `/admin` once. Payload starts on
+   the first request that uses it: it applies the committed CMS migrations and
+   creates the initial admin while the CMS has no users.
 4. Sign in at `/admin`, then remove `CMS_INITIAL_ADMIN_*` from
    `storefront.env`. Without them, a CMS with no users lets whoever opens
    `/admin` first create the admin.
@@ -121,7 +122,7 @@ signs everyone out and breaks shared preview links.
 
 Backups:
 - `deploy.sh` dumps Postgres before *backend* migrations.
-- The CMS migrates itself when the storefront starts, so its `cms` database is
+- The CMS migrates itself on its first request after a deploy, so its `cms` database is
   covered by the server's regular backups but gets no pre-deploy dump.
 - Take one manually before a storefront deploy that changes the CMS schema
   (`src/cms/migrations`), until `deploy.sh` does it.
