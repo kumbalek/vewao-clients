@@ -2,20 +2,22 @@ import Image from "next/image"
 import { getTranslations } from "next-intl/server"
 
 import { footer } from "content/site"
+import { renderLexical } from "@lib/cms/lexical"
 import { articleImage, listArticles, type Article } from "@lib/data/magazin"
 import { relatedArticles } from "@lib/util/magazin"
 import Breadcrumbs from "@modules/common/components/breadcrumbs"
 import { CopyText } from "@modules/common/components/placeholder"
-import { PlainText, RichText } from "@modules/common/components/rich-text"
+import { Prose } from "@modules/common/components/rich-text"
+import EditLink from "@modules/cms/components/edit-link"
 import { Card, Container, Heading, MediaFrame, Section, Text } from "@modules/design-system"
 import ArticleCard, { ArticleMeta } from "@modules/magazin/components/article-card"
 
 
-/** Magazine article (wireframe 08, article layout). */
-export default async function ArticleTemplate({ article }: { article: Article }) {
+/** Magazine article (wireframe 08, article layout). `edit`: a CMS preview with edit links. */
+export default async function ArticleTemplate({ article, edit = false }: { article: Article; edit?: boolean }) {
   const t = await getTranslations("magazin")
   const image = articleImage(article)
-  const gallery = article.metadata?.gallery ?? []
+  const gallery = article.gallery
   const related = relatedArticles(await listArticles(), article)
 
   return (
@@ -32,9 +34,10 @@ export default async function ArticleTemplate({ article }: { article: Article })
           <Heading level={1} size="display">
             {article.title}
           </Heading>
-          {article.metadata?.excerpt && (
+          {edit && <EditLink collection="articles" id={article.id} label={`Upravit článek ${article.title}`} />}
+          {article.excerpt && (
             <Text size="lead" tone="subtle">
-              {article.metadata.excerpt}
+              {article.excerpt}
             </Text>
           )}
         </header>
@@ -59,11 +62,9 @@ export default async function ArticleTemplate({ article }: { article: Article })
           </MediaFrame>
         )}
 
-        {article.body_html ? (
-          <RichText html={article.body_html} className="mt-10" data-testid="article-body" />
-        ) : (
-          <PlainText text={article.body ?? ""} className="mt-10" data-testid="article-body" />
-        )}
+        <Prose className="mt-10" data-testid="article-body">
+          {renderLexical(article.body)}
+        </Prose>
 
         {gallery.length > 0 && (
           <section aria-labelledby="article-gallery" className="mt-12">

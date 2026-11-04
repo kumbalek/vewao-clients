@@ -24,7 +24,7 @@ type Field = { id: string; name: string; options: { values?: string[] } | null }
 
 const MAX_IMAGE_WIDTH = 1600
 
-export function log(action: "created" | "exists" | "updated", what: string) {
+export function log(action: "created" | "exists" | "updated" | "planned", what: string) {
   console.log(`${action.padEnd(7)} ${what}`)
 }
 

@@ -2,13 +2,13 @@
 
 export const MAGAZIN_PAGE_SIZE = 12
 
-type Tagged = { slug: string; tags?: { value: string }[] | null }
+type Tagged = { slug: string; topics: string[] }
 
-const hasTag = (article: Tagged, tag: string) => !!article.tags?.some((t) => t.value === tag)
+const hasTag = (article: Tagged, tag: string) => article.topics.includes(tag)
 
 /** Distinct tags in first-seen order; articles arrive newest first. */
 export function articleTags(articles: Tagged[]): string[] {
-  return Array.from(new Set(articles.flatMap((a) => a.tags?.map((t) => t.value) ?? [])))
+  return Array.from(new Set(articles.flatMap((a) => a.topics)))
 }
 
 /**
@@ -37,10 +37,9 @@ export function selectArticles<T extends Tagged>(
 /** Articles sharing a tag first, then the newest others. */
 export function relatedArticles<T extends Tagged>(articles: T[], current: Tagged, count = 3): T[] {
   const others = articles.filter((a) => a.slug !== current.slug)
-  const tags = current.tags?.map((t) => t.value) ?? []
-  const sameTag = others.filter((a) => tags.some((tag) => hasTag(a, tag)))
+  const sameTag = others.filter((a) => current.topics.some((tag) => hasTag(a, tag)))
   return [...sameTag, ...others.filter((a) => !sameTag.includes(a))].slice(0, count)
 }
 
-/** Tags are stored lower-case ("atopický ekzém"); display them sentence-case. */
+/** Topics are stored lower-case ("atopický ekzém"); display them sentence-case. */
 export const tagLabel = (value: string) => value.charAt(0).toLocaleUpperCase("cs") + value.slice(1)
