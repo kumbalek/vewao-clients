@@ -38,7 +38,8 @@ export type ProcedureCategory = {
   title: string
   description: Copy
   href?: string
-  procedures: { title: Copy; href?: string }[]
+  /** Western procedures have sub-procedures (#43). */
+  procedures: { title: Copy; href?: string; children?: { title: string; href: string }[] }[]
 }
 
 /** Top-level navigation after the two menus (Procedury, Shop). */

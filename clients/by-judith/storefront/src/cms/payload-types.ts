@@ -338,9 +338,13 @@ export interface ProcedureCategory {
   _order?: string | null;
   name: string;
   /**
-   * Např. vychodni-medicina.
+   * Např. vychodni-medicina. Kategorie bude na /cz/<slug>.
    */
   slug: string;
+  /**
+   * Platí 7 dní. Zobrazí rozpracovanou verzi bez možnosti úprav.
+   */
+  shareLink?: string | null;
   menuDescription?: string | null;
   /**
    * Prázdné = název v menu.
@@ -447,7 +451,7 @@ export interface Procedure {
   _order?: string | null;
   name: string;
   /**
-   * Např. tradicni-akupunktura.
+   * Např. modelace-rtu. Procedura bude na /cz/<slug>.
    */
   slug: string;
   /**
@@ -458,6 +462,10 @@ export interface Procedure {
    * Jen u podprocedur, např. Modelace rtů → Injekční aplikace.
    */
   parent?: (number | null) | Procedure;
+  /**
+   * Platí 7 dní. Zobrazí rozpracovanou verzi bez možnosti úprav.
+   */
+  shareLink?: string | null;
   /**
    * Prázdné = název v menu.
    */
@@ -910,6 +918,7 @@ export interface ProcedureCategoriesSelect<T extends boolean = true> {
   _order?: T;
   name?: T;
   slug?: T;
+  shareLink?: T;
   menuDescription?: T;
   title?: T;
   perex?: T;
@@ -978,6 +987,7 @@ export interface ProceduresSelect<T extends boolean = true> {
   slug?: T;
   category?: T;
   parent?: T;
+  shareLink?: T;
   title?: T;
   perex?: T;
   image?: T;

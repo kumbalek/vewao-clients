@@ -35,6 +35,40 @@ přebírá od ní (vewao-clients#43).
 Kategorie mají Název v menu, Krátký popis v menu, H1, Perex, Obrázek, Obsah
 stránky a SEO; procedury kategorie se pod obsahem vypíší s anotacemi.
 
+## Adresy (návrh)
+
+Všechny kategorie, procedury i podprocedury jsou na `/cz/<slug>` (rozhodnutí
+2026-11-05, vewao-clients#43). Kde stránka odpovídá stránce na bbclinic.cz,
+návrh přebírá její adresu, aby staré odkazy a pozice ve vyhledávání zůstaly.
+Ke schválení před importem.
+
+| Stránka | Slug | Na bbclinic.cz |
+| --- | --- | --- |
+| Východní medicína | `tradicni-cinska-medicina` | stejná adresa |
+| Diagnostika TČM | `diagnostika-tcm` | stejná adresa |
+| Tradiční akupunktura | `tradicni-akupunktura` | – |
+| Permanentní akupunktura | `permanentni-akupunktura` | – |
+| Bylinná fytoterapie na míru | `bylinna-fytoterapie` | – |
+| Západní medicína | `zapadni-medicina` | – |
+| Injekční aplikace | `injekcni-aplikace` | – |
+| Mezoterapie, biorevitalizace, biostimulace pleti | `mezoterapie-regenerace-pleti` | stejná adresa |
+| Péče o vlasovou pokožku | `pece-o-vlasy-lecba-alopecie` | stejná adresa |
+| Modelace rtů | `modelace-rtu` | stejná adresa |
+| Aplikace botulotoxinu | `aplikace-botulotoxinu` | – |
+| Přístrojové ošetření | `pristrojove-osetreni` | – |
+| Ultherapy® Prime | `ultherapy-prime` | stejná adresa (a `/ultherapy`) |
+| Dermapen World – mikrojehličkování | `dermapen-world` | stejná adresa |
+| Plexr® | `plexr` | – |
+| Frakční laser | `frakcni-laser` | – |
+| Plastická chirurgie | `plasticka-chirurgie` | stejná adresa |
+| Blefaroplastika | `blefaroplastika` | – |
+| Chirurgická excize | `chirurgicka-excize` | – |
+| Přímý brow lift | `primy-brow-lift` | – |
+
+Staré adresy bez nové stránky potřebují trvalé přesměrování na nejbližší
+stránku: `/ultherapy`, `/lifting`, `/hubnuti`, `/laserove-osetreni`,
+`/dermatologie-akne-ekzem`.
+
 ## Přehled menu
 
 | Úroveň | Název v menu | URL od copywritera | Text v podkladech |

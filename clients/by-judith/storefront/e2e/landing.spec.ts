@@ -1,5 +1,7 @@
 import { expect, test, type Locator, type Page } from "@playwright/test"
 
+import { NEEDS_PAYLOAD, hasPayload } from "./support/payload"
+
 const SHOP = "http://127.0.0.1:8101"
 
 const TRANSPARENT = "rgba(0, 0, 0, 0)"
@@ -35,11 +37,11 @@ async function expectLandingLinks(page: Page) {
   // Every beat's link is a real anchor from the first paint, whatever the scroll.
   await expect(hero.getByRole("link", { name: "Lasery · injekční ošetření · pleť" })).toHaveAttribute(
     "href",
-    "/cz/procedury/beauty"
+    "/cz/zapadni-medicina"
   )
   await expect(hero.getByRole("link", { name: "TCM diagnostika · akupunktura" })).toHaveAttribute(
     "href",
-    "/cz/procedury/akupunktura"
+    "/cz/vychodni-medicina"
   )
   // The closing CTA uses the header's wording and target.
   await expect(hero.getByRole("link", { name: "Rezervovat" })).toHaveAttribute(
@@ -108,6 +110,7 @@ test("the header floats over the hero, then turns white past it", async ({ page,
 
 test("an open menu stays dark and see-through over the hero", async ({ page, isMobile }) => {
   test.skip(isMobile, "desktop menus")
+  test.skip(!hasPayload, NEEDS_PAYLOAD)
   await page.goto("/cz")
   const header = page.getByRole("banner")
   const procedures = header.getByRole("button", { name: "Procedury" })

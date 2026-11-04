@@ -2,7 +2,8 @@ import type { CollectionConfig } from 'payload'
 
 import { isEditor, publishedOrPreview } from '../access/roles'
 import { procedureSections } from '../blocks/sections'
-import { slugField } from '../fields/preview'
+import { previewAdmin, shareLinkField } from '../fields/preview'
+import { procedurePath, procedureSlugField } from '../fields/procedure-slug'
 import { seoField } from '../fields/seo'
 import { revalidateOnDelete, revalidateOnPublish } from '../hooks/revalidate-storefront'
 
@@ -15,13 +16,14 @@ export const ProcedureCategories: CollectionConfig = {
   labels: { singular: 'Kategorie procedur', plural: 'Kategorie procedur' },
   // Editors drag categories into menu order in the list view.
   orderable: true,
-  admin: { useAsTitle: 'name', defaultColumns: ['name', 'slug', '_status'], group: 'Procedury' },
+  admin: { useAsTitle: 'name', defaultColumns: ['name', 'slug', '_status'], group: 'Procedury', ...previewAdmin(procedurePath) },
   access: { read: publishedOrPreview, create: isEditor, update: isEditor, delete: isEditor },
   versions: { drafts: { autosave: { interval: 800 }, schedulePublish: true }, maxPerDoc: 50 },
   hooks: { afterChange: [revalidateOnPublish(tags)], afterDelete: [revalidateOnDelete(tags)] },
   fields: [
     { name: 'name', label: 'Název v menu', type: 'text', required: true },
-    slugField('Např. vychodni-medicina.'),
+    procedureSlugField('procedure-categories', 'Např. vychodni-medicina. Kategorie bude na /cz/<slug>.'),
+    shareLinkField(procedurePath),
     {
       type: 'tabs',
       tabs: [

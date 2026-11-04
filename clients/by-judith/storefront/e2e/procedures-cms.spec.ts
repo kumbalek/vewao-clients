@@ -1,11 +1,13 @@
 import { expect, test } from "@playwright/test"
 
+import { E2E_PAYLOAD_SECRET } from "../playwright.config"
+import { previewSecret, signPreview } from "../src/lib/cms/preview-token"
 import { NEEDS_PAYLOAD, SHOP, hasPayload, lexical, payloadAuth, type Auth } from "./support/payload"
 
 const { doc, p, text } = lexical
 
 // The procedures' data model in the CMS (#43): categories, procedures and one
-// level of sub-procedures. The storefront does not read it yet.
+// level of sub-procedures, and their pages at /cz/<slug> in preview.
 test.skip(!hasPayload, NEEDS_PAYLOAD)
 test.describe.configure({ mode: "serial" })
 
@@ -125,5 +127,58 @@ test.describe("procedures in the CMS", () => {
     await anonymous.dispose()
     expect(slugs).toContain(`e2e-injekcni-${run}`)
     expect(slugs).not.toContain(`e2e-koncept-${run}`)
+  })
+
+  test("a draft procedure page is private; its share link shows it read-only", async ({ browser, page, request }) => {
+    const path = `/cz/e2e-koncept-${run}`
+    expect((await page.goto(path))?.status()).toBe(404)
+
+    const { shareLink } = await get(request, "procedures", ids.draft!)
+    expect(shareLink).toContain(encodeURIComponent(path))
+    const context = await browser.newContext()
+    const preview = await context.newPage()
+    await preview.goto(shareLink)
+    await expect(preview.getByRole("heading", { level: 1 })).toHaveText("E2E Koncept")
+    await expect(preview.getByTestId("cms-preview-bar")).toContainText("Náhled konceptu")
+    await expect(preview.getByTestId("cms-edit-link")).toHaveCount(0)
+    await context.close()
+  })
+
+  test("an edit preview links the procedure to the CMS", async ({ browser }) => {
+    // What Live Preview opens: an edit-mode link signed with the CMS secret.
+    const path = `/cz/e2e-koncept-${run}`
+    const expires = Math.floor(Date.now() / 1000) + 600
+    const secret = previewSecret({ PAYLOAD_SECRET: E2E_PAYLOAD_SECRET })!
+    const query = new URLSearchParams({ path, expires: String(expires), mode: "edit", signature: signPreview(secret, path, expires, "edit") })
+
+    const context = await browser.newContext()
+    const page = await context.newPage()
+    await page.goto(`/api/cms/preview?${query}`)
+    await expect(page.getByTestId("cms-edit-link")).toHaveAttribute("href", `/admin/collections/procedures/${ids.draft}`)
+    await expect(page.getByTestId("cms-preview-bar").getByRole("link", { name: "Upravit v CMS" })).toHaveAttribute(
+      "href",
+      `/admin/collections/procedures/${ids.draft}`
+    )
+    await context.close()
+  })
+
+  test("publishing puts the procedure on its category page at once", async ({ page, request }) => {
+    const res = await request.patch(`${SHOP}/api/procedures/${ids.draft}`, { headers: auth, data: { _status: "published" } })
+    expect(res.ok(), await res.text()).toBe(true)
+
+    await page.goto(`/cz/e2e-zapadni-${run}`)
+    await expect(page.getByTestId("procedure-card").getByRole("heading", { level: 3 })).toContainText(["E2E Koncept"])
+    await page.goto(`/cz/e2e-koncept-${run}`)
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("E2E Koncept")
+    await expect(page.getByTestId("cms-preview-bar")).toHaveCount(0)
+  })
+
+  test("a slug taken by a category or a shop page is refused", async ({ request }) => {
+    const shopPage = await create(request, "procedures", { name: "E2E Ceník", slug: "cenik", category: ids.category })
+    expect(shopPage.status()).toBe(400)
+    expect(await shopPage.text()).toContain("patří jiné stránce webu")
+    const taken = await create(request, "procedures", { name: "E2E Kategorie", slug: `e2e-zapadni-${run}`, category: ids.category })
+    expect(taken.status()).toBe(400)
+    expect(await taken.text()).toContain("už má kategorie")
   })
 })

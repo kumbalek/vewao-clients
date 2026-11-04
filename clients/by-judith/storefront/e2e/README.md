@@ -21,8 +21,11 @@ These are storefront contract tests. They do not prove real Comgate
 authorization, webhooks, fulfilment or price-history persistence; verify those
 against the dev backend with Comgate test mode before launch.
 
-The CMS specs (`cms.spec.ts` and the magazine in `magazin.spec.ts`) need Payload's
-own database and are skipped without one. CI runs them against a Postgres
+The CMS specs need Payload's own database and are skipped without one: pages
+(`cms.spec.ts`), the magazine (`magazin.spec.ts`), procedures (`clinic.spec.ts`,
+`procedures-cms.spec.ts`, Ceník in `cenik-novinky.spec.ts`) and the procedure
+menu in the header specs. `cms.setup.ts` creates the procedure fixtures they
+share once, before the desktop and mobile projects. CI runs them against a Postgres
 service; locally, create an empty database, migrate it and point the run at it:
 
 ```sh

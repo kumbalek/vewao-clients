@@ -2,7 +2,8 @@ import { APIError, type CollectionBeforeDeleteHook, type CollectionBeforeValidat
 
 import { isEditor, publishedOrPreview } from '../access/roles'
 import { procedureSections } from '../blocks/sections'
-import { slugField } from '../fields/preview'
+import { previewAdmin, shareLinkField } from '../fields/preview'
+import { procedurePath, procedureSlugField } from '../fields/procedure-slug'
 import { seoField } from '../fields/seo'
 import { revalidateOnDelete, revalidateOnPublish } from '../hooks/revalidate-storefront'
 
@@ -59,6 +60,7 @@ export const Procedures: CollectionConfig = {
     defaultColumns: ['name', 'category', 'parent', '_status'],
     listSearchableFields: ['name', 'slug'],
     group: 'Procedury',
+    ...previewAdmin(procedurePath),
   },
   access: { read: publishedOrPreview, create: isEditor, update: isEditor, delete: isEditor },
   versions: { drafts: { autosave: { interval: 800 }, schedulePublish: true }, maxPerDoc: 100 },
@@ -70,7 +72,7 @@ export const Procedures: CollectionConfig = {
   },
   fields: [
     { name: 'name', label: 'Název v menu', type: 'text', required: true },
-    slugField('Např. tradicni-akupunktura.'),
+    procedureSlugField('procedures', 'Např. modelace-rtu. Procedura bude na /cz/<slug>.'),
     {
       name: 'category',
       label: 'Kategorie',
@@ -95,6 +97,7 @@ export const Procedures: CollectionConfig = {
       },
       admin: { position: 'sidebar', description: 'Jen u podprocedur, např. Modelace rtů → Injekční aplikace.' },
     },
+    shareLinkField(procedurePath),
     {
       type: 'tabs',
       tabs: [

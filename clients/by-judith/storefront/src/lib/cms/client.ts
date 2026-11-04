@@ -6,6 +6,7 @@ import { cookies, draftMode } from "next/headers"
 import { getPayload } from "payload"
 
 import type { LexicalState } from "./lexical"
+import type { Procedure as CmsProcedure, ProcedureCategory as CmsProcedureCategory } from "../../cms/payload-types"
 import { PREVIEW_COOKIE, previewSecret, verifyPreview, type PreviewGrant } from "./preview-token"
 
 /**
@@ -35,6 +36,7 @@ export type CmsArticle = {
   createdAt: string
   _status?: "draft" | "published" | null
 }
+export type { CmsProcedure, CmsProcedureCategory }
 export type CmsNews = { id: number; title: string; perex: string; href?: string | null; validUntil?: string | null; image?: CmsMedia | number | null }
 
 /** Fallback if a publish hook could not expire the cache. */
@@ -134,4 +136,45 @@ export async function getCmsArticle(slug: string, draft: boolean): Promise<CmsAr
     tags: ["cms:articles"],
     revalidate: MAX_AGE_SECONDS,
   })()
+}
+
+// Two categories and a few dozen procedures: read whole, arranged in the storefront.
+const MAX_PROCEDURES = 500
+export type CmsProcedureDocs = { categories: CmsProcedureCategory[]; procedures: CmsProcedure[] }
+
+async function findProcedureDocs(): Promise<CmsProcedureDocs> {
+  const payload = await getPayload({ config })
+  const [categories, procedures] = await Promise.all([
+    payload.find({ collection: "procedure-categories", sort: "_order", depth: 1, limit: MAX_PROCEDURES, overrideAccess: false }),
+    payload.find({ collection: "procedures", sort: "_order", depth: 1, limit: MAX_PROCEDURES, overrideAccess: false }),
+  ])
+  if (procedures.totalDocs > procedures.docs.length) {
+    console.warn(`Procedury: ${procedures.totalDocs} procedures, only ${procedures.docs.length} listed`)
+  }
+  return { categories: categories.docs, procedures: procedures.docs }
+}
+
+/** Published categories and procedures, in menu order. */
+export function listCmsProcedureDocs(): Promise<CmsProcedureDocs> {
+  return unstable_cache(findProcedureDocs, ["cms-procedures"], {
+    tags: ["cms:procedures"],
+    revalidate: MAX_AGE_SECONDS,
+  })()
+}
+
+export type CmsProcedureDraft =
+  | { collection: "procedure-categories"; doc: CmsProcedureCategory }
+  | { collection: "procedures"; doc: CmsProcedure }
+
+/** The latest draft at a slug, for a preview grant: a category or a procedure. */
+export async function getCmsProcedureDraft(slug: string): Promise<CmsProcedureDraft | null> {
+  const payload = await getPayload({ config })
+  const where = { slug: { equals: slug } }
+  const [categories, procedures] = await Promise.all([
+    payload.find({ collection: "procedure-categories", where, depth: 1, limit: 1, draft: true, overrideAccess: true }),
+    payload.find({ collection: "procedures", where, depth: 1, limit: 1, draft: true, overrideAccess: true }),
+  ])
+  if (categories.docs[0]) return { collection: "procedure-categories", doc: categories.docs[0] }
+  if (procedures.docs[0]) return { collection: "procedures", doc: procedures.docs[0] }
+  return null
 }

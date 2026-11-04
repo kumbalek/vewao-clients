@@ -127,6 +127,17 @@ export default function MobileMenu({
                                   <CopyText value={procedure.title} />
                                 </span>
                               )}
+                              {procedure.children?.length ? (
+                                <ul className="border-l border-line pl-4">
+                                  {procedure.children.map((child) => (
+                                    <li key={child.href}>
+                                      <LocalizedClientLink href={child.href} className={subLinkClasses}>
+                                        {child.title}
+                                      </LocalizedClientLink>
+                                    </li>
+                                  ))}
+                                </ul>
+                              ) : null}
                             </li>
                           ))}
                         </ul>

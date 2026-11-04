@@ -34,10 +34,13 @@ export default defineConfig({
   reporter: process.env.CI ? [["list"], ["github"]] : "list",
   use: { baseURL: "http://127.0.0.1:8101", trace: "retain-on-failure", storageState: decided },
   projects: [
-    { name: "desktop", use: { ...devices["Desktop Chrome"] } },
+    // CMS content the specs share; skipped without a Payload database.
+    { name: "cms-fixtures", testMatch: /cms\.setup\.ts/ },
+    { name: "desktop", use: { ...devices["Desktop Chrome"] }, dependencies: ["cms-fixtures"] },
     {
       name: "mobile",
       use: { ...devices["iPhone 13"], defaultBrowserType: "chromium" },
+      dependencies: ["cms-fixtures"],
     },
   ],
   webServer: [
