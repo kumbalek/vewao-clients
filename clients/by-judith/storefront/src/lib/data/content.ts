@@ -98,8 +98,13 @@ const markdownToPlain = (markdown: string) =>
     .replace(/(?<!\\)\*+/g, "")
     .replace(/\\(.)/g, "$1")
 
+/** Text cut at a word boundary to at most `length` characters, with an ellipsis. */
+export function clip(text: string, length: number): string {
+  const flat = text.replace(/\s+/g, " ").trim()
+  return flat.length > length ? `${flat.slice(0, length).replace(/\s+\S*$/, "")}…` : flat
+}
+
 /** Teaser text: the given summary, else the start of the Markdown body. */
 export function teaser(summary: string | null | undefined, body: string | null, length = 180): string {
-  const text = (summary || markdownToPlain(body ?? "")).replace(/\s+/g, " ").trim()
-  return text.length > length ? `${text.slice(0, length).replace(/\s+\S*$/, "")}…` : text
+  return clip(summary || markdownToPlain(body ?? ""), length)
 }

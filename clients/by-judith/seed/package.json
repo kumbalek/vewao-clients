@@ -11,10 +11,11 @@
     "seed:dev": "node --experimental-strip-types seed-dev.ts",
     "magazin:extract": "node --experimental-strip-types extract-magazin.ts",
     "magazin:import": "node --experimental-strip-types import-magazin.ts",
+    "magazin:import-payload": "node --experimental-strip-types import-payload-magazin.ts",
     "clinic:extract": "node --experimental-strip-types extract-clinic.ts",
     "clinic:import": "node --experimental-strip-types import-clinic.ts",
     "novinky:setup": "node --experimental-strip-types setup-novinky.ts",
-    "test": "node --experimental-strip-types --test magazin/*.test.ts content/*.test.ts",
+    "test": "node --experimental-strip-types --test magazin/*.test.ts content/*.test.ts payload/*.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

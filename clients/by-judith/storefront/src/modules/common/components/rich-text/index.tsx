@@ -30,6 +30,19 @@ export function RichText({
   )
 }
 
+/** Already-rendered elements, such as CMS rich text, with the same typography. */
+export function Prose({
+  children,
+  className,
+  ...props
+}: { children: React.ReactNode; className?: string } & React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div className={clx(prose, className)} {...props}>
+      {children}
+    </div>
+  )
+}
+
 /** A text-format body: blank lines separate paragraphs. */
 export function PlainText({
   text,

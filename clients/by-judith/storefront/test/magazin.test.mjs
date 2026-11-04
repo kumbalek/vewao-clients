@@ -8,7 +8,7 @@ import {
   tagLabel,
 } from "../src/lib/util/magazin.ts"
 
-const article = (slug, ...tags) => ({ slug, tags: tags.map((value) => ({ value })) })
+const article = (slug, ...topics) => ({ slug, topics })
 const many = (n) => Array.from({ length: n }, (_, i) => article(`a${i}`))
 
 test("the newest article is featured once and not repeated in the grid", () => {

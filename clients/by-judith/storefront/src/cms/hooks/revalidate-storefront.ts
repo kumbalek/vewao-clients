@@ -28,6 +28,14 @@ export const revalidateOnPublish =
     return doc
   }
 
+/** For collections without drafts: every save is live. */
+export const revalidateOnChange =
+  (tagsFor: (doc: Tagged) => string[]): CollectionAfterChangeHook =>
+  ({ doc, req }) => {
+    expire(req, tagsFor(doc))
+    return doc
+  }
+
 export const revalidateOnDelete =
   (tagsFor: (doc: Tagged) => string[]): CollectionAfterDeleteHook =>
   ({ doc, req }) => {

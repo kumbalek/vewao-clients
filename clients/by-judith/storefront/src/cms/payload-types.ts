@@ -68,6 +68,8 @@ export interface Config {
   blocks: {};
   collections: {
     pages: Page;
+    articles: Article;
+    topics: Topic;
     news: News;
     products: Product;
     media: Media;
@@ -81,6 +83,8 @@ export interface Config {
   collectionsJoins: {};
   collectionsSelect: {
     pages: PagesSelect<false> | PagesSelect<true>;
+    articles: ArticlesSelect<false> | ArticlesSelect<true>;
+    topics: TopicsSelect<false> | TopicsSelect<true>;
     news: NewsSelect<false> | NewsSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
@@ -264,6 +268,65 @@ export interface Product {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "articles".
+ */
+export interface Article {
+  id: number;
+  title: string;
+  /**
+   * Např. rozhovor-s-klientkou. Článek bude na /cz/magazin/<slug>.
+   */
+  slug: string;
+  /**
+   * Zobrazí se u článku. Pořadí v magazínu určuje datum vytvoření.
+   */
+  publishedAt?: string | null;
+  topics?: (number | Topic)[] | null;
+  /**
+   * Platí 7 dní. Zobrazí rozpracovanou verzi bez možnosti úprav.
+   */
+  shareLink?: string | null;
+  /**
+   * Úvod pod nadpisem a text na kartě článku. Bez perexu karta ukáže začátek textu.
+   */
+  excerpt?: string | null;
+  image?: (number | null) | Media;
+  body: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  gallery?: (number | Media)[] | null;
+  sourceUrl?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "topics".
+ */
+export interface Topic {
+  id: number;
+  /**
+   * Malými písmeny, např. „atopický ekzém“. Na webu začíná velkým písmenem; je i v adrese filtru (?tag=…).
+   */
+  name: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "news".
  */
 export interface News {
@@ -430,6 +493,14 @@ export interface PayloadLockedDocument {
         value: number | Page;
       } | null)
     | ({
+        relationTo: 'articles';
+        value: number | Article;
+      } | null)
+    | ({
+        relationTo: 'topics';
+        value: number | Topic;
+      } | null)
+    | ({
         relationTo: 'news';
         value: number | News;
       } | null)
@@ -540,6 +611,34 @@ export interface PagesSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "articles_select".
+ */
+export interface ArticlesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  publishedAt?: T;
+  topics?: T;
+  shareLink?: T;
+  excerpt?: T;
+  image?: T;
+  body?: T;
+  gallery?: T;
+  sourceUrl?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "topics_select".
+ */
+export interface TopicsSelect<T extends boolean = true> {
+  name?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -705,10 +804,15 @@ export interface TaskSchedulePublish {
   input: {
     type?: ('publish' | 'unpublish') | null;
     locale?: string | null;
-    doc?: {
-      relationTo: 'pages';
-      value: number | Page;
-    } | null;
+    doc?:
+      | ({
+          relationTo: 'pages';
+          value: number | Page;
+        } | null)
+      | ({
+          relationTo: 'articles';
+          value: number | Article;
+        } | null);
     global?: string | null;
     user?: {
       relationTo: 'users';
