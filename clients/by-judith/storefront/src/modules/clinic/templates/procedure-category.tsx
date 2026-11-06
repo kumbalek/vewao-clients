@@ -1,46 +1,43 @@
 import Image from "next/image"
 import { getTranslations } from "next-intl/server"
 
-import { listFaq, listProcedures, type ProcedureCategory } from "@lib/data/clinic"
-import { contentImage } from "@lib/data/content"
-import { splitAtFirstHeading } from "@lib/util/clinic"
-import { Placeholder } from "@modules/common/components/placeholder"
-import { RichText } from "@modules/common/components/rich-text"
-import { Heading, MediaFrame, Section, Text } from "@modules/design-system"
-import FaqList from "@modules/clinic/components/faq-list"
+import type { CategoryBranch } from "@lib/util/procedures"
+import EditLink from "@modules/cms/components/edit-link"
 import ProcedureCard from "@modules/clinic/components/procedure-card"
+import ProcedureSections from "@modules/clinic/components/procedure-sections"
+import { Heading, MediaFrame, Section, Text } from "@modules/design-system"
 
 /**
- * A procedure category (wireframe 02): introduction, the procedures, then the
- * category's further sections ("Na co se zaměřujeme?") and its FAQ.
+ * A procedure category, Východní or Západní medicína (wireframe 02): its
+ * introduction and sections, then its procedures with their annotations.
  */
-export default async function ProcedureCategoryTemplate({ category }: { category: ProcedureCategory }) {
+export default async function ProcedureCategoryTemplate({
+  branch,
+  edit = false,
+}: {
+  branch: CategoryBranch
+  /** A CMS preview with edit links. */
+  edit?: boolean
+}) {
   const t = await getTranslations("procedures")
-  const [procedures, faq] = await Promise.all([listProcedures(category.slug), listFaq(category.slug)])
-  const [intro, sections] = splitAtFirstHeading(category.body_html ?? "")
-  const image = contentImage(category)
+  const { category, procedures } = branch
 
   return (
     <>
       <Section spacing="lg">
         <div className="grid items-center gap-10 small:grid-cols-[3fr_2fr] small:gap-16">
-          <div>
+          <div className="flex flex-col items-start gap-6">
             <Heading level={1} size="display">
               {category.title}
             </Heading>
-            {intro.trim() ? (
-              <RichText html={intro} className="mt-6" />
-            ) : (
-              <Text className="mt-6">
-                <Placeholder>úvod kategorie</Placeholder>
-              </Text>
-            )}
+            {edit && <EditLink collection="procedure-categories" id={category.id} label={`Upravit kategorii ${category.name}`} />}
+            {category.perex && <Text size="lead">{category.perex}</Text>}
           </div>
-          {image && (
-            <MediaFrame ratio="portrait" className="mx-auto max-w-md">
+          {category.image && (
+            <MediaFrame ratio="portrait" className="mx-auto w-full max-w-md">
               <Image
-                src={image.url}
-                alt={image.alt ?? ""}
+                src={category.image.url}
+                alt={category.image.alt ?? ""}
                 fill
                 priority
                 sizes="(min-width: 1024px) 450px, 100vw"
@@ -51,13 +48,19 @@ export default async function ProcedureCategoryTemplate({ category }: { category
         </div>
       </Section>
 
-      <Section spacing="md" aria-labelledby="procedures-offer" className="pt-0 small:pt-0">
+      {category.sections.length > 0 && (
+        <Section spacing="md" width="text" className="pt-0 small:pt-0">
+          <ProcedureSections sections={category.sections} />
+        </Section>
+      )}
+
+      <Section spacing="md" aria-labelledby="procedures-offer">
         <Heading id="procedures-offer" level={2} size="lg">
           {t("offer")}
         </Heading>
         {procedures.length > 0 ? (
           <ul className="mt-8 grid gap-x-6 gap-y-12 xsmall:grid-cols-2 small:grid-cols-3">
-            {procedures.map((procedure) => (
+            {procedures.map(({ procedure }) => (
               <li key={procedure.id}>
                 <ProcedureCard procedure={procedure} />
               </li>
@@ -69,18 +72,6 @@ export default async function ProcedureCategoryTemplate({ category }: { category
           </Text>
         )}
       </Section>
-
-      {sections && (
-        <Section spacing="md" width="text">
-          <RichText html={sections} className="[&>h2:first-child]:mt-0" />
-        </Section>
-      )}
-
-      {faq.length > 0 && (
-        <Section spacing="lg" width="text">
-          <FaqList items={faq} />
-        </Section>
-      )}
     </>
   )
 }

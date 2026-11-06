@@ -44,7 +44,7 @@ test("west is read before east, each linking to its procedure category", () => {
   )
   assert.deepEqual(
     BEATS.map((beat) => beat.action?.href),
-    [undefined, "/procedury/beauty", "/procedury/akupunktura", undefined]
+    [undefined, "/zapadni-medicina", "/vychodni-medicina", undefined]
   )
   // Only the last beat carries the booking button.
   assert.deepEqual(

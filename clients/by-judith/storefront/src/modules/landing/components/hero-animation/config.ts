@@ -69,7 +69,7 @@ export const BEATS: Beat[] = [
     mobileTitle: "Efektivita pro\nmoderní život",
     action: {
       label: "Lasery · injekční ošetření · pleť",
-      href: "/procedury/beauty",
+      href: "/zapadni-medicina",
     },
   },
   {
@@ -81,7 +81,7 @@ export const BEATS: Beat[] = [
     mobileTitle: "Revoluce\nv\u00a0akupunktuře",
     action: {
       label: "TCM diagnostika · akupunktura",
-      href: "/procedury/akupunktura",
+      href: "/vychodni-medicina",
     },
   },
   {

@@ -1,7 +1,7 @@
 import { Metadata } from "next"
 
-import { listAllProcedures, listProcedureCategories } from "@lib/data/clinic"
-import { priceListSections } from "@lib/util/clinic"
+import { listPriceList } from "@lib/data/procedures"
+import type { PriceListEntry } from "@lib/util/procedures"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { ButtonLink, Container, Heading, Section, Text } from "@modules/design-system"
 
@@ -11,15 +11,12 @@ export const metadata: Metadata = {
 }
 
 /**
- * Every procedure's price list, by category (vewao-clients#20). Built from the
- * procedures' "Ceník" field in admin → Obsah, so it never needs its own edits.
+ * Every procedure's prices, by category (vewao-clients#20, #43). Built from the
+ * procedures' Cena tab in the CMS, so it never needs its own edits; a
+ * sub-procedure's prices follow its parent procedure.
  */
 export default async function PriceListPage() {
-  const [categories, procedures] = await Promise.all([
-    listProcedureCategories(),
-    listAllProcedures(),
-  ])
-  const sections = priceListSections(categories, procedures)
+  const sections = await listPriceList()
 
   return (
     <Section spacing="md">
@@ -47,23 +44,28 @@ export default async function PriceListPage() {
               data-testid="price-list-section"
             >
               <Heading id={`cenik-${section.slug}`} level={2} size="md">
-                {section.title}
+                <LocalizedClientLink href={section.href} className="hover:underline">
+                  {section.name}
+                </LocalizedClientLink>
               </Heading>
-              {section.procedures.map((procedure) => (
-                <div key={procedure.slug} className="flex flex-col gap-2">
+              {section.entries.map((entry) => (
+                <div key={entry.slug} className="flex flex-col gap-2">
                   <Heading level={3} size="sm">
-                    <LocalizedClientLink href={procedure.href} className="hover:underline">
-                      {procedure.title}
+                    <LocalizedClientLink href={entry.href} className="hover:underline">
+                      {entry.name}
                     </LocalizedClientLink>
                   </Heading>
-                  <dl className="divide-y divide-line text-sm">
-                    {procedure.rows.map((row) => (
-                      <div key={row.title} className="flex justify-between gap-4 py-3">
-                        <dt className="text-ink-subtle">{row.title}</dt>
-                        <dd className="text-right text-ink">{row.price}</dd>
-                      </div>
-                    ))}
-                  </dl>
+                  <Rows entry={entry} />
+                  {entry.children.map((child) => (
+                    <div key={child.slug} className="flex flex-col gap-2 border-l border-line pl-4">
+                      <Heading level={4} size="sm">
+                        <LocalizedClientLink href={child.href} className="hover:underline">
+                          {child.name}
+                        </LocalizedClientLink>
+                      </Heading>
+                      <Rows entry={child} />
+                    </div>
+                  ))}
                 </div>
               ))}
             </section>
@@ -75,5 +77,19 @@ export default async function PriceListPage() {
         </div>
       </Container>
     </Section>
+  )
+}
+
+function Rows({ entry }: { entry: PriceListEntry }) {
+  if (!entry.rows.length) return null
+  return (
+    <dl className="divide-y divide-line text-sm">
+      {entry.rows.map((row, index) => (
+        <div key={index} className="flex justify-between gap-4 py-3">
+          <dt className="text-ink-subtle">{row.item ?? entry.name}</dt>
+          <dd className="text-right text-ink">{row.price}</dd>
+        </div>
+      ))}
+    </dl>
   )
 }

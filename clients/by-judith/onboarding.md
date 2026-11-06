@@ -77,6 +77,16 @@ kept. The owner chose to build in steps:
   Imported on local and dev. Missing procedure content is marked `[doplnit]`.
   Procedure prices (incl. "Akce … místo …") and the Ultherapy manufacturer
   claims were copied as-is and await merchant review (vewao-workspace#21).
+- Built (2026-11-05, vewao-clients#43): procedures moved to the Payload CMS
+  in the structure the owner agreed: Východní and Západní medicína, their
+  procedures, and one level of sub-procedures for western medicine. Every
+  category, procedure and sub-procedure is at `/cz/<slug>`, reusing the
+  bbclinic.cz slug where a page matches (owner decision 2026-11-05: flat
+  addresses for SEO and stable links). Pages have drafts, Live Preview and
+  share links; the Procedury menu shows sub-procedures; Ceník reads the
+  procedures' price rows. The copywriter's texts are structured in
+  `content/procedury.md`; the Content plugin's procedure categories, procedures
+  and FAQ are no longer shown (FAQ to follow in the CMS, #32).
 - "Rezervovat" links to `/content/contact` until a booking provider is chosen
   (vewao-workspace#30).
 - Missing site content is marked `[doplnit]` in `storefront/src/content/site.ts`
@@ -132,7 +142,8 @@ lead doctor, imported from the legacy repo's `new-hp` branch (staged work on
   see-through. Past the hero they are the usual white header. The cart
   dropdown and the mobile menu stay white.
 - Adapted to this site: the real header replaces the demo's mock one. The two
-  category links go to `/procedury/beauty` and `/procedury/akupunktura`. The closing CTA uses the
+  category links go to `/zapadni-medicina` and `/vychodni-medicina` (until
+  2026-11-05 `/procedury/beauty` and `/procedury/akupunktura`). The closing CTA uses the
   header's "Rezervovat" and contact page. The demo used "Objednat konzultaci"
   and a `/rezervace` page that does not exist here.
 - Landing copy, incl. "Lasery" in the Beauty link (no imported laser
