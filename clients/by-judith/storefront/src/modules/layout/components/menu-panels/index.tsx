@@ -10,6 +10,10 @@ export type MenuCollection = { id: string; handle: string; title: string }
 const pillClasses =
   "block rounded-full border border-line bg-white px-4 py-2 text-sm text-ink transition-colors hover:bg-surface-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink overlay:border-white/30 overlay:bg-transparent overlay:text-white overlay:hover:bg-white/10 overlay:focus-visible:outline-white"
 
+/** A sub-procedure under its procedure's pill. */
+const subLinkClasses =
+  "block rounded px-2 py-1 text-sm text-ink-subtle hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-ink overlay:text-white/85 overlay:hover:text-white overlay:focus-visible:outline-white"
+
 /** Inverted colours for the panels while the header is over a dark hero. */
 const overlayArrow = "overlay:text-white overlay:hover:text-white/80 overlay:focus-visible:outline-white"
 const overlayLabel = "overlay:text-white/70"
@@ -65,6 +69,17 @@ export function ProceduresPanel({ categories }: { categories: ProcedureCategory[
                     <CopyText value={procedure.title} />
                   </span>
                 )}
+                {procedure.children?.length ? (
+                  <ul className="mt-1 flex flex-col pl-4">
+                    {procedure.children.map((child) => (
+                      <li key={child.href}>
+                        <LocalizedClientLink href={child.href} className={subLinkClasses}>
+                          {child.title}
+                        </LocalizedClientLink>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
               </li>
             ))}
           </ul>

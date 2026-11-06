@@ -1,7 +1,7 @@
 import { Metadata } from "next"
 
 import { listCartOptions, retrieveCart } from "@lib/data/cart"
-import { listProcedureMenu } from "@lib/data/clinic"
+import { listProcedureMenu } from "@lib/data/procedures"
 import { listCollections } from "@lib/data/collections"
 import { retrieveCustomer } from "@lib/data/customer"
 import { getBaseURL } from "@lib/util/env"

@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test"
 
+import { NEEDS_PAYLOAD, hasPayload } from "./support/payload"
+
 const MOCK = "http://127.0.0.1:9101"
 const SHOP = "http://127.0.0.1:8101"
 
@@ -17,21 +19,25 @@ test.beforeEach(async ({ context, request }) => {
 })
 
 test("Ceník lists every priced procedure by category with links", async ({ page }) => {
+  test.skip(!hasPayload, NEEDS_PAYLOAD)
   await page.goto("/cz/cenik")
   await expect(page.getByRole("heading", { name: "Ceník", level: 1 })).toBeVisible()
 
   const sections = page.getByTestId("price-list-section")
-  await expect(sections).toHaveCount(1)
-  const section = sections.first()
-  await expect(section.getByRole("heading", { name: "Akupunktura", level: 2 })).toBeVisible()
-  // Druhá procedura has no price; the beauty procedure has no category here.
-  await expect(section.getByRole("heading", { level: 3 })).toHaveText(["Testovací procedura"])
-  await expect(section.getByRole("link", { name: "Testovací procedura" })).toHaveAttribute(
-    "href",
-    "/cz/procedury/akupunktura/testovaci-procedura"
-  )
-  await expect(section.getByRole("term")).toHaveText(["Jedno sezení", "Balíček 5 sezení"])
-  await expect(section.getByRole("definition")).toHaveText(["1.000 Kč", "4.000 Kč"])
+  await expect(sections.getByRole("heading", { level: 2 })).toHaveText(["Východní medicína", "Západní medicína"])
+
+  // Druhá procedura has no price; hidden rows stay in the CMS.
+  const east = sections.first()
+  await expect(east.getByRole("heading", { level: 3 })).toHaveText(["Testovací procedura"])
+  await expect(east.getByRole("link", { name: "Testovací procedura" })).toHaveAttribute("href", "/cz/testovaci-procedura")
+  await expect(east.getByRole("term")).toHaveText(["Jedno sezení", "Balíček 5 sezení"])
+  await expect(east.getByRole("definition")).toHaveText(["1.000 Kč", "4.000 Kč"])
+
+  // A sub-procedure's prices sit under its parent procedure.
+  const west = sections.nth(1)
+  await expect(west.getByRole("heading", { level: 3 })).toHaveText(["Injekční aplikace"])
+  await expect(west.getByRole("heading", { level: 4 })).toHaveText(["Modelace rtů"])
+  await expect(west.getByRole("term")).toHaveText(["Baby Lips"])
 })
 
 test("Novinky shows current posts pinned first and the products on sale", async ({ page }) => {
@@ -46,7 +52,7 @@ test("Novinky shows current posts pinned first and the products on sale", async 
   ])
   await expect(
     cards.first().getByRole("link", { name: "Více informací: Nová procedura v nabídce" })
-  ).toHaveAttribute("href", "/cz/procedury/akupunktura/testovaci-procedura")
+  ).toHaveAttribute("href", "/cz/testovaci-procedura")
   await expect(cards.nth(1).getByText("Platí do 31. 12. 2099")).toBeVisible()
   await expect(
     cards.nth(1).getByRole("link", { name: "Více informací: Podzimní sleva" })

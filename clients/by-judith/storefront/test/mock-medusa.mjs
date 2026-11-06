@@ -53,8 +53,8 @@ let promotionTiers = []
 // Magazine articles as the Content plugin serves them: newest first, body_html
 // only on the detail route (the plugin renders and sanitises Markdown).
 const photo = { image: "http://localhost:9101/static/dn.webp", image_width: 1200, image_height: 1798, gallery: [] }
-// Clinic collections (seed/import-clinic.ts): one category, two of its
-// procedures plus one from another category, its FAQ, the team and O nás.
+// Clinic collections (seed/import-clinic.ts): the team and O nás. Procedures
+// come from the CMS (#43).
 const clinic = {
   stranky: [
     { slug: "o-nas", title: "O nás", body: "Text o klinice.", body_html: "<p>Text o klinice.</p>", metadata: { ...photo, perex: "Perex o klinice.", image_alt: "Interiér kliniky" } },
@@ -62,30 +62,11 @@ const clinic = {
   tym: [
     { slug: "jana-recepcni", title: "Jana Recepční", body: null, metadata: { role: "recepční", pismeno: "J", poradi: 2 } },
     { slug: "mgr-testovaci-terapeutka", title: "Mgr. Testovací Terapeutka", body: "První odstavec medailonku.\n\nDruhý odstavec medailonku.", metadata: { ...photo, role: "terapeutka", image_alt: "Testovací terapeutka", poradi: 1 } },
-  ],
-  "kategorie-procedur": [
-    {
-      slug: "akupunktura", title: "Akupunktura", body: "Úvod kategorie.",
-      body_html: "<p>Úvod kategorie.</p>\n<h2>Na co se zaměřujeme?</h2>\n<h3>Dermatologie</h3>\n<p>akné, ekzém</p>",
-      metadata: { ...photo, perex: null, image_alt: "Aplikace akupunktury", poradi: 1 },
-    },
-  ],
-  procedury: [
-    { slug: "druha-procedura", title: "Druhá procedura", body: "Druhý popis.", body_html: "<p>Druhý popis.</p>", metadata: { kategorie: "akupunktura", cena: null, poradi: 2 } },
-    {
-      slug: "testovaci-procedura", title: "Testovací procedura", body: "Popis **procedury**.", body_html: "<p>Popis <strong>procedury</strong>.</p>",
-      metadata: { ...photo, kategorie: "akupunktura", cena: "od 1.000 Kč", delka: "45 min", cenik: "Jedno sezení — 1.000 Kč\nBalíček 5 sezení — 4.000 Kč", image_alt: "Procedura", poradi: 1 },
-    },
-    { slug: "cizi-procedura", title: "Cizí procedura", body: "Jinde.", body_html: "<p>Jinde.</p>", metadata: { kategorie: "beauty", poradi: 1 } },
-  ],
-  faq: [
-    { slug: "faq-boli-to", title: "Bolí to?", body: "Většinou vůbec ne.", metadata: { kategorie: "akupunktura", poradi: 1 } },
-    { slug: "faq-testovaci-procedura-jak-dlouho", title: "Jak dlouho to trvá?", body: "Asi hodinu.", metadata: { kategorie: "akupunktura", procedura: "testovaci-procedura", poradi: 2 } },
-  ],
+  ]
 }
 // Editors' news (seed/setup-novinky.ts): pinned, expired and open-ended.
 const novinky = [
-  { slug: "nova-procedura", title: "Nová procedura v nabídce", body: null, metadata: { perex: "Nově nabízíme testovací proceduru.", odkaz: "/procedury/akupunktura/testovaci-procedura", poradi: 1 } },
+  { slug: "nova-procedura", title: "Nová procedura v nabídce", body: null, metadata: { perex: "Nově nabízíme testovací proceduru.", odkaz: "/testovaci-procedura", poradi: 1 } },
   { slug: "stara-akce", title: "Skončená akce", body: null, metadata: { perex: "Už neplatí.", platnost_do: "2020-01-31" } },
   { slug: "podzimni-sleva", title: "Podzimní sleva", body: null, metadata: { perex: "Sleva na vybrané služby.", odkaz: "https://example.com/akce", platnost_do: "2099-12-31" } },
 ]
