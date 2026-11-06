@@ -5,10 +5,12 @@ import { previewGrantFor } from "@lib/cms/client"
 import { articleExcerpt, articleImage, getArticle } from "@lib/data/magazin"
 import PreviewBar from "@modules/cms/components/preview-bar"
 import ArticleTemplate from "@modules/magazin/templates/article"
+import { fullSiteOnly, isShopOnly } from "@lib/site-mode"
 
 type Props = { params: Promise<{ countryCode: string; slug: string }> }
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
+  if (isShopOnly()) return {}
   const { slug } = await props.params
   const article = await getArticle(slug).catch(() => null)
   if (!article) return {}
@@ -28,6 +30,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 }
 
 export default async function ArticlePage(props: Props) {
+  fullSiteOnly()
   const { countryCode, slug } = await props.params
   const path = `/${countryCode}/magazin/${slug}`
   // A signed CMS preview of this article shows its latest draft.

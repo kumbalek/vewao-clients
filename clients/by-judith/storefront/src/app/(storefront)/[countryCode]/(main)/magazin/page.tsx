@@ -2,8 +2,10 @@ import { Metadata } from "next"
 import { getTranslations } from "next-intl/server"
 
 import MagazinOverview from "@modules/magazin/templates/magazin-overview"
+import { fullSiteOnly, isShopOnly } from "@lib/site-mode"
 
 export async function generateMetadata(): Promise<Metadata> {
+  if (isShopOnly()) return {}
   const t = await getTranslations("magazin")
   return { title: t("title"), description: t("description") }
 }
@@ -11,6 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function MagazinPage(props: {
   searchParams: Promise<{ tag?: string | string[]; page?: string | string[] }>
 }) {
+  fullSiteOnly()
   const searchParams = await props.searchParams
   const tag = [searchParams.tag].flat()[0]?.trim() || undefined
   const page = Number([searchParams.page].flat()[0] ?? 1)

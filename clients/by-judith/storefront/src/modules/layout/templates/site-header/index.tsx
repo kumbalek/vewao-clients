@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl"
 
 import {
   bookingPath,
+  isFullSitePath,
   contact,
   freeDeliveryFrom,
   navigationLinks,
@@ -51,6 +52,7 @@ export default function SiteHeader({
   cart,
   collections,
   procedureMenu,
+  shopOnly = false,
 }: {
   countryCode: string
   /** The region's currency: prices and the free-delivery threshold (#45). */
@@ -60,8 +62,11 @@ export default function SiteHeader({
   cart: HttpTypes.StoreCart | null
   collections: MenuCollection[]
   procedureMenu: ProcedureCategory[]
+  /** The e-shop alone (SITE_MODE=shop, #47): no clinic menu, booking or full-site links. */
+  shopOnly?: boolean
 }) {
   const t = useTranslations("layout")
+  const links = shopOnly ? navigationLinks.filter((link) => !isFullSitePath(link.href)) : navigationLinks
   const cartCount = cart?.items?.reduce((sum, item) => sum + item.quantity, 0) ?? 0
 
   return (
@@ -112,23 +117,26 @@ export default function SiteHeader({
                 countryCode={countryCode}
                 categories={procedureMenu}
                 collections={collections}
-                links={navigationLinks}
+                links={links}
                 cartCount={cartCount}
                 bookingPath={bookingPath}
                 regionOptions={regionOptions}
+                shopOnly={shopOnly}
               />
             </div>
             <nav
               aria-label={t("mainNavigation")}
               className="hidden h-full items-center gap-4 medium:flex large:gap-6"
             >
-              <HeaderMenu label={t("procedures")}>
-                <ProceduresPanel categories={procedureMenu} />
-              </HeaderMenu>
+              {!shopOnly && (
+                <HeaderMenu label={t("procedures")}>
+                  <ProceduresPanel categories={procedureMenu} />
+                </HeaderMenu>
+              )}
               <HeaderMenu label={t("shop")}>
                 <ShopPanel collections={collections} />
               </HeaderMenu>
-              {navigationLinks.map((link) =>
+              {links.map((link) =>
                 link.href ? (
                   <LocalizedClientLink key={link.label} href={link.href} className={linkClasses}>
                     {link.label}
@@ -171,23 +179,27 @@ export default function SiteHeader({
               </span>
             </LocalizedClientLink>
             <CartDropdown cart={cart} />
-            <ButtonLink href={bookingPath} className={`hidden medium:inline-flex ${bookOverlayClasses}`}>
-              {t("book")}
-            </ButtonLink>
+            {!shopOnly && (
+              <ButtonLink href={bookingPath} className={`hidden medium:inline-flex ${bookOverlayClasses}`}>
+                {t("book")}
+              </ButtonLink>
+            )}
           </div>
         </Container>
       </header>
 
       {/* Positioned so a hero pulled up under it does not cover it. */}
-      <Container className="relative z-40 py-3 medium:hidden">
-        <ButtonLink
-          href={bookingPath}
-          fullWidth
-          className={`mx-auto flex max-w-md ${bookOverlayClasses}`}
-        >
-          {t("book")}
-        </ButtonLink>
-      </Container>
+      {!shopOnly && (
+        <Container className="relative z-40 py-3 medium:hidden">
+          <ButtonLink
+            href={bookingPath}
+            fullWidth
+            className={`mx-auto flex max-w-md ${bookOverlayClasses}`}
+          >
+            {t("book")}
+          </ButtonLink>
+        </Container>
+      )}
     </HeaderShell>
   )
 }

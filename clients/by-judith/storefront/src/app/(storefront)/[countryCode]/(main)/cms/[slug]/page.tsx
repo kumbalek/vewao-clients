@@ -6,6 +6,7 @@ import { Container, Heading, Section } from "@modules/design-system"
 import CmsBlocks from "@modules/cms/components/blocks"
 import EditLink from "@modules/cms/components/edit-link"
 import PreviewBar from "@modules/cms/components/preview-bar"
+import { fullSiteOnly } from "@lib/site-mode"
 
 type Props = { params: Promise<{ countryCode: string; slug: string }> }
 
@@ -13,6 +14,7 @@ type Props = { params: Promise<{ countryCode: string; slug: string }> }
 export const metadata: Metadata = { robots: { index: false, follow: false } }
 
 export default async function CmsPage({ params }: Props) {
+  fullSiteOnly()
   const { countryCode, slug } = await params
   const path = `/${countryCode}/cms/${slug}`
   const grant = await previewGrantFor(path)

@@ -98,6 +98,18 @@ Both repositories are now configured and deploying; see the 2026-09-24 record be
    automatically. Changes to server Compose/NPM/env files remain an explicit
    manual operation; application images deploy automatically.
 
+## Site mode: the e-shop alone (vewao-clients#47)
+
+`SITE_MODE=shop` in `storefront.env` makes the storefront the temporary
+production site:
+- the home page is the e-shop's front page;
+- the header keeps the shop, account, cart and the CZ/SK delivery switch;
+- the clinic's pages (landing, procedures, Ceník, Magazín, Novinky, O nás, CMS
+  pages) return 404 and are not linked.
+
+Leave it empty for the full site. It is read at request time, so switching
+needs only `docker compose … up -d storefront`, no new image.
+
 ## Content CMS (Payload inside the storefront, D22)
 
 The storefront serves the Payload admin at `https://<shop>/admin` and keeps

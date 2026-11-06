@@ -7,6 +7,7 @@ import { getProcedurePage } from "@lib/data/procedures"
 import PreviewBar from "@modules/cms/components/preview-bar"
 import ProcedureTemplate from "@modules/clinic/templates/procedure"
 import ProcedureCategoryTemplate from "@modules/clinic/templates/procedure-category"
+import { fullSiteOnly, isShopOnly } from "@lib/site-mode"
 
 type Props = { params: Promise<{ countryCode: string; slug: string }> }
 
@@ -16,6 +17,7 @@ type Props = { params: Promise<{ countryCode: string; slug: string }> }
  * take precedence; the CMS refuses those names as slugs.
  */
 export async function generateMetadata(props: Props): Promise<Metadata> {
+  if (isShopOnly()) return {}
   const { slug } = await props.params
   const page = await getProcedurePage(slug).catch(() => null)
   if (!page) return {}
@@ -35,6 +37,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 }
 
 export default async function ProcedurePage(props: Props) {
+  fullSiteOnly()
   const { countryCode, slug } = await props.params
   const path = `/${countryCode}/${slug}`
   // A signed CMS preview of this page shows its latest draft.

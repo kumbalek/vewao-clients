@@ -5,6 +5,7 @@ import { getRegion } from "@lib/data/regions"
 import { Heading, Section, Text } from "@modules/design-system"
 import NewsCard from "@modules/novinky/components/news-card"
 import ProductPreview from "@modules/products/components/product-preview"
+import { fullSiteOnly } from "@lib/site-mode"
 
 export const metadata: Metadata = {
   title: "Novinky a slevy",
@@ -19,6 +20,7 @@ type Props = { params: Promise<{ countryCode: string }> }
  * Omnibus-correct prices as the shop.
  */
 export default async function NewsPage({ params }: Props) {
+  fullSiteOnly()
   const { countryCode } = await params
   const [posts, region, saleProducts] = await Promise.all([
     listNews(),

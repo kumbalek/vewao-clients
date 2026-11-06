@@ -47,6 +47,11 @@ export type ProcedureCategory = {
   procedures: { title: Copy; href?: string; children?: { title: string; href: string }[] }[]
 }
 
+/** Pages of the full site, hidden while only the e-shop is live (SITE_MODE=shop, #47). */
+export const fullSitePaths = ["/magazin", "/cenik", "/novinky", "/o-nas"]
+export const isFullSitePath = (href?: string) =>
+  !!href && fullSitePaths.some((path) => href === path || href.startsWith(`${path}/`))
+
 /** Top-level navigation after the two menus (Procedury, Shop). */
 export const navigationLinks: NavLink[] = [
   { label: "Magazín", href: "/magazin" },
