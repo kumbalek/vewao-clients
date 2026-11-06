@@ -9,6 +9,8 @@ import type { NavLink, ProcedureCategory } from "content/site"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { CopyText, Placeholder } from "@modules/common/components/placeholder"
 import { ButtonLink } from "@modules/design-system"
+import type { RegionOption } from "@lib/util/region-options"
+import RegionSwitch from "@modules/layout/components/region-switch"
 import { ChevronIcon, CloseIcon, MenuIcon } from "@modules/design-system/components/icons"
 import type { MenuCollection } from "@modules/layout/components/menu-panels"
 import SearchForm from "@modules/layout/components/search-form"
@@ -38,6 +40,7 @@ export default function MobileMenu({
   links,
   cartCount,
   bookingPath,
+  regionOptions,
 }: {
   countryCode: string
   categories: ProcedureCategory[]
@@ -45,6 +48,7 @@ export default function MobileMenu({
   links: NavLink[]
   cartCount: number
   bookingPath: string
+  regionOptions: RegionOption[]
 }) {
   const t = useTranslations("layout")
   const [open, setOpen] = useState(false)
@@ -191,6 +195,7 @@ export default function MobileMenu({
                 </li>
               </ul>
             </nav>
+            <RegionSwitch options={regionOptions} className="mt-4 flex-wrap text-sm text-ink-subtle" />
           </div>
 
           <div className="grid flex-none grid-cols-2 gap-3 border-t border-line p-4">

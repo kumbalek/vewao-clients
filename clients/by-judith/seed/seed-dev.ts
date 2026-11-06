@@ -4,7 +4,8 @@ import { readFileSync } from "node:fs"
 
 /**
  * Local/dev seed for By Judith: clinic pickup, PPL delivery, the legacy
- * catalogue snapshot and dev stock, created through the Admin API.
+ * catalogue snapshot and dev stock, created through the Admin API. Slovakia
+ * pays in EUR in a region of its own (vewao-clients#45).
  *
  * Idempotent and additive: it creates what is missing and leaves existing
  * records alone, so admin edits on dev survive a re-run. It builds on the
@@ -35,6 +36,8 @@ type ShippingSpec = {
   set: string
   type: "pickup" | "shipping"
   zone: string
+  /** The service zone's country: where this option delivers. */
+  country: string
   option: string
   code: string
   prices: HttpTypes.AdminCreateShippingOption["prices"]
@@ -45,6 +48,14 @@ const COUNTRY = "cz"
 const SALES_CHANNEL = process.env.SEED_SALES_CHANNEL ?? "Local storefront"
 const DEV_STOCK = 100
 const FREE_DELIVERY_FROM = 5000
+
+// Slovakia pays in EUR (owner decision 2026-11-06, vewao-clients#45). The EUR
+// amounts below are DEV PLACEHOLDERS until the merchant sets real ones.
+const EUR = { currency: "eur", country: "sk", region: "Slovensko" }
+const FREE_DELIVERY_FROM_EUR = 200
+const PPL_SK_EUR = 8
+/** Placeholder EUR price: CZK at 25 Kč/€, up to a whole euro, minus 10 cents (1 890 Kč → 75,90 €). */
+const devEurPrice = (czk: number) => Math.ceil(czk / 25) - 0.1
 const DEFAULT_OPTION = { title: "Default option", value: "Default option value" }
 
 const LOCATION = {
@@ -65,6 +76,7 @@ const SHIPPING: ShippingSpec[] = [
     set: "Beauty Body Clinic pick up",
     type: "pickup",
     zone: "Osobní odběr",
+    country: COUNTRY,
     option: "Pobočka Beauty Body Clinic",
     code: "clinic-pickup",
     prices: [{ currency_code: CURRENCY, amount: 0 }],
@@ -73,6 +85,7 @@ const SHIPPING: ShippingSpec[] = [
     set: "Beauty Body Clinic shipping",
     type: "shipping",
     zone: "Doprava na adresu",
+    country: COUNTRY,
     option: "Přepravce PPL",
     code: "ppl",
     // Medusa 2.20.1 identifies a price by rule attribute and value but not
@@ -88,6 +101,27 @@ const SHIPPING: ShippingSpec[] = [
         currency_code: CURRENCY,
         amount: 0,
         rules: [{ attribute: "item_total", operator: "gt", value: FREE_DELIVERY_FROM - 0.01 }],
+      },
+    ],
+  },
+  // Delivery to Slovakia in EUR; carrier, price and threshold await the merchant.
+  {
+    set: "Beauty Body Clinic shipping",
+    type: "shipping",
+    zone: "Doprava na Slovensko",
+    country: EUR.country,
+    option: "Přepravce PPL – Slovensko",
+    code: "ppl-sk",
+    prices: [
+      {
+        currency_code: EUR.currency,
+        amount: PPL_SK_EUR,
+        rules: [{ attribute: "item_total", operator: "lt", value: FREE_DELIVERY_FROM_EUR }],
+      },
+      {
+        currency_code: EUR.currency,
+        amount: 0,
+        rules: [{ attribute: "item_total", operator: "gt", value: FREE_DELIVERY_FROM_EUR - 0.01 }],
       },
     ],
   },
@@ -163,9 +197,9 @@ async function findRegion() {
 }
 
 /** Shop prices are consumer prices including VAT, as in the legacy shop. */
-async function ensureTaxInclusivePrices(regionId: string) {
+async function ensureTaxInclusivePrices(currency: string, regionId: string) {
   const wanted = [
-    { attribute: "currency_code", value: CURRENCY },
+    { attribute: "currency_code", value: currency },
     { attribute: "region_id", value: regionId },
   ]
   const { price_preferences } = await sdk.admin.pricePreference.list({ limit: 100 })
@@ -181,6 +215,56 @@ async function ensureTaxInclusivePrices(regionId: string) {
       log("exists", `tax-inclusive price preference ${attribute}=${value}`)
     }
   }
+}
+
+/** EUR next to CZK among the store's currencies; CZK stays the default. */
+async function ensureEurCurrency() {
+  const { stores } = await sdk.admin.store.list({ fields: "id,*supported_currencies" })
+  const store = stores[0]
+  if (!store) {
+    throw new Error("No store found; run the platform seed first.")
+  }
+  const current = store.supported_currencies ?? []
+  if (current.some((c) => c.currency_code === EUR.currency)) {
+    log("exists", `store currency ${EUR.currency}`)
+    return
+  }
+  await sdk.admin.store.update(store.id, {
+    supported_currencies: [
+      ...current.map((c) => ({ currency_code: c.currency_code, is_default: c.is_default })),
+      { currency_code: EUR.currency, is_default: false },
+    ],
+  })
+  log("created", `store currency ${EUR.currency}`)
+}
+
+/**
+ * Slovensko in EUR. It offers the Czech region's online payments; paying on
+ * site belongs to clinic pickup, which Slovakia has no zone for.
+ */
+async function ensureSlovakRegion(czechRegionId: string) {
+  const { regions } = await sdk.admin.region.list({ fields: "id,name,currency_code,*countries" })
+  const existing = regions.find((r) => r.countries?.some((c) => c.iso_2 === EUR.country))
+  if (existing) {
+    log("exists", `region ${existing.name} (${existing.currency_code})`)
+    return existing
+  }
+  const { region: czech } = await sdk.admin.region.retrieve(czechRegionId, { fields: "id,*payment_providers" })
+  const providers = (czech.payment_providers ?? [])
+    .map((p) => p?.id)
+    .filter((id): id is string => Boolean(id) && id !== "pp_system_default")
+  if (!providers.length) {
+    throw new Error("The Czech region has no online payment provider (Comgate) to offer in Slovakia.")
+  }
+  const { region } = await sdk.admin.region.create({
+    name: EUR.region,
+    currency_code: EUR.currency,
+    countries: [EUR.country],
+    payment_providers: providers,
+    automatic_taxes: true,
+  })
+  log("created", `region ${EUR.region} (${EUR.currency}, ${providers.join(", ")})`)
+  return region
 }
 
 const LOCATION_FIELDS =
@@ -243,7 +327,7 @@ async function ensureShipping(locationId: string, shippingProfileId: string) {
     if (!zone) {
       const { fulfillment_set } = await sdk.admin.fulfillmentSet.createServiceZone(set.id, {
         name: spec.zone,
-        geo_zones: [{ type: "country", country_code: COUNTRY }],
+        geo_zones: [{ type: "country", country_code: spec.country }],
       })
       zone = fulfillment_set.service_zones?.find((z) => z?.name === spec.zone)
       log("created", `service zone ${spec.zone}`)
@@ -324,11 +408,44 @@ async function ensureProducts(
           manage_inventory: true,
           allow_backorder: false,
           options: { [DEFAULT_OPTION.title]: DEFAULT_OPTION.value },
-          prices: [{ currency_code: CURRENCY, amount: p.variant.price_czk }],
+          prices: [
+            { currency_code: CURRENCY, amount: p.variant.price_czk },
+            { currency_code: EUR.currency, amount: devEurPrice(p.variant.price_czk) },
+          ],
         },
       ],
     })
     log("created", `product ${p.title} (${p.variant.sku}, ${p.variant.price_czk} Kč)`)
+  }
+}
+
+/** An EUR price (dev placeholder) on every catalogue variant that has none. */
+async function ensureEurPrices(catalogue: Catalogue) {
+  for (const p of catalogue.products) {
+    const { products } = await sdk.admin.product.list({
+      handle: p.handle,
+      fields: "id,variants.id,variants.sku,*variants.prices",
+    })
+    const variant = products[0]?.variants?.find((v) => v.sku === p.variant.sku)
+    if (!products[0] || !variant) {
+      throw new Error(`No variant ${p.variant.sku} for ${p.handle}`)
+    }
+    const prices = variant.prices ?? []
+    if (prices.some((price) => price.currency_code === EUR.currency)) {
+      log("exists", `EUR price for SKU ${p.variant.sku}`)
+      continue
+    }
+    // From the variant's current CZK price: admin edits since the snapshot count.
+    const czk = prices.find((price) => price.currency_code === CURRENCY)?.amount ?? p.variant.price_czk
+    const amount = devEurPrice(czk)
+    // A variant's prices are replaced as a set: keep the existing ones.
+    await sdk.admin.product.updateVariant(products[0].id, variant.id, {
+      prices: [
+        ...prices.map((price) => ({ id: price.id, currency_code: price.currency_code, amount: price.amount })),
+        { currency_code: EUR.currency, amount },
+      ],
+    })
+    log("created", `EUR price for SKU ${p.variant.sku}: ${amount} € (placeholder)`)
   }
 }
 
@@ -393,12 +510,16 @@ async function main() {
 
   const salesChannel = await findSalesChannel()
   const region = await findRegion()
-  await ensureTaxInclusivePrices(region.id)
+  await ensureTaxInclusivePrices(CURRENCY, region.id)
+  await ensureEurCurrency()
+  const slovakia = await ensureSlovakRegion(region.id)
+  await ensureTaxInclusivePrices(EUR.currency, slovakia.id)
   const locationId = await ensureLocation(salesChannel.id)
   const shippingProfileId = await ensureShippingProfile()
   await ensureShipping(locationId, shippingProfileId)
   const collections = await ensureCollections(catalogue)
   await ensureProducts(catalogue, collections, salesChannel.id, shippingProfileId)
+  await ensureEurPrices(catalogue)
   await ensureStock(catalogue, locationId)
   await ensureTierPromotions()
   console.log("By Judith dev seed complete.")

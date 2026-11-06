@@ -99,6 +99,14 @@ kept. The owner chose to build in steps:
   and the shop's products currently on sale. Empty until the merchant writes
   posts. Prices repeat the procedures' "Akce … místo …" wording, which still
   needs the merchant's review.
+- Slovakia in EUR (owner decision 2026-11-06, vewao-clients#45): customers
+  shipping to Slovakia pay in EUR in a region of their own; the site stays
+  Czech and Czech customers keep CZK. Every country is at `/<country>/…`
+  (`/cz`, `/sk`); the header and the mobile menu switch the delivery country
+  and move the cart with it. EUR prices, Slovak shipping and the EUR
+  free-delivery threshold are dev placeholders until the merchant sets them;
+  VAT for Slovak consumers and EUR invoices wait on the accountant
+  (vewao-workspace#13, vewao-platform#30).
 - Values follow agreed facts, not the wireframe: free delivery from 5 000 Kč
   (wireframe: 1 500), hours from the current contact page (Po–Pá 10–18; the
   wireframe shows Po–Pá 9–19 · So 9–14).

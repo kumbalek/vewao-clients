@@ -23,10 +23,15 @@ export const contact = {
 }
 
 /**
- * Free PPL delivery from this item total in CZK. Must match the backend's PPL
- * price rule (FREE_DELIVERY_FROM in ../seed/seed-dev.ts); a unit test checks it.
+ * Free PPL delivery from this item total, per currency. Must match the
+ * backend's PPL price rules (FREE_DELIVERY_FROM and FREE_DELIVERY_FROM_EUR in
+ * ../seed/seed-dev.ts); a unit test checks it. The EUR value is a placeholder
+ * until the merchant sets it (vewao-clients#45).
  */
-export const freeDeliveryFrom = 5000
+export const freeDeliveryFrom: Record<string, number> = { czk: 5000, eur: 200 }
+
+/** Where the shop delivers, in Czech; each country is a region with its own currency (#45). */
+export const deliveryCountries: Record<string, string> = { cz: "Česko", sk: "Slovensko" }
 
 /** "Rezervovat" leads to the contact details until a booking provider is integrated. */
 export const bookingPath = "/content/contact"

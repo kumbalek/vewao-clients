@@ -7,11 +7,30 @@ import { createServer } from "node:http"
 const STOREFRONT = "http://127.0.0.1:8101"
 const GATEWAY = "http://localhost:9101"
 const region = { id: "reg_test", name: "Česko", currency_code: "czk", countries: [{ iso_2: "cz", display_name: "Česko" }] }
+// Slovakia pays in EUR in a region of its own (vewao-clients#45).
+const regionSk = { id: "reg_sk", name: "Slovensko", currency_code: "eur", countries: [{ iso_2: "sk", display_name: "Slovensko" }] }
 const address = { first_name: "Test", last_name: "Customer", address_1: "Testovací 1", city: "Praha", postal_code: "11000", country_code: "cz", phone: "777000000" }
+const addressSk = { ...address, address_1: "Hlavná 1", city: "Bratislava", postal_code: "81101", country_code: "sk" }
 const shippingOptions = [
   { id: "so_ppl", name: "Přepravce PPL", price_type: "flat", amount: 150, service_zone: { fulfillment_set: { type: "shipping" } }, prices: [] },
   { id: "so_pickup", name: "Pobočka Beauty Body Clinic", price_type: "flat", amount: 0, service_zone: { fulfillment_set: { type: "pickup", location: { address: { address_1: "Kosmická 19", postal_code: "149 00", city: "Praha 4 - Háje", country_code: "cz" } } } }, prices: [] },
 ]
+// PPL to Slovakia: 8 €, free from 200 € (the dev seed's placeholders).
+const shippingOptionSk = { id: "so_ppl_sk", name: "Přepravce PPL – Slovensko", price_type: "flat", amount: 8, service_zone: { fulfillment_set: { type: "shipping" } }, prices: [] }
+// The same variants in EUR: [calculated, original] per variant.
+const eurPrices = { variant_test: [19.9, 19.9], variant_sale: [59.9, 75.9], variant_gift: [7.9, 7.9] }
+const isSk = (current) => current?.region_id === regionSk.id
+/** A product as the Slovak region prices it. */
+function pricedFor(product, regionId) {
+  if (regionId !== regionSk.id) return product
+  return {
+    ...product,
+    variants: product.variants.map((v) => ({
+      ...v,
+      calculated_price: { ...v.calculated_price, calculated_amount: eurPrices[v.id][0], original_amount: eurPrices[v.id][1], currency_code: "eur" },
+    })),
+  }
+}
 const providers = [{ id: "pp_comgate_comgate" }, { id: "pp_system_default" }, { id: "pp_stripe_stripe" }]
 const carts = new Map()
 const orders = new Map()
@@ -90,6 +109,10 @@ function relationsDepth(field) {
 
 // Cart id prefixes select the fixture: pickup, free PPL delivery (≥ 5 000 Kč) or paid PPL delivery.
 function shippingFor(id) {
+  if (isSk(carts.get(id)) || (!carts.has(id) && id.startsWith("cart_sk"))) {
+    const itemSubtotal = (carts.get(id)?.items ?? [{ total: eurPrices.variant_test[0] }]).reduce((sum, item) => sum + item.total, 0)
+    return { option: shippingOptionSk, amount: itemSubtotal >= 200 ? 0 : 8 }
+  }
   if (id.startsWith("cart_pickup")) return { option: shippingOptions[1], amount: 0 }
   if (id.startsWith("cart_freeppl")) return { option: shippingOptions[0], amount: 0 }
   const itemSubtotal = (carts.get(id)?.items ?? [{ total: 490 }]).reduce((sum, item) => sum + item.total, 0)
@@ -97,6 +120,20 @@ function shippingFor(id) {
   return { option: shippingOptions[0], amount }
 }
 function cart(id) {
+  if (!carts.has(id) && id.startsWith("cart_sk")) {
+    // A Slovak cart: EUR, one test product at 19,90 €.
+    const { option, amount } = shippingFor(id)
+    const price = eurPrices.variant_test[0]
+    carts.set(id, {
+      id, region_id: regionSk.id, region: regionSk, currency_code: "eur", email: "test@example.invalid", completed_at: null,
+      shipping_address: addressSk, billing_address: addressSk,
+      items: [{ id: "item_test", variant_id: "variant_test", title: "Testovací produkt", product_title: "Testovací produkt", product_handle: "testovaci-produkt", quantity: 1, unit_price: price, total: price, original_total: price, is_discountable: true, thumbnail: "/logo.webp", variant: { id: "variant_test", title: "Standard", options: [] }, product: { id: "prod_test", handle: "testovaci-produkt" }, metadata: {} }],
+      shipping_methods: [{ id: "sm_test", shipping_option_id: option.id, name: option.name, amount, total: amount }],
+      total: price + amount, subtotal: price + amount, item_subtotal: price, item_total: price, shipping_subtotal: amount, shipping_total: amount,
+      discount_total: 0, tax_total: 0, original_total: price + amount, promotions: [],
+      payment_collection: { id: `paycol_${id}`, payment_sessions: [] },
+    })
+  }
   if (!carts.has(id)) {
     const { option, amount } = shippingFor(id)
     carts.set(id, {
@@ -254,20 +291,22 @@ const server = createServer(async (req, res) => {
     const item = Object.values(contentCollections).flat().find((a) => a.slug === decodeURIComponent(itemMatch[1]))
     return item ? send({ content_item: item }) : send({ type: "not_found", message: `Content item "${itemMatch[1]}" not found` }, 404)
   }
-  if (url.pathname === "/store/regions") return send({ regions: [region] })
+  if (url.pathname === "/store/regions") return send({ regions: [region, regionSk] })
   if (url.pathname === "/store/regions/reg_test") return send({ region })
+  if (url.pathname === "/store/regions/reg_sk") return send({ region: regionSk })
   if (url.pathname === "/store/collections") return send({ collections: [], count: 0 })
   if (url.pathname === "/store/product-categories") return send({ product_categories: [], count: 0 })
   if (url.pathname === "/store/products") {
     // The SDK encodes id arrays as id[0]=…; accept any id key.
+    const regionId = url.searchParams.get("region_id")
     if (url.searchParams.get("handle") === giftProduct.handle) {
-      return send({ products: [giftProduct], count: 1 })
+      return send({ products: [pricedFor(giftProduct, regionId)], count: 1 })
     }
     // An unfiltered listing (Novinky's sale section) holds the sale product.
     const unfiltered = !url.searchParams.get("handle") && !url.searchParams.get("q") && ![...url.searchParams.keys()].some((key) => key.startsWith("id") || key.startsWith("collection_id") || key.startsWith("category_id"))
-    if (unfiltered) return send({ products: [saleProduct], count: 1 })
+    if (unfiltered) return send({ products: [pricedFor(saleProduct, regionId)], count: 1 })
     const wanted = url.searchParams.get("handle") === saleProduct.handle || [...url.searchParams].some(([key, value]) => key.startsWith("id") && value === saleProduct.id)
-    return send(wanted ? { products: [saleProduct], count: 1 } : { products: [], count: 0 })
+    return send(wanted ? { products: [pricedFor(saleProduct, regionId)], count: 1 } : { products: [], count: 0 })
   }
   if (url.pathname === `/store/products/${saleProduct.id}/price-history`) {
     return send({ product_id: saleProduct.id, region_id: region.id, variants: [{ variant_id: "variant_sale", currency_code: "czk", ...priceHistory }] })
@@ -358,8 +397,17 @@ const server = createServer(async (req, res) => {
       .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
     return send({ orders: list, count: list.length, offset: 0, limit: 10 })
   }
-  if (url.pathname === "/store/shipping-options") return send({ shipping_options: shippingOptions })
-  if (url.pathname === "/store/payment-providers") return send({ payment_providers: providers })
+  if (url.pathname === "/store/shipping-options") {
+    // Slovak carts get delivery to Slovakia only, priced like the cart's items.
+    const current = carts.get(url.searchParams.get("cart_id") ?? "")
+    if (isSk(current)) return send({ shipping_options: [{ ...shippingOptionSk, amount: shippingFor(current.id).amount }] })
+    return send({ shipping_options: shippingOptions })
+  }
+  if (url.pathname === "/store/payment-providers") {
+    // Paying on site belongs to clinic pickup, which Slovakia has no zone for.
+    if (url.searchParams.get("region_id") === regionSk.id) return send({ payment_providers: [providers[0]] })
+    return send({ payment_providers: providers })
+  }
   if (url.pathname === "/store/withdrawals" && req.method === "POST") {
     // Mirrors vewao-platform's withdrawal route: confirmation required, the
     // statement recorded whether or not the order matches. "500" fails.
@@ -375,6 +423,26 @@ const server = createServer(async (req, res) => {
   const orderMatch = url.pathname.match(/^\/store\/orders\/([^/]+)$/)
   if (orderMatch) return orders.has(orderMatch[1]) ? send({ order: orders.get(orderMatch[1]) }) : send({ message: "Order not found" }, 404)
   const cartMatch = url.pathname.match(/^\/store\/carts\/([^/]+)$/)
+  if (cartMatch && req.method === "POST" && data.region_id) {
+    // Moving a cart to another region re-prices it in that region's currency.
+    const current = cart(cartMatch[1])
+    const target = data.region_id === regionSk.id ? regionSk : region
+    if (current.region_id !== target.id) {
+      current.region_id = target.id
+      current.region = target
+      current.currency_code = target.currency_code
+      current.shipping_address = target === regionSk ? addressSk : address
+      current.billing_address = current.shipping_address
+      for (const item of current.items) {
+        const prices = { variant_test: 490, variant_sale: 1490, variant_gift: 199 }
+        item.unit_price = target === regionSk ? eurPrices[item.variant_id][0] : prices[item.variant_id]
+        item.total = item.quantity * item.unit_price
+        item.original_total = item.total
+      }
+      recalcCart(current)
+    }
+    return send({ cart: current })
+  }
   if (cartMatch) return send({ cart: cart(cartMatch[1]) })
   const lineItemsMatch = url.pathname.match(/^\/store\/carts\/([^/]+)\/line-items$/)
   if (lineItemsMatch && req.method === "POST") {
@@ -384,7 +452,7 @@ const server = createServer(async (req, res) => {
       if (!current.items.some((item) => item.id === "item_gift")) {
         current.items.push({
           id: "item_gift", variant_id: "variant_gift", title: giftProduct.title, product_title: giftProduct.title, product_handle: giftProduct.handle,
-          quantity: 1, unit_price: 199, total: 199, original_total: 199, is_discountable: false,
+          quantity: 1, unit_price: isSk(current) ? eurPrices.variant_gift[0] : 199, total: isSk(current) ? eurPrices.variant_gift[0] : 199, original_total: isSk(current) ? eurPrices.variant_gift[0] : 199, is_discountable: false,
           thumbnail: null, variant: giftProduct.variants[0], product: giftProduct, metadata: {},
         })
       }
@@ -400,9 +468,10 @@ const server = createServer(async (req, res) => {
       existing.total = existing.quantity * existing.unit_price
       existing.original_total = existing.total
     } else {
+      const unit = isSk(current) ? eurPrices.variant_sale[0] : 1490
       current.items.push({
         id: "item_sale", variant_id: "variant_sale", title: saleProduct.title, product_title: saleProduct.title, product_handle: saleProduct.handle,
-        quantity: data.quantity, unit_price: 1490, total: data.quantity * 1490, original_total: data.quantity * 1490, is_discountable: true,
+        quantity: data.quantity, unit_price: unit, total: data.quantity * unit, original_total: data.quantity * unit, is_discountable: true,
         thumbnail: saleProduct.thumbnail, variant: saleProduct.variants[0], product: saleProduct, metadata: {},
       })
     }
