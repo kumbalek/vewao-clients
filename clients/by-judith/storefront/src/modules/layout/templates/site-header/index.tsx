@@ -23,6 +23,8 @@ import {
   type MenuCollection,
 } from "@modules/layout/components/menu-panels"
 import MobileMenu from "@modules/layout/components/mobile-menu"
+import type { RegionOption } from "@lib/util/region-options"
+import RegionSwitch from "@modules/layout/components/region-switch"
 import SearchForm from "@modules/layout/components/search-form"
 
 const linkClasses =
@@ -44,11 +46,17 @@ const bookOverlayClasses =
  */
 export default function SiteHeader({
   countryCode,
+  currencyCode,
+  regionOptions,
   cart,
   collections,
   procedureMenu,
 }: {
   countryCode: string
+  /** The region's currency: prices and the free-delivery threshold (#45). */
+  currencyCode: string
+  /** Delivery countries to switch between (Česko, Slovensko). */
+  regionOptions: RegionOption[]
   cart: HttpTypes.StoreCart | null
   collections: MenuCollection[]
   procedureMenu: ProcedureCategory[]
@@ -72,12 +80,19 @@ export default function SiteHeader({
             width="page"
             className="flex h-8 items-center justify-end gap-3 text-xs text-ink-subtle overlay:text-white/85"
           >
-            <span data-testid="free-delivery-note">
-              {t("freeDelivery", {
-                amount: convertToLocale({ amount: freeDeliveryFrom, currency_code: "czk" }),
-              })}
-            </span>
-            <span aria-hidden="true">·</span>
+            <RegionSwitch options={regionOptions} />
+            {regionOptions.length > 1 && <span aria-hidden="true">·</span>}
+            {freeDeliveryFrom[currencyCode] !== undefined && (
+              <>
+                <span data-testid="free-delivery-note">
+                  {t("freeDelivery", {
+                    // A whole threshold reads "200 €", not "200,00 €".
+                    amount: convertToLocale({ amount: freeDeliveryFrom[currencyCode], currency_code: currencyCode, minimumFractionDigits: 0 }),
+                  })}
+                </span>
+                <span aria-hidden="true">·</span>
+              </>
+            )}
             <a
               href={contact.phone.href}
               className="flex items-center gap-1 hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-ink overlay:hover:text-white overlay:focus-visible:outline-white"
@@ -100,6 +115,7 @@ export default function SiteHeader({
                 links={navigationLinks}
                 cartCount={cartCount}
                 bookingPath={bookingPath}
+                regionOptions={regionOptions}
               />
             </div>
             <nav

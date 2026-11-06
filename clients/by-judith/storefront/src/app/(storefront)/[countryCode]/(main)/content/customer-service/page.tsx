@@ -5,6 +5,7 @@ import Help from "@modules/order/components/help"
 import { useTranslations } from "next-intl"
 import * as Accordion from "@radix-ui/react-accordion"
 import UnderlineLink from "@modules/common/components/interactive-link"
+import { Placeholder } from "@modules/common/components/placeholder"
 
 const MorphingTrigger = () => {
   return (
@@ -157,6 +158,10 @@ export default function CustomerServicePage() {
                       <p className="">
                         Odeslání pomocí přepravce PPL, cena za odeslání je 150
                         Kč. Při nákupu nad 5.000 Kč je doprava zdarma.
+                      </p>
+                      <p className="mt-2">
+                        Na Slovensko doručujeme také přes PPL, ceny jsou v eurech:{" "}
+                        <Placeholder>cena dopravy na Slovensko a hranice dopravy zdarma v €</Placeholder>
                       </p>
                     </div>
                   </div>
