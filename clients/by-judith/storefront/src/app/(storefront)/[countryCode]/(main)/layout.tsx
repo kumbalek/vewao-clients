@@ -1,11 +1,15 @@
 import { Metadata } from "next"
 
 import { listCartOptions, retrieveCart } from "@lib/data/cart"
-import { listProcedureMenu } from "@lib/data/clinic"
+import { listProcedureMenu } from "@lib/data/procedures"
 import { listCollections } from "@lib/data/collections"
 import { retrieveCustomer } from "@lib/data/customer"
+import { listRegions } from "@lib/data/regions"
+import { isShopOnly } from "@lib/site-mode"
+import { regionOptions } from "@lib/util/region-options"
 import { getBaseURL } from "@lib/util/env"
 import { StoreCartShippingOption } from "@medusajs/types"
+import { deliveryCountries } from "content/site"
 import CartMismatchBanner from "@modules/layout/components/cart-mismatch-banner"
 import SiteFooter from "@modules/layout/templates/site-footer"
 import SiteHeader from "@modules/layout/templates/site-header"
@@ -36,15 +40,24 @@ export default async function PageLayout(props: {
     () => ({ collections: [] })
   )
   const menuCollections = collections.map(({ id, handle, title }) => ({ id, handle, title }))
-  const procedureMenu = await listProcedureMenu().catch(() => [])
+  // While only the e-shop is live (#47), the clinic's menu is not shown or read.
+  const shopOnly = isShopOnly()
+  const procedureMenu = shopOnly ? [] : await listProcedureMenu().catch(() => [])
+  // Each delivery country is a region with its own currency (#45).
+  const regions = (await listRegions().catch(() => null)) ?? []
+  const region = regions.find((r) => r.countries?.some((c) => c?.iso_2 === countryCode))
+  const currencyCode = region?.currency_code ?? cart?.currency_code ?? "czk"
 
   return (
     <>
       <SiteHeader
         countryCode={countryCode}
+        currencyCode={currencyCode}
+        regionOptions={regionOptions(regions, deliveryCountries)}
         cart={cart}
         collections={menuCollections}
         procedureMenu={procedureMenu}
+        shopOnly={shopOnly}
       />
       {customer && cart && (
         <CartMismatchBanner customer={customer} cart={cart} />
@@ -58,7 +71,7 @@ export default async function PageLayout(props: {
         />
       )}
       <main id="main">{props.children}</main>
-      <SiteFooter collections={menuCollections} />
+      <SiteFooter collections={menuCollections} shopOnly={shopOnly} />
     </>
   )
 }

@@ -1,5 +1,7 @@
 import { expect, test, type Locator, type Page } from "@playwright/test"
 
+import { hasPayload } from "./support/payload"
+
 const MOCK = "http://127.0.0.1:9101"
 const SHOP = "http://127.0.0.1:8101"
 
@@ -70,11 +72,11 @@ test("the desktop header offers the wireframe navigation", async ({ page, isMobi
   await procedures.focus()
   await page.keyboard.press("Enter")
   await expect(procedures).toHaveAttribute("aria-expanded", "true")
-  // The menu lists the CMS's categories and their procedures.
-  await expect(page.getByRole("link", { name: "Testovací procedura" })).toHaveAttribute(
-    "href",
-    "/cz/procedury/akupunktura/testovaci-procedura"
-  )
+  // The menu lists the CMS's categories, procedures and sub-procedures.
+  if (hasPayload) {
+    await expect(page.getByRole("link", { name: "Testovací procedura" })).toHaveAttribute("href", "/cz/testovaci-procedura")
+    await expect(page.getByRole("link", { name: "Modelace rtů" })).toHaveAttribute("href", "/cz/modelace-rtu")
+  }
   await page.keyboard.press("Escape")
   await expect(procedures).toHaveAttribute("aria-expanded", "false")
   await expect(procedures).toBeFocused()
@@ -108,10 +110,10 @@ test("the mobile header opens a full-screen menu", async ({ page, isMobile }) =>
   await expect(menu.getByRole("link", { name: "Košík (1)" })).toBeVisible()
 
   await menu.getByText("Procedury").click()
-  await expect(menu.getByRole("link", { name: "Akupunktura", exact: true })).toHaveAttribute(
-    "href",
-    "/cz/procedury/akupunktura"
-  )
+  if (hasPayload) {
+    await expect(menu.getByRole("link", { name: "Východní medicína", exact: true })).toHaveAttribute("href", "/cz/vychodni-medicina")
+    await expect(menu.getByRole("link", { name: "Modelace rtů" })).toHaveAttribute("href", "/cz/modelace-rtu")
+  }
 
   await page.keyboard.press("Escape")
   await expect(menu).toBeHidden()

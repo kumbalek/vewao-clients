@@ -2,6 +2,12 @@ import { defineConfig, devices } from "@playwright/test"
 
 /** The test build's GA4 ID: analytics, and so the consent banner, are on. */
 export const TEST_GA_ID = "G-TEST000001"
+/**
+ * E2E_SITE_MODE=shop runs the server as the temporary production site, the
+ * e-shop alone (#47); e2e/shop-mode.spec.ts runs only then.
+ */
+export const E2E_SHOP_ONLY = process.env.E2E_SITE_MODE === "shop"
+
 /** Signs CMS preview links in the test build; the workflow migrates with it too. */
 export const E2E_PAYLOAD_SECRET = "e2e-payload-secret-not-for-production"
 
@@ -34,10 +40,13 @@ export default defineConfig({
   reporter: process.env.CI ? [["list"], ["github"]] : "list",
   use: { baseURL: "http://127.0.0.1:8101", trace: "retain-on-failure", storageState: decided },
   projects: [
-    { name: "desktop", use: { ...devices["Desktop Chrome"] } },
+    // CMS content the specs share; skipped without a Payload database.
+    { name: "cms-fixtures", testMatch: /cms\.setup\.ts/ },
+    { name: "desktop", use: { ...devices["Desktop Chrome"] }, dependencies: ["cms-fixtures"] },
     {
       name: "mobile",
       use: { ...devices["iPhone 13"], defaultBrowserType: "chromium" },
+      dependencies: ["cms-fixtures"],
     },
   ],
   webServer: [
@@ -61,6 +70,7 @@ export default defineConfig({
         NEXT_PUBLIC_BASE_URL: "http://127.0.0.1:8101",
         NEXT_TELEMETRY_DISABLED: "1",
         NEXT_PUBLIC_GA_MEASUREMENT_ID: TEST_GA_ID,
+        ...(E2E_SHOP_ONLY ? { SITE_MODE: "shop" } : {}),
         // e2e/cms.spec.ts runs only when a Payload database is configured.
         ...(process.env.E2E_PAYLOAD_DATABASE_URL
           ? {

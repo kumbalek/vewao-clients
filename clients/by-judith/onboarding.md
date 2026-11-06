@@ -77,6 +77,16 @@ kept. The owner chose to build in steps:
   Imported on local and dev. Missing procedure content is marked `[doplnit]`.
   Procedure prices (incl. "Akce … místo …") and the Ultherapy manufacturer
   claims were copied as-is and await merchant review (vewao-workspace#21).
+- Built (2026-11-05, vewao-clients#43): procedures moved to the Payload CMS
+  in the structure the owner agreed: Východní and Západní medicína, their
+  procedures, and one level of sub-procedures for western medicine. Every
+  category, procedure and sub-procedure is at `/cz/<slug>`, reusing the
+  bbclinic.cz slug where a page matches (owner decision 2026-11-05: flat
+  addresses for SEO and stable links). Pages have drafts, Live Preview and
+  share links; the Procedury menu shows sub-procedures; Ceník reads the
+  procedures' price rows. The copywriter's texts are structured in
+  `content/procedury.md`; the Content plugin's procedure categories, procedures
+  and FAQ are no longer shown (FAQ to follow in the CMS, #32).
 - "Rezervovat" links to `/content/contact` until a booking provider is chosen
   (vewao-workspace#30).
 - Missing site content is marked `[doplnit]` in `storefront/src/content/site.ts`
@@ -89,6 +99,14 @@ kept. The owner chose to build in steps:
   and the shop's products currently on sale. Empty until the merchant writes
   posts. Prices repeat the procedures' "Akce … místo …" wording, which still
   needs the merchant's review.
+- Slovakia in EUR (owner decision 2026-11-06, vewao-clients#45): customers
+  shipping to Slovakia pay in EUR in a region of their own; the site stays
+  Czech and Czech customers keep CZK. Every country is at `/<country>/…`
+  (`/cz`, `/sk`); the header and the mobile menu switch the delivery country
+  and move the cart with it. EUR prices, Slovak shipping and the EUR
+  free-delivery threshold are dev placeholders until the merchant sets them;
+  VAT for Slovak consumers and EUR invoices wait on the accountant
+  (vewao-workspace#13, vewao-platform#30).
 - Values follow agreed facts, not the wireframe: free delivery from 5 000 Kč
   (wireframe: 1 500), hours from the current contact page (Po–Pá 10–18; the
   wireframe shows Po–Pá 9–19 · So 9–14).
@@ -124,7 +142,8 @@ lead doctor, imported from the legacy repo's `new-hp` branch (staged work on
   see-through. Past the hero they are the usual white header. The cart
   dropdown and the mobile menu stay white.
 - Adapted to this site: the real header replaces the demo's mock one. The two
-  category links go to `/procedury/beauty` and `/procedury/akupunktura`. The closing CTA uses the
+  category links go to `/zapadni-medicina` and `/vychodni-medicina` (until
+  2026-11-05 `/procedury/beauty` and `/procedury/akupunktura`). The closing CTA uses the
   header's "Rezervovat" and contact page. The demo used "Objednat konzultaci"
   and a `/rezervace` page that does not exist here.
 - Landing copy, incl. "Lasery" in the Beauty link (no imported laser

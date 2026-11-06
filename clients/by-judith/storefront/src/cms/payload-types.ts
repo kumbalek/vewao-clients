@@ -70,6 +70,8 @@ export interface Config {
     pages: Page;
     articles: Article;
     topics: Topic;
+    'procedure-categories': ProcedureCategory;
+    procedures: Procedure;
     news: News;
     products: Product;
     media: Media;
@@ -85,6 +87,8 @@ export interface Config {
     pages: PagesSelect<false> | PagesSelect<true>;
     articles: ArticlesSelect<false> | ArticlesSelect<true>;
     topics: TopicsSelect<false> | TopicsSelect<true>;
+    'procedure-categories': ProcedureCategoriesSelect<false> | ProcedureCategoriesSelect<true>;
+    procedures: ProceduresSelect<false> | ProceduresSelect<true>;
     news: NewsSelect<false> | NewsSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
@@ -327,6 +331,264 @@ export interface Topic {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "procedure-categories".
+ */
+export interface ProcedureCategory {
+  id: number;
+  _order?: string | null;
+  name: string;
+  /**
+   * Např. vychodni-medicina. Kategorie bude na /cz/<slug>.
+   */
+  slug: string;
+  /**
+   * Platí 7 dní. Zobrazí rozpracovanou verzi bez možnosti úprav.
+   */
+  shareLink?: string | null;
+  menuDescription?: string | null;
+  /**
+   * Prázdné = název v menu.
+   */
+  title?: string | null;
+  perex?: string | null;
+  image?: (number | null) | Media;
+  /**
+   * Pod obsahem následují procedury kategorie s anotacemi.
+   */
+  sections?:
+    | (
+        | {
+            heading?: string | null;
+            content: {
+              root: {
+                type: string;
+                children: {
+                  type: any;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            };
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'textSection';
+          }
+        | {
+            heading?: string | null;
+            intro?: string | null;
+            style: 'headings' | 'labels' | 'steps';
+            points: {
+              title: string;
+              text?: string | null;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'pointsSection';
+          }
+        | {
+            name: string;
+            tagline?: string | null;
+            /**
+             * Např. Princip, Účinek, Ideální pro, Výsledek.
+             */
+            points?:
+              | {
+                  label: string;
+                  text: {
+                    root: {
+                      type: string;
+                      children: {
+                        type: any;
+                        version: number;
+                        [k: string]: unknown;
+                      }[];
+                      direction: ('ltr' | 'rtl') | null;
+                      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                      indent: number;
+                      version: number;
+                    };
+                    [k: string]: unknown;
+                  };
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'preparation';
+          }
+      )[]
+    | null;
+  seo?: {
+    /**
+     * Nejvýš kolem 60 znaků. Prázdné = nadpis stránky.
+     */
+    title?: string | null;
+    /**
+     * Nejvýš kolem 155 znaků. Prázdné = perex.
+     */
+    description?: string | null;
+    /**
+     * Podklad pro SEO od copywritera; na web se nevypisují.
+     */
+    keywords?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "procedures".
+ */
+export interface Procedure {
+  id: number;
+  _order?: string | null;
+  name: string;
+  /**
+   * Např. modelace-rtu. Procedura bude na /cz/<slug>.
+   */
+  slug: string;
+  /**
+   * Podprocedury přebírají kategorii nadřazené procedury.
+   */
+  category?: (number | null) | ProcedureCategory;
+  /**
+   * Jen u podprocedur, např. Modelace rtů → Injekční aplikace.
+   */
+  parent?: (number | null) | Procedure;
+  /**
+   * Platí 7 dní. Zobrazí rozpracovanou verzi bez možnosti úprav.
+   */
+  shareLink?: string | null;
+  /**
+   * Prázdné = název v menu.
+   */
+  title?: string | null;
+  perex?: string | null;
+  image?: (number | null) | Media;
+  sections?:
+    | (
+        | {
+            heading?: string | null;
+            content: {
+              root: {
+                type: string;
+                children: {
+                  type: any;
+                  version: number;
+                  [k: string]: unknown;
+                }[];
+                direction: ('ltr' | 'rtl') | null;
+                format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                indent: number;
+                version: number;
+              };
+              [k: string]: unknown;
+            };
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'textSection';
+          }
+        | {
+            heading?: string | null;
+            intro?: string | null;
+            style: 'headings' | 'labels' | 'steps';
+            points: {
+              title: string;
+              text?: string | null;
+              id?: string | null;
+            }[];
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'pointsSection';
+          }
+        | {
+            name: string;
+            tagline?: string | null;
+            /**
+             * Např. Princip, Účinek, Ideální pro, Výsledek.
+             */
+            points?:
+              | {
+                  label: string;
+                  text: {
+                    root: {
+                      type: string;
+                      children: {
+                        type: any;
+                        version: number;
+                        [k: string]: unknown;
+                      }[];
+                      direction: ('ltr' | 'rtl') | null;
+                      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+                      indent: number;
+                      version: number;
+                    };
+                    [k: string]: unknown;
+                  };
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'preparation';
+          }
+      )[]
+    | null;
+  /**
+   * Např. Objednat se na tradiční akupunkturu. Prázdné = Rezervovat.
+   */
+  ctaLabel?: string | null;
+  annotation?: string | null;
+  /**
+   * Např. Více o vstupní diagnostice TČM →
+   */
+  annotationLink?: string | null;
+  /**
+   * Např. od 1.000 Kč
+   */
+  priceSummary?: string | null;
+  /**
+   * Např. 45 minut
+   */
+  duration?: string | null;
+  priceRows?:
+    | {
+        /**
+         * Prázdné = cena celé procedury.
+         */
+        item?: string | null;
+        price: string;
+        hidden?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  seo?: {
+    /**
+     * Nejvýš kolem 60 znaků. Prázdné = nadpis stránky.
+     */
+    title?: string | null;
+    /**
+     * Nejvýš kolem 155 znaků. Prázdné = perex.
+     */
+    description?: string | null;
+    /**
+     * Podklad pro SEO od copywritera; na web se nevypisují.
+     */
+    keywords?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "news".
  */
 export interface News {
@@ -501,6 +763,14 @@ export interface PayloadLockedDocument {
         value: number | Topic;
       } | null)
     | ({
+        relationTo: 'procedure-categories';
+        value: number | ProcedureCategory;
+      } | null)
+    | ({
+        relationTo: 'procedures';
+        value: number | Procedure;
+      } | null)
+    | ({
         relationTo: 'news';
         value: number | News;
       } | null)
@@ -639,6 +909,154 @@ export interface TopicsSelect<T extends boolean = true> {
   name?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "procedure-categories_select".
+ */
+export interface ProcedureCategoriesSelect<T extends boolean = true> {
+  _order?: T;
+  name?: T;
+  slug?: T;
+  shareLink?: T;
+  menuDescription?: T;
+  title?: T;
+  perex?: T;
+  image?: T;
+  sections?:
+    | T
+    | {
+        textSection?:
+          | T
+          | {
+              heading?: T;
+              content?: T;
+              id?: T;
+              blockName?: T;
+            };
+        pointsSection?:
+          | T
+          | {
+              heading?: T;
+              intro?: T;
+              style?: T;
+              points?:
+                | T
+                | {
+                    title?: T;
+                    text?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        preparation?:
+          | T
+          | {
+              name?: T;
+              tagline?: T;
+              points?:
+                | T
+                | {
+                    label?: T;
+                    text?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+      };
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        keywords?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "procedures_select".
+ */
+export interface ProceduresSelect<T extends boolean = true> {
+  _order?: T;
+  name?: T;
+  slug?: T;
+  category?: T;
+  parent?: T;
+  shareLink?: T;
+  title?: T;
+  perex?: T;
+  image?: T;
+  sections?:
+    | T
+    | {
+        textSection?:
+          | T
+          | {
+              heading?: T;
+              content?: T;
+              id?: T;
+              blockName?: T;
+            };
+        pointsSection?:
+          | T
+          | {
+              heading?: T;
+              intro?: T;
+              style?: T;
+              points?:
+                | T
+                | {
+                    title?: T;
+                    text?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        preparation?:
+          | T
+          | {
+              name?: T;
+              tagline?: T;
+              points?:
+                | T
+                | {
+                    label?: T;
+                    text?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+      };
+  ctaLabel?: T;
+  annotation?: T;
+  annotationLink?: T;
+  priceSummary?: T;
+  duration?: T;
+  priceRows?:
+    | T
+    | {
+        item?: T;
+        price?: T;
+        hidden?: T;
+        id?: T;
+      };
+  seo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        keywords?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -812,6 +1230,14 @@ export interface TaskSchedulePublish {
       | ({
           relationTo: 'articles';
           value: number | Article;
+        } | null)
+      | ({
+          relationTo: 'procedure-categories';
+          value: number | ProcedureCategory;
+        } | null)
+      | ({
+          relationTo: 'procedures';
+          value: number | Procedure;
         } | null);
     global?: string | null;
     user?: {

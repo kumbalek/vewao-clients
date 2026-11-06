@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl"
 
 import {
   bookingPath,
+  isFullSitePath,
   contact,
   freeDeliveryFrom,
   navigationLinks,
@@ -23,6 +24,8 @@ import {
   type MenuCollection,
 } from "@modules/layout/components/menu-panels"
 import MobileMenu from "@modules/layout/components/mobile-menu"
+import type { RegionOption } from "@lib/util/region-options"
+import RegionSwitch from "@modules/layout/components/region-switch"
 import SearchForm from "@modules/layout/components/search-form"
 
 const linkClasses =
@@ -44,16 +47,26 @@ const bookOverlayClasses =
  */
 export default function SiteHeader({
   countryCode,
+  currencyCode,
+  regionOptions,
   cart,
   collections,
   procedureMenu,
+  shopOnly = false,
 }: {
   countryCode: string
+  /** The region's currency: prices and the free-delivery threshold (#45). */
+  currencyCode: string
+  /** Delivery countries to switch between (Česko, Slovensko). */
+  regionOptions: RegionOption[]
   cart: HttpTypes.StoreCart | null
   collections: MenuCollection[]
   procedureMenu: ProcedureCategory[]
+  /** The e-shop alone (SITE_MODE=shop, #47): no clinic menu, booking or full-site links. */
+  shopOnly?: boolean
 }) {
   const t = useTranslations("layout")
+  const links = shopOnly ? navigationLinks.filter((link) => !isFullSitePath(link.href)) : navigationLinks
   const cartCount = cart?.items?.reduce((sum, item) => sum + item.quantity, 0) ?? 0
 
   return (
@@ -72,12 +85,19 @@ export default function SiteHeader({
             width="page"
             className="flex h-8 items-center justify-end gap-3 text-xs text-ink-subtle overlay:text-white/85"
           >
-            <span data-testid="free-delivery-note">
-              {t("freeDelivery", {
-                amount: convertToLocale({ amount: freeDeliveryFrom, currency_code: "czk" }),
-              })}
-            </span>
-            <span aria-hidden="true">·</span>
+            <RegionSwitch options={regionOptions} />
+            {regionOptions.length > 1 && <span aria-hidden="true">·</span>}
+            {freeDeliveryFrom[currencyCode] !== undefined && (
+              <>
+                <span data-testid="free-delivery-note">
+                  {t("freeDelivery", {
+                    // A whole threshold reads "200 €", not "200,00 €".
+                    amount: convertToLocale({ amount: freeDeliveryFrom[currencyCode], currency_code: currencyCode, minimumFractionDigits: 0 }),
+                  })}
+                </span>
+                <span aria-hidden="true">·</span>
+              </>
+            )}
             <a
               href={contact.phone.href}
               className="flex items-center gap-1 hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-ink overlay:hover:text-white overlay:focus-visible:outline-white"
@@ -97,22 +117,26 @@ export default function SiteHeader({
                 countryCode={countryCode}
                 categories={procedureMenu}
                 collections={collections}
-                links={navigationLinks}
+                links={links}
                 cartCount={cartCount}
                 bookingPath={bookingPath}
+                regionOptions={regionOptions}
+                shopOnly={shopOnly}
               />
             </div>
             <nav
               aria-label={t("mainNavigation")}
               className="hidden h-full items-center gap-4 medium:flex large:gap-6"
             >
-              <HeaderMenu label={t("procedures")}>
-                <ProceduresPanel categories={procedureMenu} />
-              </HeaderMenu>
+              {!shopOnly && (
+                <HeaderMenu label={t("procedures")}>
+                  <ProceduresPanel categories={procedureMenu} />
+                </HeaderMenu>
+              )}
               <HeaderMenu label={t("shop")}>
                 <ShopPanel collections={collections} />
               </HeaderMenu>
-              {navigationLinks.map((link) =>
+              {links.map((link) =>
                 link.href ? (
                   <LocalizedClientLink key={link.label} href={link.href} className={linkClasses}>
                     {link.label}
@@ -155,23 +179,27 @@ export default function SiteHeader({
               </span>
             </LocalizedClientLink>
             <CartDropdown cart={cart} />
-            <ButtonLink href={bookingPath} className={`hidden medium:inline-flex ${bookOverlayClasses}`}>
-              {t("book")}
-            </ButtonLink>
+            {!shopOnly && (
+              <ButtonLink href={bookingPath} className={`hidden medium:inline-flex ${bookOverlayClasses}`}>
+                {t("book")}
+              </ButtonLink>
+            )}
           </div>
         </Container>
       </header>
 
       {/* Positioned so a hero pulled up under it does not cover it. */}
-      <Container className="relative z-40 py-3 medium:hidden">
-        <ButtonLink
-          href={bookingPath}
-          fullWidth
-          className={`mx-auto flex max-w-md ${bookOverlayClasses}`}
-        >
-          {t("book")}
-        </ButtonLink>
-      </Container>
+      {!shopOnly && (
+        <Container className="relative z-40 py-3 medium:hidden">
+          <ButtonLink
+            href={bookingPath}
+            fullWidth
+            className={`mx-auto flex max-w-md ${bookOverlayClasses}`}
+          >
+            {t("book")}
+          </ButtonLink>
+        </Container>
+      )}
     </HeaderShell>
   )
 }

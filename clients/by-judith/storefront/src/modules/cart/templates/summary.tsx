@@ -10,6 +10,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import GiftPackagingToggle from "@modules/cart/components/gift-packaging"
 import { HttpTypes } from "@medusajs/types"
 import type { GiftPackaging } from "@lib/data/gift-packaging"
+import { useParams } from "next/navigation"
 
 type SummaryProps = {
   cart: HttpTypes.StoreCart & {
@@ -29,6 +30,8 @@ function getCheckoutStep(cart: HttpTypes.StoreCart) {
 }
 
 const Summary = ({ cart, giftPackaging }: SummaryProps) => {
+  // The page's country: adding gift packaging must keep the cart in its region (#45).
+  const { countryCode } = useParams<{ countryCode: string }>()
   const t = useTranslations("cart")
   const step = getCheckoutStep(cart)
 
@@ -43,7 +46,7 @@ const Summary = ({ cart, giftPackaging }: SummaryProps) => {
       {giftPackaging && (
         <GiftPackagingToggle
           cart={cart}
-          countryCode={"cz"}
+          countryCode={countryCode}
           giftPackaging={giftPackaging}
         />
       )}
