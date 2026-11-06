@@ -41,6 +41,7 @@ export default function MobileMenu({
   cartCount,
   bookingPath,
   regionOptions,
+  shopOnly = false,
 }: {
   countryCode: string
   categories: ProcedureCategory[]
@@ -49,6 +50,8 @@ export default function MobileMenu({
   cartCount: number
   bookingPath: string
   regionOptions: RegionOption[]
+  /** The e-shop alone (#47): no procedures or booking. */
+  shopOnly?: boolean
 }) {
   const t = useTranslations("layout")
   const [open, setOpen] = useState(false)
@@ -105,50 +108,52 @@ export default function MobileMenu({
             <SearchForm countryCode={countryCode} />
             <nav aria-label={t("mainNavigation")} className="mt-2">
               <ul className="divide-y divide-line">
-                <li>
-                  <Section title={t("procedures")}>
-                    {!categories.length && (
-                      <Placeholder className="text-base">{t("procedures")}</Placeholder>
-                    )}
-                    {categories.map((category) => (
-                      <div key={category.title} className="py-2">
-                        {category.href ? (
-                          <LocalizedClientLink href={category.href} className={subLinkClasses}>
-                            {category.title}
-                          </LocalizedClientLink>
-                        ) : (
-                          <span className="block py-2 text-base text-ink">{category.title}</span>
-                        )}
-                        <ul className="border-l border-line pl-4">
-                          {category.procedures.map((procedure, index) => (
-                            <li key={index}>
-                              {procedure.href ? (
-                                <LocalizedClientLink href={procedure.href} className={subLinkClasses}>
-                                  <CopyText value={procedure.title} />
-                                </LocalizedClientLink>
-                              ) : (
-                                <span className="block py-2 text-base">
-                                  <CopyText value={procedure.title} />
-                                </span>
-                              )}
-                              {procedure.children?.length ? (
-                                <ul className="border-l border-line pl-4">
-                                  {procedure.children.map((child) => (
-                                    <li key={child.href}>
-                                      <LocalizedClientLink href={child.href} className={subLinkClasses}>
-                                        {child.title}
-                                      </LocalizedClientLink>
-                                    </li>
-                                  ))}
-                                </ul>
-                              ) : null}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </Section>
-                </li>
+                {!shopOnly && (
+                  <li>
+                    <Section title={t("procedures")}>
+                      {!categories.length && (
+                        <Placeholder className="text-base">{t("procedures")}</Placeholder>
+                      )}
+                      {categories.map((category) => (
+                        <div key={category.title} className="py-2">
+                          {category.href ? (
+                            <LocalizedClientLink href={category.href} className={subLinkClasses}>
+                              {category.title}
+                            </LocalizedClientLink>
+                          ) : (
+                            <span className="block py-2 text-base text-ink">{category.title}</span>
+                          )}
+                          <ul className="border-l border-line pl-4">
+                            {category.procedures.map((procedure, index) => (
+                              <li key={index}>
+                                {procedure.href ? (
+                                  <LocalizedClientLink href={procedure.href} className={subLinkClasses}>
+                                    <CopyText value={procedure.title} />
+                                  </LocalizedClientLink>
+                                ) : (
+                                  <span className="block py-2 text-base">
+                                    <CopyText value={procedure.title} />
+                                  </span>
+                                )}
+                                {procedure.children?.length ? (
+                                  <ul className="border-l border-line pl-4">
+                                    {procedure.children.map((child) => (
+                                      <li key={child.href}>
+                                        <LocalizedClientLink href={child.href} className={subLinkClasses}>
+                                          {child.title}
+                                        </LocalizedClientLink>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                ) : null}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </Section>
+                  </li>
+                )}
                 <li>
                   <Section title={t("shop")}>
                     <ul>
@@ -198,11 +203,11 @@ export default function MobileMenu({
             <RegionSwitch options={regionOptions} className="mt-4 flex-wrap text-sm text-ink-subtle" />
           </div>
 
-          <div className="grid flex-none grid-cols-2 gap-3 border-t border-line p-4">
+          <div className={`grid flex-none gap-3 border-t border-line p-4 ${shopOnly ? "grid-cols-1" : "grid-cols-2"}`}>
             <ButtonLink href="/cart" variant="secondary">
               {t("cartCount", { count: cartCount })}
             </ButtonLink>
-            <ButtonLink href={bookingPath}>{t("book")}</ButtonLink>
+            {!shopOnly && <ButtonLink href={bookingPath}>{t("book")}</ButtonLink>}
           </div>
         </DialogPanel>
       </Dialog>

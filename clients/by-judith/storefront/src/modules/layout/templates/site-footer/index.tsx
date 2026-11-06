@@ -2,7 +2,7 @@ import Image from "next/image"
 import { useTranslations } from "next-intl"
 import React from "react"
 
-import { contact, footer } from "content/site"
+import { contact, footer, isFullSitePath } from "content/site"
 import { consentCategories } from "@lib/consent"
 import { CookieSettingsButton } from "@modules/common/components/cookie-consent"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
@@ -38,10 +38,17 @@ function Column({
 }
 
 /** Global footer (wireframe 00 · D). */
-export default function SiteFooter({ collections }: { collections: MenuCollection[] }) {
+export default function SiteFooter({
+  collections,
+  shopOnly = false,
+}: {
+  collections: MenuCollection[]
+  /** The e-shop alone (SITE_MODE=shop, #47): no links to the full site's pages. */
+  shopOnly?: boolean
+}) {
   const t = useTranslations("layout")
 
-  const quickLinks = [
+  const allLinks = [
     { label: t("allProducts"), href: "/store" },
     ...collections.slice(0, 3).map((c) => ({ label: c.title, href: `/collections/${c.handle}` })),
     { label: t("magazin"), href: "/magazin" },
@@ -49,6 +56,7 @@ export default function SiteFooter({ collections }: { collections: MenuCollectio
     { label: t("customerService"), href: "/content/customer-service" },
     { label: t("contact"), href: "/content/contact" },
   ]
+  const quickLinks = shopOnly ? allLinks.filter((link) => !isFullSitePath(link.href)) : allLinks
 
   return (
     <footer className="border-t border-line bg-surface" data-testid="site-footer">

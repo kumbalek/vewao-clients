@@ -4,6 +4,7 @@ import { listPriceList } from "@lib/data/procedures"
 import type { PriceListEntry } from "@lib/util/procedures"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { ButtonLink, Container, Heading, Section, Text } from "@modules/design-system"
+import { fullSiteOnly } from "@lib/site-mode"
 
 export const metadata: Metadata = {
   title: "Ceník",
@@ -16,6 +17,7 @@ export const metadata: Metadata = {
  * sub-procedure's prices follow its parent procedure.
  */
 export default async function PriceListPage() {
+  fullSiteOnly()
   const sections = await listPriceList()
 
   return (
