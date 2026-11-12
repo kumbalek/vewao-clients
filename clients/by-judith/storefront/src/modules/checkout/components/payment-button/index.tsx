@@ -6,6 +6,7 @@ import { HttpTypes } from "@medusajs/types"
 import { Button } from "@medusajs/ui"
 import React, { useState } from "react"
 import ErrorMessage from "../error-message"
+import { deliveryDone } from "@lib/util/shipping"
 import { useTranslations } from "next-intl"
 
 type PaymentButtonProps = {
@@ -27,7 +28,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     !cart.shipping_address ||
     !cart.billing_address ||
     !cart.email ||
-    (cart.shipping_methods?.length ?? 0) < 1 ||
+    !deliveryDone(cart) ||
     !!disabled
 
   const paymentSession = cart.payment_collection?.payment_sessions?.find(
