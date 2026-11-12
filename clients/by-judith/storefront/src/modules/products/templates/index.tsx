@@ -61,7 +61,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
         data-testid="product-container"
       >
         <div className="flex flex-col small:sticky small:top-24 small:py-0 max-w-[420px] w-full pb-8 gap-y-1">
-          <ImageGallery images={product?.images || []} />
+          <ImageGallery images={product?.images || []} title={product.title} />
           {/* <ProductOnboardingCta /> */}
           <Suspense
             fallback={

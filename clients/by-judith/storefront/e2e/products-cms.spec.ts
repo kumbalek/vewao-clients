@@ -1,6 +1,6 @@
 import { expect as baseExpect, test, type APIRequestContext } from "@playwright/test"
 
-import { NEEDS_PAYLOAD, SHOP, hasPayload, lexical, payloadAuth, type Auth } from "./support/payload"
+import { NEEDS_PAYLOAD, SHOP, ensureImage, hasPayload, lexical, payloadAuth, type Auth } from "./support/payload"
 
 const expect = baseExpect.configure({ timeout: 15_000 })
 const { doc, p, text } = lexical
@@ -146,6 +146,20 @@ test.describe("product texts from the CMS", () => {
     expect(after._status).toBe("published")
     // The rename kept the editor's published texts.
     expect(JSON.stringify(after.description)).toContain("Rozpracovaný popis.")
+  })
+
+  test("an image inserted in a text shows with its alt text", async ({ page, request }) => {
+    const media = await ensureImage(request, admin, "Balení akčního produktu")
+    const image = { type: "upload", version: 3, format: "", fields: null, id: crypto.randomUUID().replaceAll("-", "").slice(0, 24), relationTo: "media", value: media }
+    const res = await request.patch(`${SHOP}/api/products/${docId}`, {
+      headers: admin,
+      data: { description: doc(p(text("Popis s obrázkem.")), image), _status: "published" },
+    })
+    expect(res.status(), await res.text()).toBe(200)
+    await page.goto(PRODUCT_PAGE)
+    const description = page.getByTestId("product-description")
+    await expect(description).toContainText("Popis s obrázkem.")
+    await expect(description.getByRole("img", { name: "Balení akčního produktu" })).toBeVisible()
   })
 
   test("deleting the product in Medusa deletes its document", async ({ page, request }) => {

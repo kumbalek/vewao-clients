@@ -30,7 +30,7 @@ const Faq = () => {
         </div>
 
         <div className="w-full small:w-1/2 large:w-1/3 max-w-[1080px]">
-          <Thumbnail thumbnail={"/jh-about.webp"} size="full" />
+          <Thumbnail thumbnail={"/jh-about.webp"} size="full" alt="Judita, zakladatelka Beauty Body Clinic" />
         </div>
       </div>
     </div>

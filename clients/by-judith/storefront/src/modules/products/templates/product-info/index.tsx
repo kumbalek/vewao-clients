@@ -1,6 +1,7 @@
 import { HttpTypes } from "@medusajs/types"
 import { Heading } from "@medusajs/ui"
-import { lexicalToPlainText, renderLexical } from "@lib/cms/lexical"
+import { lexicalHasContent } from "@lib/cms/lexical"
+import CmsRichText from "@modules/cms/components/cms-rich-text"
 import type { ProductTexts } from "@lib/cms/product-texts"
 
 type ProductInfoProps = {
@@ -31,12 +32,12 @@ const ProductInfo = ({ product, texts }: ProductInfoProps) => {
           </p>
         )}
 
-        {lexicalToPlainText(texts.description).trim() && (
+        {lexicalHasContent(texts.description) && (
           <div
-            className="font-normal font-sans txt-medium text-ui-fg-subtle [&_p+p]:mt-4 [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_strong]:font-semibold [&_a]:underline"
+            className="font-normal font-sans txt-medium text-ui-fg-subtle [&>*+*]:mt-4 [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_strong]:font-semibold [&_a]:underline [&_img]:rounded-[1.5rem]"
             data-testid="product-description"
           >
-            {renderLexical(texts.description)}
+            <CmsRichText state={texts.description} />
           </div>
         )}
       </div>

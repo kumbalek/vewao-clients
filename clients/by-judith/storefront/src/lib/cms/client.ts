@@ -6,6 +6,7 @@ import { cookies, draftMode } from "next/headers"
 import { getPayload } from "payload"
 
 import type { LexicalState } from "./lexical"
+import { sameOriginPath } from "./media-url"
 import type { Procedure as CmsProcedure, ProcedureCategory as CmsProcedureCategory, Product as CmsProduct } from "../../cms/payload-types"
 import { PREVIEW_COOKIE, previewSecret, verifyPreview, type PreviewGrant } from "./preview-token"
 
@@ -42,14 +43,9 @@ export type CmsNews = { id: number; title: string; perex: string; href?: string 
 /** Fallback if a publish hook could not expire the cache. */
 const MAX_AGE_SECONDS = 300
 
-/**
- * Payload prefixes its files with the shop's own origin (serverURL). The shop
- * serves them itself, so next/image gets the path: a local image, not a remote
- * host it would have to allow and fetch over the network.
- */
+/** A media file's address for next/image: a path when the shop serves it itself. */
 export function cmsMediaUrl(media: CmsMedia): string {
-  const origin = process.env.NEXT_PUBLIC_BASE_URL?.replace(/\/+$/, "")
-  return origin && media.url.startsWith(`${origin}/`) ? media.url.slice(origin.length) : media.url
+  return sameOriginPath(media.url)
 }
 
 /** The preview grant for this request's path, if draft mode was opened for it. */
@@ -187,7 +183,8 @@ export async function getCmsProcedureDraft(slug: string): Promise<CmsProcedureDr
 async function findProduct(medusaId: string, draft: boolean): Promise<CmsProduct | "missing" | null> {
   const payload = await getPayload({ config })
   const where = { medusaId: { equals: medusaId } }
-  const result = await payload.find({ collection: "products", where, depth: 0, limit: 1, draft, overrideAccess: draft })
+  // depth 1 populates images inside the rich text.
+  const result = await payload.find({ collection: "products", where, depth: 1, limit: 1, draft, overrideAccess: draft })
   if (result.docs[0]) return result.docs[0]
   const { totalDocs } = await payload.count({ collection: "products", where, overrideAccess: true })
   return totalDocs ? null : "missing"

@@ -2,7 +2,7 @@ import Image from "next/image"
 import { getTranslations } from "next-intl/server"
 
 import { footer } from "content/site"
-import { renderLexical } from "@lib/cms/lexical"
+import CmsRichText from "@modules/cms/components/cms-rich-text"
 import { articleImage, listArticles, type Article } from "@lib/data/magazin"
 import { relatedArticles } from "@lib/util/magazin"
 import Breadcrumbs from "@modules/common/components/breadcrumbs"
@@ -63,7 +63,7 @@ export default async function ArticleTemplate({ article, edit = false }: { artic
         )}
 
         <Prose className="mt-10" data-testid="article-body">
-          {renderLexical(article.body)}
+          <CmsRichText state={article.body} />
         </Prose>
 
         {gallery.length > 0 && (

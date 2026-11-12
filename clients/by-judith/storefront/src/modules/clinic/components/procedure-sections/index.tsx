@@ -1,4 +1,5 @@
-import { renderLexical, type LexicalState } from "@lib/cms/lexical"
+import type { LexicalState } from "@lib/cms/lexical"
+import CmsRichText from "@modules/cms/components/cms-rich-text"
 import type { ProcedureSection } from "@lib/util/procedures"
 import { Prose } from "@modules/common/components/rich-text"
 import { Card, Heading, Text } from "@modules/design-system"
@@ -27,7 +28,7 @@ function ProcedureSectionView({ section }: { section: ProcedureSection }) {
               {section.heading}
             </Heading>
           )}
-          <Prose>{renderLexical(section.content as LexicalState)}</Prose>
+          <Prose><CmsRichText state={section.content as LexicalState} /></Prose>
         </section>
       )
 
@@ -84,7 +85,7 @@ function ProcedureSectionView({ section }: { section: ProcedureSection }) {
                   <dt className="text-xs uppercase tracking-widest text-ink-muted">{point.label}</dt>
                   <dd className="mt-1">
                     <Prose className="text-base leading-7 [&_p]:mt-2 [&_ul]:mt-2">
-                      {renderLexical(point.text as LexicalState)}
+                      <CmsRichText state={point.text as LexicalState} />
                     </Prose>
                   </dd>
                 </div>
