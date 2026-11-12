@@ -6,7 +6,7 @@ import { cookies, draftMode } from "next/headers"
 import { getPayload } from "payload"
 
 import type { LexicalState } from "./lexical"
-import type { Procedure as CmsProcedure, ProcedureCategory as CmsProcedureCategory } from "../../cms/payload-types"
+import type { Procedure as CmsProcedure, ProcedureCategory as CmsProcedureCategory, Product as CmsProduct } from "../../cms/payload-types"
 import { PREVIEW_COOKIE, previewSecret, verifyPreview, type PreviewGrant } from "./preview-token"
 
 /**
@@ -36,7 +36,7 @@ export type CmsArticle = {
   createdAt: string
   _status?: "draft" | "published" | null
 }
-export type { CmsProcedure, CmsProcedureCategory }
+export type { CmsProcedure, CmsProcedureCategory, CmsProduct }
 export type CmsNews = { id: number; title: string; perex: string; href?: string | null; validUntil?: string | null; image?: CmsMedia | number | null }
 
 /** Fallback if a publish hook could not expire the cache. */
@@ -177,4 +177,26 @@ export async function getCmsProcedureDraft(slug: string): Promise<CmsProcedureDr
   if (categories.docs[0]) return { collection: "procedure-categories", doc: categories.docs[0] }
   if (procedures.docs[0]) return { collection: "procedures", doc: procedures.docs[0] }
   return null
+}
+
+/**
+ * A product's texts: its published document, or its latest draft inside a
+ * preview grant. "missing" when the product has no document at all (not yet
+ * synced from Medusa); an unpublished document is not missing.
+ */
+async function findProduct(medusaId: string, draft: boolean): Promise<CmsProduct | "missing" | null> {
+  const payload = await getPayload({ config })
+  const where = { medusaId: { equals: medusaId } }
+  const result = await payload.find({ collection: "products", where, depth: 0, limit: 1, draft, overrideAccess: draft })
+  if (result.docs[0]) return result.docs[0]
+  const { totalDocs } = await payload.count({ collection: "products", where, overrideAccess: true })
+  return totalDocs ? null : "missing"
+}
+
+export async function getCmsProduct(medusaId: string, handle: string, draft: boolean): Promise<CmsProduct | "missing" | null> {
+  if (draft) return findProduct(medusaId, true)
+  return unstable_cache(() => findProduct(medusaId, false), ["cms-product", medusaId], {
+    tags: [`cms:products:${handle}`],
+    revalidate: MAX_AGE_SECONDS,
+  })()
 }

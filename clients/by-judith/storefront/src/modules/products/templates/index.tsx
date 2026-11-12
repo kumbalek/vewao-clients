@@ -11,17 +11,21 @@ import { notFound } from "next/navigation"
 import ProductActionsWrapper from "./product-actions-wrapper"
 import { HttpTypes } from "@medusajs/types"
 import { useTranslations } from "next-intl"
+import type { ProductTexts } from "@lib/cms/product-texts"
 
 type ProductTemplateProps = {
   product: HttpTypes.StoreProduct
   region: HttpTypes.StoreRegion
   countryCode: string
+  /** Subtitle, description and tab texts from the CMS (vewao-clients#50). */
+  texts: ProductTexts
 }
 
 const ProductTemplate: React.FC<ProductTemplateProps> = ({
   product,
   region,
   countryCode,
+  texts,
 }) => {
   const t = useTranslations("product")
 
@@ -72,8 +76,8 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
           </Suspense>
         </div>
         <div className="flex flex-col items-center gap-4 block w-full small:max-w-[500px] small:pl-8 relative">
-          <ProductInfo product={product} />
-          <ProductTabs product={product} />
+          <ProductInfo product={product} texts={texts} />
+          <ProductTabs texts={texts} />
         </div>
       </div>
       <div

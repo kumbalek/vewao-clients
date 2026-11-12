@@ -1,15 +1,15 @@
 import { HttpTypes } from "@medusajs/types"
-import { Heading, Text } from "@medusajs/ui"
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import { useTranslations } from "next-intl"
+import { Heading } from "@medusajs/ui"
+import { lexicalToPlainText, renderLexical } from "@lib/cms/lexical"
+import type { ProductTexts } from "@lib/cms/product-texts"
 
 type ProductInfoProps = {
   product: HttpTypes.StoreProduct
+  texts: Pick<ProductTexts, "subtitle" | "description">
 }
 
-const ProductInfo = ({ product }: ProductInfoProps) => {
-  const t = useTranslations("product")
-
+/** The product's name from Medusa; its subtitle and description from the CMS. */
+const ProductInfo = ({ product, texts }: ProductInfoProps) => {
   return (
     <div id="product-info">
       <div className="flex flex-col gap-y-4 mx-auto">
@@ -22,19 +22,23 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
             {product.title}
           </Heading>
         </div>
-        <p
-          className="text-ui-fg-base whitespace-pre-line"
-          data-testid="product-subtitle"
-        >
-          {product.subtitle}
-        </p>
+        {texts.subtitle && (
+          <p
+            className="text-ui-fg-base whitespace-pre-line"
+            data-testid="product-subtitle"
+          >
+            {texts.subtitle}
+          </p>
+        )}
 
-        <Text
-          className="text-ui-fg-subtle whitespace-pre-line"
-          data-testid="product-description"
-        >
-          {product.description}
-        </Text>
+        {lexicalToPlainText(texts.description).trim() && (
+          <div
+            className="font-normal font-sans txt-medium text-ui-fg-subtle [&_p+p]:mt-4 [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_strong]:font-semibold [&_a]:underline"
+            data-testid="product-description"
+          >
+            {renderLexical(texts.description)}
+          </div>
+        )}
       </div>
     </div>
   )

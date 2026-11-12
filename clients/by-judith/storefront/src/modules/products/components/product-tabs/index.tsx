@@ -1,207 +1,50 @@
 "use client"
 
-import Back from "@modules/common/icons/back"
-import FastDelivery from "@modules/common/icons/fast-delivery"
-import Refresh from "@modules/common/icons/refresh"
 import { useTranslations } from "next-intl"
 import Accordion from "./accordion"
-import { HttpTypes } from "@medusajs/types"
-import { parseIngredients } from "@lib/util/ingredients"
+import { lexicalToPlainText, renderLexical, type LexicalState } from "@lib/cms/lexical"
+import type { ProductTexts } from "@lib/cms/product-texts"
 
 type ProductTabsProps = {
-  product: HttpTypes.StoreProduct
+  texts: Pick<ProductTexts, "dosage" | "ingredients" | "information">
 }
 
-const ProductTabs = ({ product }: ProductTabsProps) => {
+// The tabs' typography: paragraphs and list items spaced alike, ingredients as a
+// dashed list (the dash hidden from screen readers), allergens emphasised.
+const tabText = [
+  "py-4 flex flex-col gap-y-4 font-normal font-sans txt-medium text-ui-fg-subtle",
+  "[&_ul]:flex [&_ul]:flex-col [&_ul]:gap-y-4 [&_ol]:flex [&_ol]:flex-col [&_ol]:gap-y-4",
+  "[&_li]:flex [&_li]:items-start [&_li]:gap-x-2 [&_li]:px-2 [&_li]:before:content-['–'_/_''] [&_li]:before:shrink-0",
+  "[&_strong]:font-semibold [&_strong]:text-ui-fg-base [&_a]:underline",
+].join(" ")
+
+/** Dosage, ingredients and further information from the product's texts; empty tabs are left out. */
+const ProductTabs = ({ texts }: ProductTabsProps) => {
   const t = useTranslations("product")
-  const tabs = [
-    // {
-    //   label: "Product Information",
-    //   component: <ProductInfoTab product={product} />,
-    // },
-    // {
-    //   label: "Shipping & Returns",
-    //   component: <ShippingInfoTab />,
-    // },
-    {
-      label: t("dose"),
-      component: <DoseTab product={product} />,
-    },
-    {
-      label: t("ingredients"),
-      component: <IngredientsTab product={product} />,
-    },
-    {
-      label: t("info"),
-      component: <InfoTab product={product} />,
-    },
-  ]
+  const tabs: { label: string; state: LexicalState; testId: string }[] = [
+    { label: t("dose"), state: texts.dosage, testId: "product-dosage" },
+    { label: t("ingredients"), state: texts.ingredients, testId: "product-ingredients" },
+    { label: t("info"), state: texts.information, testId: "product-information" },
+  ].filter((tab) => lexicalToPlainText(tab.state).trim())
+
+  if (!tabs.length) return null
 
   return (
     <div className="w-full lg:max-w-[500px]">
       <Accordion type="multiple">
-        {tabs.map((tab, i) => (
+        {tabs.map((tab) => (
           <Accordion.Item
-            key={i}
+            key={tab.testId}
             title={tab.label}
             headingSize="medium"
             value={tab.label}
           >
-            {tab.component}
+            <div className={tabText} data-testid={tab.testId}>
+              {renderLexical(tab.state)}
+            </div>
           </Accordion.Item>
         ))}
       </Accordion>
-    </div>
-  )
-}
-
-const ProductInfoTab = ({ product }: ProductTabsProps) => {
-  return (
-    <div className="text-small-regular py-8">
-      <div className="grid grid-cols-2 gap-x-8">
-        <div className="flex flex-col gap-y-4">
-          <div>
-            <span className="font-semibold">Material</span>
-            <p>{product.material ? product.material : "-"}</p>
-          </div>
-          <div>
-            <span className="font-semibold">Country of origin</span>
-            <p>{product.origin_country ? product.origin_country : "-"}</p>
-          </div>
-          <div>
-            <span className="font-semibold">Type</span>
-            <p>{product.type ? product.type.value : "-"}</p>
-          </div>
-        </div>
-        <div className="flex flex-col gap-y-4">
-          <div>
-            <span className="font-semibold">Weight</span>
-            <p>{product.weight ? `${product.weight} g` : "-"}</p>
-          </div>
-          <div>
-            <span className="font-semibold">Dimensions</span>
-            <p>
-              {product.length && product.width && product.height
-                ? `${product.length}L x ${product.width}W x ${product.height}H`
-                : "-"}
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-const ShippingInfoTab = () => {
-  return (
-    <div className="text-small-regular py-8">
-      <div className="grid grid-cols-1 gap-y-8">
-        <div className="flex items-start gap-x-2">
-          <FastDelivery />
-          <div>
-            <span className="font-semibold">Fast delivery</span>
-            <p className="max-w-sm">
-              Your package will arrive in 3-5 business days at your pick up
-              location or in the comfort of your home.
-            </p>
-          </div>
-        </div>
-        <div className="flex items-start gap-x-2">
-          <Refresh />
-          <div>
-            <span className="font-semibold">Simple exchanges</span>
-            <p className="max-w-sm">
-              Is the fit not quite right? No worries - we&apos;ll exchange your
-              product for a new one.
-            </p>
-          </div>
-        </div>
-        <div className="flex items-start gap-x-2">
-          <Back />
-          <div>
-            <span className="font-semibold">Easy returns</span>
-            <p className="max-w-sm">
-              Just return your product and we&apos;ll refund your money. No
-              questions asked – we&apos;ll do our best to make sure your return
-              is hassle-free.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-const IngredientsTab = ({ product }: ProductTabsProps) => {
-  const ingredients = parseIngredients(product?.metadata?.ingredients)
-
-  return (
-    <div className="text-small-regular py-4">
-      <ul className="flex flex-col gap-y-4">
-        {ingredients.map((segments, index) => (
-          <li
-            key={`ingredient_${index}`}
-            className="flex items-start gap-x-2 px-2"
-          >
-            <span aria-hidden="true">{"–"}</span>
-            <span className="font-normal font-sans txt-medium text-ui-fg-subtle whitespace-pre-line">
-              {segments.map((segment, i) =>
-                segment.allergen ? (
-                  <strong key={i} className="font-semibold text-ui-fg-base">
-                    {segment.text}
-                  </strong>
-                ) : (
-                  segment.text
-                )
-              )}
-            </span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  )
-}
-
-const DoseTab = ({ product }: ProductTabsProps) => {
-  const dose = (product?.metadata?.dose || "") as string
-  const parsedDose = dose.split(";")
-
-  return (
-    <div className="text-small-regular py-4">
-      <div className="flex flex-col gap-y-4">
-        {parsedDose.map((singleDose, index) => (
-          <p
-            key={`dose_${index}`}
-            className="font-normal font-sans txt-medium text-ui-fg-subtle whitespace-pre-line"
-          >
-            {singleDose}
-          </p>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-const InfoTab = ({ product }: ProductTabsProps) => {
-  const weight = product?.metadata?.weight as string
-  const information = (product?.metadata?.informations || "") as string
-  const parsedInformation = information.split(";")
-
-  return (
-    <div className="text-small-regular py-4">
-      <div className="flex flex-col gap-y-4">
-        {parsedInformation.map((singleInfo, index) => (
-          <p
-            key={`info_${index}`}
-            className="font-normal font-sans txt-medium text-ui-fg-subtle whitespace-pre-line"
-          >
-            {singleInfo}
-          </p>
-        ))}
-        <p className="font-normal font-sans txt-medium text-ui-fg-subtle whitespace-pre-line">
-          {weight}
-        </p>
-      </div>
     </div>
   )
 }
