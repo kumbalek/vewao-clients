@@ -9,6 +9,7 @@ import { Button, Container, Heading, Text, clx } from "@medusajs/ui"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import PaymentContainer from "@modules/checkout/components/payment-container"
 import type { HttpTypes } from "@medusajs/types"
+import { deliveryDone } from "@lib/util/shipping"
 import Divider from "@modules/common/components/divider"
 import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { useCallback, useEffect, useState, useMemo } from "react"
@@ -58,8 +59,7 @@ const Payment = ({
     filteredPaymentMethods.some(
       (method) => method.id === activeSession.provider_id
     )
-  const paymentReady =
-    activeSessionAllowed && (cart.shipping_methods?.length ?? 0) > 0
+  const paymentReady = activeSessionAllowed && deliveryDone(cart)
 
   const createQueryString = useCallback(
     (name: string, value: string) => {

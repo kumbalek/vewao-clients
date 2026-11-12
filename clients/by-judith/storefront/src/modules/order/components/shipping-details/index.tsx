@@ -1,4 +1,5 @@
 import { convertToLocale } from "@lib/util/money"
+import { cartNeedsShipping } from "@lib/util/shipping"
 import { HttpTypes } from "@medusajs/types"
 import { Heading, Text } from "@medusajs/ui"
 import { useTranslations } from "next-intl"
@@ -72,7 +73,9 @@ const ShippingDetails = ({ order }: ShippingDetailsProps) => {
                 })
                   .replace(/,/g, "")
                   .replace(/\./g, ",")})`
-              : "–"}
+              : cartNeedsShipping(order)
+                ? "–"
+                : t("byEmail")}
           </Text>
         </div>
       </div>

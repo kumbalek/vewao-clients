@@ -2,6 +2,7 @@
 
 import { RadioGroup, Radio } from "@headlessui/react"
 import { setShippingMethod } from "@lib/data/cart"
+import { cartNeedsShipping } from "@lib/util/shipping"
 import { calculatePriceForShippingOption } from "@lib/data/fulfillment"
 import { convertToLocale } from "@lib/util/money"
 import { CheckCircleSolid, Loader } from "@medusajs/icons"
@@ -429,4 +430,24 @@ const Shipping: React.FC<ShippingProps> = ({
   )
 }
 
-export default Shipping
+/** A cart of vouchers alone is delivered by e-mail: nothing to choose (#52). */
+const NoDeliveryNeeded = () => {
+  const t = useTranslations("checkout")
+  return (
+    <div className="bg-white" data-testid="delivery-not-needed">
+      <div className="flex flex-row items-center justify-between mb-6">
+        <Heading level="h2" className="flex flex-row text-3xl-regular gap-x-2 items-baseline">
+          {t("delivery")}
+          <CheckCircleSolid />
+        </Heading>
+      </div>
+      <Text className="txt-medium text-ui-fg-subtle">{t("noDeliveryNeeded")}</Text>
+      <Divider className="mt-8" />
+    </div>
+  )
+}
+
+const ShippingStep: React.FC<ShippingProps> = (props) =>
+  cartNeedsShipping(props.cart) ? <Shipping {...props} /> : <NoDeliveryNeeded />
+
+export default ShippingStep

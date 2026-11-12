@@ -9,6 +9,7 @@ import {
   paymentReturnStatus,
 } from "@lib/util/payment-methods"
 import { HttpTypes } from "@medusajs/types"
+import { cartNeedsShipping } from "@lib/util/shipping"
 import { revalidateTag } from "next/cache"
 import { redirect } from "next/navigation"
 import {
@@ -339,6 +340,7 @@ export async function submitPromotionForm(
 
 // TODO: Pass a POJO instead of a form entity here
 export async function setAddresses(currentState: unknown, formData: FormData) {
+  let updated: HttpTypes.StoreCart | undefined
   try {
     if (!formData) {
       throw new Error("No form data found when setting addresses")
@@ -380,13 +382,16 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
         province: formData.get("billing_address.province"),
         phone: formData.get("billing_address.phone"),
       }
-    await updateCart(data)
+    updated = await updateCart(data)
   } catch (e: any) {
     return e.message
   }
 
+  // Vouchers alone need no delivery: straight on to payment (#52).
   redirect(
-    `/${formData.get("shipping_address.country_code")}/checkout?step=delivery`
+    `/${formData.get("shipping_address.country_code")}/checkout?step=${
+      cartNeedsShipping(updated) ? "delivery" : "payment"
+    }`
   )
 }
 

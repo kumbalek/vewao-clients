@@ -7,6 +7,7 @@ import PaymentButton from "../payment-button"
 import { useSearchParams } from "next/navigation"
 import { useTranslations } from "next-intl"
 import { Label, Switch } from "@medusajs/ui"
+import { deliveryDone } from "@lib/util/shipping"
 import InteractiveLink from "@modules/common/components/interactive-link"
 
 const Review = ({ cart, isPickup }: { cart: any; isPickup: boolean }) => {
@@ -21,7 +22,7 @@ const Review = ({ cart, isPickup }: { cart: any; isPickup: boolean }) => {
 
   const previousStepsCompleted =
     cart.shipping_address &&
-    cart.shipping_methods.length > 0 &&
+    deliveryDone(cart) &&
     (cart.payment_collection || paidByGiftcard)
 
   return (
