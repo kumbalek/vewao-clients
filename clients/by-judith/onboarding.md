@@ -171,6 +171,42 @@ publishable key to `storefront/.env.local`. See
 admin creation, plugin rebuilds and provider limitations. A running Docker
 engine is required.
 
+## Product texts in Payload (2026-11-12)
+
+Owner direction: all product texts are edited in the CMS (vewao-clients#50).
+Medusa keeps the product itself: name, handle, price, stock, photos, variants,
+shipping properties and status. The shop's product page reads from the CMS:
+- the subtitle and description;
+- the *Doporučené dávkování*, *Složení* and *Důležité informace* tabs.
+
+An empty tab is not shown.
+
+- **Moving the texts:** Medusa's sync (vewao-platform#33, `FEATURE_PAYLOAD_SYNC`)
+  creates each product's CMS document. It fills the document once from the
+  legacy Medusa fields (`subtitle`, `description`, metadata `dose`,
+  `ingredients`, `informations`, `weight`) and publishes it. On 2026-11-12 the
+  conversion matched all 8 products word for word, run on a copy of the local
+  catalogue.
+- **Editing after the first sync:** the Medusa description and metadata are no
+  longer read. They stay in Medusa only as a rollback copy; edit texts in the
+  CMS under *Produkty*. Drafts, preview, share links and version history work
+  as for articles.
+- **Allergens:** in *Složení*, mark allergens in **bold** (EU 1169/2011, Art. 21).
+  None of the 8 current products marks any. The merchant should confirm
+  whether that is correct.
+- **What Medusa changes:** a rename in Medusa updates the document's title and
+  handle. It waits while an editor has an unpublished draft. Deleting a
+  product in Medusa deletes its texts.
+- **Fallback:** until a product has a document, or while the CMS cannot be read,
+  the page shows the legacy Medusa texts.
+
+Activation per environment:
+1. Deploy the storefront (Payload migration `product_texts`) and the platform.
+2. In the CMS, create a user with only the *Medusa (integrace)* role and enable its API key.
+3. Set `FEATURE_PAYLOAD_SYNC=true`, `PAYLOAD_SYNC_URL` and `PAYLOAD_SYNC_API_KEY`
+   in `platform.env`, then recreate the platform.
+4. Run the full sync once (`plugin-cms-sync` README) and compare the product pages.
+
 ## Order emails — Resend (2026-10-01)
 
 The platform now implements these Czech customer notifications:

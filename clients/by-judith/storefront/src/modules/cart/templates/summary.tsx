@@ -9,6 +9,7 @@ import Divider from "@modules/common/components/divider"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import GiftPackagingToggle from "@modules/cart/components/gift-packaging"
 import { HttpTypes } from "@medusajs/types"
+import { deliveryDone } from "@lib/util/shipping"
 import type { GiftPackaging } from "@lib/data/gift-packaging"
 import { useParams } from "next/navigation"
 
@@ -22,7 +23,7 @@ type SummaryProps = {
 function getCheckoutStep(cart: HttpTypes.StoreCart) {
   if (!cart?.shipping_address?.address_1 || !cart.email) {
     return "address"
-  } else if (cart?.shipping_methods?.length === 0) {
+  } else if (!deliveryDone(cart)) {
     return "delivery"
   } else {
     return "payment"

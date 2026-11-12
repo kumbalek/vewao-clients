@@ -1,5 +1,6 @@
 "use client"
 
+import { cartNeedsShipping } from "@lib/util/shipping"
 import { freeShippingTarget } from "@lib/util/free-shipping"
 import { convertToLocale } from "@lib/util/money"
 import { CheckCircleSolid, XMark } from "@medusajs/icons"
@@ -37,7 +38,8 @@ export default function ShippingPriceNudge({
 }) {
   const t = useTranslations("shipping")
 
-  if (!cart || !shippingOptions?.length) {
+  // Nothing to deliver (vouchers alone, #52): free delivery means nothing.
+  if (!cart || !shippingOptions?.length || !cartNeedsShipping(cart)) {
     return
   }
 

@@ -47,7 +47,8 @@ const cartControls = { delayMs: 0, status: 200, message: "Košík se nepodařilo
 // A product on a sale price list: Medusa's list price 1 890, sale price 1 490.
 const saleProduct = {
   id: "prod_sale", handle: "akcni-produkt", title: "Akční produkt", subtitle: "Testovací akce", description: "Popis produktu",
-  thumbnail: "/logo.webp", images: [], collection: null, collection_id: null, tags: [], type: null,
+  thumbnail: "/logo.webp", collection: null, collection_id: null, tags: [], type: null,
+  images: [{ id: "img_sale_1", url: "/logo.webp", rank: 0 }, { id: "img_sale_2", url: "/logo.webp", rank: 1 }],
   metadata: { ingredients: JSON.stringify(["Meruňka obecná (extrakt ze semene) 960 mg", "**Hořčice** setá (extrakt ze semene) 640 mg"]) },
   options: [{ id: "opt_default", title: "Default option", values: [{ id: "optval_default", value: "Default option value" }] }],
   variants: [{
@@ -119,7 +120,27 @@ function shippingFor(id) {
   const amount = itemSubtotal >= 5000 ? 0 : 150
   return { option: shippingOptions[0], amount }
 }
+// A gift voucher line (vewao-platform#25): no shipping profile, so no delivery.
+const voucherItem = () => ({
+  id: "item_voucher", variant_id: "variant_voucher", title: "Dárkový poukaz", product_title: "Dárkový poukaz", product_handle: "darkovy-poukaz",
+  subtitle: "1 000 Kč", quantity: 1, unit_price: 1000, total: 1000, original_total: 1000, is_discountable: true, requires_shipping: false,
+  thumbnail: null, variant: { id: "variant_voucher", title: "1 000 Kč", options: [] }, product: { id: "prod_voucher", handle: "darkovy-poukaz" }, metadata: {},
+})
 function cart(id) {
+  if (!carts.has(id) && id.startsWith("cart_voucher")) {
+    // cart_voucher…: vouchers alone. cart_vouchermix…: a voucher and goods, delivery not chosen yet.
+    const mixed = id.startsWith("cart_vouchermix")
+    const goods = { id: "item_test", variant_id: "variant_test", title: "Testovací produkt", product_title: "Testovací produkt", product_handle: "testovaci-produkt", quantity: 1, unit_price: 490, total: 490, original_total: 490, is_discountable: true, requires_shipping: true, thumbnail: "/logo.webp", variant: { id: "variant_test", title: "Standard", options: [] }, product: { id: "prod_test", handle: "testovaci-produkt" }, metadata: {} }
+    const items = mixed ? [voucherItem(), goods] : [voucherItem()]
+    const itemTotal = items.reduce((sum, item) => sum + item.total, 0)
+    carts.set(id, {
+      id, region_id: region.id, region, currency_code: "czk", email: "test@example.invalid", completed_at: null,
+      shipping_address: address, billing_address: address, items, shipping_methods: [],
+      total: itemTotal, subtotal: itemTotal, item_subtotal: itemTotal, item_total: itemTotal, shipping_subtotal: 0, shipping_total: 0,
+      discount_total: 0, tax_total: 0, original_total: itemTotal, promotions: [],
+      payment_collection: { id: `paycol_${id}`, payment_sessions: [] },
+    })
+  }
   if (!carts.has(id) && id.startsWith("cart_sk")) {
     // A Slovak cart: EUR, one test product at 19,90 €.
     const { option, amount } = shippingFor(id)
@@ -152,6 +173,14 @@ function cart(id) {
 function recalcCart(current) {
   current.item_subtotal = current.items.reduce((sum, item) => sum + item.total, 0)
   current.item_total = current.item_subtotal
+  if (current.items.every((item) => item.requires_shipping === false)) {
+    // Vouchers alone: no shipping method, nothing to pay for delivery.
+    Object.assign(current, { shipping_methods: [], shipping_subtotal: 0, shipping_total: 0, discount_total: 0 })
+    current.subtotal = current.item_subtotal
+    current.total = current.subtotal
+    current.original_total = current.subtotal
+    return
+  }
   const { option, amount } = shippingFor(current.id)
   current.shipping_subtotal = amount
   current.shipping_total = amount

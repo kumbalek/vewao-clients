@@ -1,7 +1,7 @@
 import Image from "next/image"
 
 import { cmsMediaUrl, listCmsNews, type CmsBlock } from "@lib/cms/client"
-import { renderLexical } from "@lib/cms/lexical"
+import CmsRichText from "./cms-rich-text"
 import { getRegion } from "@lib/data/regions"
 import { listProducts } from "@lib/data/products"
 import { ButtonLink, Container, Heading, MediaFrame, Section, Text } from "@modules/design-system"
@@ -51,7 +51,7 @@ async function CmsBlockView({ block, context }: { block: CmsBlock; context: Cont
       return (
         <Section spacing="md">
           <Container width="text" className="prose-cms flex flex-col gap-4 text-ink [&_a]:underline [&_h2]:text-2xl [&_h3]:text-xl [&_ol]:list-decimal [&_ol]:pl-6 [&_ul]:list-disc [&_ul]:pl-6">
-            {renderLexical(block.content)}
+            <CmsRichText state={block.content} />
           </Container>
         </Section>
       )

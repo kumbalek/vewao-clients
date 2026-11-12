@@ -147,6 +147,8 @@
     "billingAddress": "Fakturační adresa",
     "sameAsBilling": "Fakturační adresa je shodná s doručovací.",
     "delivery": "Doprava",
+    "noDeliveryNeeded": "Dárkové poukazy vám pošleme e-mailem hned po zaplacení, doprava není potřeba.",
+    "byEmail": "E-mailem (dárkové poukazy)",
     "contact": "Kontakt",
     "shippingMethod": "Způsob dopravy",
     "pickUpLabel": "Osobní odběr",
