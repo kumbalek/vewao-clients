@@ -16,6 +16,14 @@ export type LexicalNode = {
 
 export type LexicalState = { root: LexicalNode } | null | undefined
 
+/** An image from the CMS media collection, as an upload node carries it once populated. */
+export type LexicalMedia = { url: string; alt: string; width?: number; height?: number }
+
+export type LexicalRenderOptions = {
+  /** Renders an image, e.g. with next/image; `undefined` falls back to a plain <img>. */
+  image?: (media: LexicalMedia, key: number) => ReactNode | undefined
+}
+
 // Lexical text format bitmask, in nesting order (bold outermost).
 const FORMAT_WRAPPERS: Array<[number, string]> = [
   [1, "strong"],
@@ -34,6 +42,24 @@ const SAFE_HREF = /^(\/(?![/\\])|#|https?:\/\/|mailto:|tel:)/i
 function safeHref(url: unknown): string | null {
   if (typeof url !== "string" || !SAFE_HREF.test(url)) return null
   return url
+}
+
+// Image sources: same-origin paths or http(s) only.
+const SAFE_SRC = /^(\/(?![/\\])|https?:\/\/)/i
+
+/**
+ * The image of a Payload upload node. Only media documents count, and only once
+ * populated (read with depth >= 1): an unpopulated node holds just an ID.
+ */
+function uploadMedia(node: LexicalNode): LexicalMedia | null {
+  if (node.relationTo !== "media" || !node.value || typeof node.value !== "object") return null
+  const { url, alt, width, height } = node.value as Record<string, unknown>
+  if (typeof url !== "string" || !SAFE_SRC.test(url)) return null
+  return {
+    url,
+    alt: typeof alt === "string" ? alt : "",
+    ...(typeof width === "number" && typeof height === "number" ? { width, height } : {}),
+  }
 }
 
 function linkFields(node: LexicalNode): { url: unknown; newTab: boolean } {
@@ -60,23 +86,23 @@ function renderText(node: LexicalNode, key: number): ReactNode {
 }
 
 // Renders a list of siblings; every element gets the sibling index as its key.
-function renderSiblings(nodes: LexicalNode[] | undefined): ReactNode[] {
+function renderSiblings(nodes: LexicalNode[] | undefined, options: LexicalRenderOptions): ReactNode[] {
   const list = nodes ?? []
   const out: ReactNode[] = []
   for (let i = 0; i < list.length; i++) {
-    const rendered = renderNode(list[i], i)
+    const rendered = renderNode(list[i], i, options)
     if (rendered !== null) out.push(rendered)
   }
   return out
 }
 
-function renderNode(node: LexicalNode, key: number): ReactNode {
+function renderNode(node: LexicalNode, key: number, options: LexicalRenderOptions): ReactNode {
   switch (node.type) {
     case "root":
-      return renderSiblings(node.children)
+      return renderSiblings(node.children, options)
 
     case "paragraph": {
-      const children = renderSiblings(node.children)
+      const children = renderSiblings(node.children, options)
       // An empty paragraph renders nothing, not <p><br/></p>.
       return children.length ? h("p", { key }, children) : null
     }
@@ -85,25 +111,25 @@ function renderNode(node: LexicalNode, key: number): ReactNode {
       // The page owns the only h1, so h1 from the CMS is downgraded to h2.
       const tag =
         typeof node.tag === "string" && /^h[2-6]$/.test(node.tag) ? node.tag : "h2"
-      return h(tag, { key }, renderSiblings(node.children))
+      return h(tag, { key }, renderSiblings(node.children, options))
     }
 
     case "list": {
       const tag = node.listType === "number" ? "ol" : "ul"
-      return h(tag, { key }, renderSiblings(node.children))
+      return h(tag, { key }, renderSiblings(node.children, options))
     }
 
     case "listitem":
-      return h("li", { key }, renderSiblings(node.children))
+      return h("li", { key }, renderSiblings(node.children, options))
 
     case "quote":
-      return h("blockquote", { key }, renderSiblings(node.children))
+      return h("blockquote", { key }, renderSiblings(node.children, options))
 
     case "link":
     case "autolink": {
       const { url, newTab } = linkFields(node)
       const href = safeHref(url)
-      const children = renderSiblings(node.children)
+      const children = renderSiblings(node.children, options)
       if (href === null) return children.length ? children : null
       return h(
         "a",
@@ -125,9 +151,24 @@ function renderNode(node: LexicalNode, key: number): ReactNode {
     case "text":
       return renderText(node, key)
 
+    case "upload": {
+      const media = uploadMedia(node)
+      if (!media) return null
+      const custom = options.image?.(media, key)
+      if (custom !== undefined) return custom
+      return h("img", {
+        key,
+        src: media.url,
+        alt: media.alt,
+        ...(media.width ? { width: media.width, height: media.height } : {}),
+        loading: "lazy",
+        decoding: "async",
+      })
+    }
+
     default:
       // Unknown node type: keep its children, never throw.
-      return node.children?.length ? renderSiblings(node.children) : null
+      return node.children?.length ? renderSiblings(node.children, options) : null
   }
 }
 
@@ -144,7 +185,15 @@ export function lexicalToPlainText(state: LexicalState): string {
   return parts.join("").replace(/\s+/g, " ").trim()
 }
 
-export function renderLexical(state: LexicalState): ReactNode {
+/** Whether the state shows anything: text, or an image that would render. */
+export function lexicalHasContent(state: LexicalState): boolean {
+  if (lexicalToPlainText(state)) return true
+  const walk = (node: LexicalNode): boolean =>
+    (node.type === "upload" && uploadMedia(node) !== null) || (node.children ?? []).some(walk)
+  return Boolean(state?.root && walk(state.root))
+}
+
+export function renderLexical(state: LexicalState, options: LexicalRenderOptions = {}): ReactNode {
   if (state == null || state.root == null) return null
-  return renderNode(state.root, 0)
+  return renderNode(state.root, 0, options)
 }

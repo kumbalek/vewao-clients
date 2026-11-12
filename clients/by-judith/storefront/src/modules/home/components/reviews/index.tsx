@@ -9,7 +9,7 @@ const Reviews = () => {
     <div className="w-full relative flex flex-col items-center py-8 small:py-12">
       <div className="w-full relative content-container max-w-7xl flex gap-8 justify-between flex-col-reverse small:flex-row  py-8 small:p-16">
         <div className="small:w-1/3 max-w-96">
-          <Thumbnail thumbnail={"/dn.webp"} size="full" />
+          <Thumbnail thumbnail={"/dn.webp"} size="full" alt="Denisa Nesvačilová" />
         </div>
         <div className="flex flex-col gap-8 small:w-2/3">
           <div className="px-6 small:px-8 py-8 bg-zinc-50 rounded-[3rem] flex flex-col justify-center">

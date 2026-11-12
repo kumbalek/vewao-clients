@@ -2,7 +2,7 @@ import assert from "node:assert/strict"
 import test from "node:test"
 import { createElement, Fragment } from "react"
 import { renderToStaticMarkup } from "react-dom/server"
-import { lexicalToPlainText, renderLexical } from "../src/lib/cms/lexical.ts"
+import { lexicalHasContent, lexicalToPlainText, renderLexical } from "../src/lib/cms/lexical.ts"
 
 const markup = (state) =>
   renderToStaticMarkup(createElement(Fragment, null, renderLexical(state)))
@@ -235,4 +235,37 @@ test("plain text joins blocks and line breaks with spaces and keeps link text", 
   }
   assert.equal(lexicalToPlainText(state), "Jak jste se k nám dostala? A proč? Díky doporučení. Jedna dvě")
   assert.equal(lexicalToPlainText(null), "")
+})
+
+const upload = (value, relationTo = "media") => ({ type: "upload", relationTo, value, format: "", version: 3 })
+const doc = (...children) => ({ root: { type: "root", children } })
+const photo = { id: 7, url: "/api/media/file/foto.webp", alt: "Balení № 1 Allergy", width: 1200, height: 800 }
+
+test("images inserted in the CMS render with their alt text and size", () => {
+  assert.equal(
+    markup(doc(upload(photo))),
+    '<img src="/api/media/file/foto.webp" alt="Balení № 1 Allergy" width="1200" height="800" loading="lazy" decoding="async"/>'
+  )
+  const custom = renderToStaticMarkup(createElement(Fragment, null, renderLexical(doc(upload(photo)), {
+    image: (media, key) => createElement("figure", { key }, media.alt),
+  })))
+  assert.equal(custom, "<figure>Balení № 1 Allergy</figure>")
+  // A custom renderer may decline (e.g. no dimensions): the plain <img> applies.
+  const declined = renderToStaticMarkup(createElement(Fragment, null, renderLexical(doc(upload({ url: "/a.svg", alt: "" })), { image: () => undefined })))
+  assert.equal(declined, '<img src="/a.svg" alt="" loading="lazy" decoding="async"/>')
+})
+
+test("unpopulated, foreign or unsafe images render nothing", () => {
+  assert.equal(markup(doc(upload(7))), "")
+  assert.equal(markup(doc(upload(photo, "users"))), "")
+  assert.equal(markup(doc(upload({ ...photo, url: "javascript:alert(1)" }))), "")
+  assert.equal(markup(doc(upload({ ...photo, url: "//evil.example/x.webp" }))), "")
+})
+
+test("an image alone counts as content; text-free states do not", () => {
+  assert.equal(lexicalHasContent(doc(upload(photo))), true)
+  assert.equal(lexicalHasContent(doc(upload(7))), false)
+  assert.equal(lexicalHasContent(doc({ type: "paragraph", children: [] })), false)
+  assert.equal(lexicalHasContent(doc({ type: "paragraph", children: [{ type: "text", text: "Text", format: 0 }] })), true)
+  assert.equal(lexicalHasContent(null), false)
 })
