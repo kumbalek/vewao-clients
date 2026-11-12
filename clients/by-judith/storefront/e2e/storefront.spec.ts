@@ -280,6 +280,18 @@ test("announces a sale only against the 30-day lowest price", async ({
   await expect(page.getByTestId("product-price-discount")).toHaveCount(0)
 })
 
+test("product photos are named after the product; product thumbnails are decorative", async ({ page }) => {
+  await page.goto("/cz/products/akcni-produkt")
+  await expect(page.getByRole("img", { name: "Akční produkt – foto 1" })).toBeVisible()
+  await expect(page.getByRole("img", { name: "Akční produkt – foto 2" })).toBeAttached()
+  await expect(page.locator('img[alt="Thumbnail"], img[alt^="Product image"]')).toHaveCount(0)
+
+  await page.goto("/cz/store")
+  const card = page.getByTestId("product-wrapper").filter({ hasText: "Akční produkt" })
+  // The name is right below the photo, so the photo itself is not announced again.
+  await expect(card.locator("img").first()).toHaveAttribute("alt", "")
+})
+
 test("emphasises allergens in the ingredients list", async ({ page }) => {
   await page.goto("/cz/products/akcni-produkt")
   await page.getByRole("button", { name: "Složení" }).click()

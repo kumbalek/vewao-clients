@@ -47,7 +47,8 @@ const cartControls = { delayMs: 0, status: 200, message: "Košík se nepodařilo
 // A product on a sale price list: Medusa's list price 1 890, sale price 1 490.
 const saleProduct = {
   id: "prod_sale", handle: "akcni-produkt", title: "Akční produkt", subtitle: "Testovací akce", description: "Popis produktu",
-  thumbnail: "/logo.webp", images: [], collection: null, collection_id: null, tags: [], type: null,
+  thumbnail: "/logo.webp", collection: null, collection_id: null, tags: [], type: null,
+  images: [{ id: "img_sale_1", url: "/logo.webp", rank: 0 }, { id: "img_sale_2", url: "/logo.webp", rank: 1 }],
   metadata: { ingredients: JSON.stringify(["Meruňka obecná (extrakt ze semene) 960 mg", "**Hořčice** setá (extrakt ze semene) 640 mg"]) },
   options: [{ id: "opt_default", title: "Default option", values: [{ id: "optval_default", value: "Default option value" }] }],
   variants: [{

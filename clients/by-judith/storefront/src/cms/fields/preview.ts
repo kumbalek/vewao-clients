@@ -2,7 +2,7 @@ import type { CollectionConfig, Field } from 'payload'
 
 import { previewUrl } from '../lib/preview-url'
 
-/** Where a document is on the shop, from its slug, e.g. `/cz/magazin/<slug>`. */
+/** Where a document is on the shop, from its slug (or handle), e.g. `/cz/magazin/<slug>`. */
 type PathFor = (slug: unknown) => string
 
 /** A slug's form: lower-case words joined by hyphens. */
@@ -22,7 +22,7 @@ export const slugField = (description: string): Field => ({
 })
 
 /** A read-only link that shows the current draft to someone without an account. */
-export const shareLinkField = (pathFor: PathFor): Field => ({
+export const shareLinkField = (pathFor: PathFor, key = 'slug'): Field => ({
   name: 'shareLink',
   label: 'Odkaz pro sdílení náhledu',
   type: 'text',
@@ -33,12 +33,12 @@ export const shareLinkField = (pathFor: PathFor): Field => ({
     description: 'Platí 7 dní. Zobrazí rozpracovanou verzi bez možnosti úprav.',
   },
   hooks: {
-    afterRead: [({ data }) => (data?.slug ? previewUrl({ path: pathFor(data.slug), edit: false, ttlSeconds: 7 * 24 * 3600 }) : null)],
+    afterRead: [({ data }) => (data?.[key] ? previewUrl({ path: pathFor(data[key]), edit: false, ttlSeconds: 7 * 24 * 3600 }) : null)],
   },
 })
 
 /** Live Preview (the eye) and the Preview button open the draft with edit links. */
-export const previewAdmin = (pathFor: PathFor): Pick<NonNullable<CollectionConfig['admin']>, 'livePreview' | 'preview'> => ({
-  livePreview: { url: ({ data }) => previewUrl({ path: pathFor(data?.slug), edit: true, ttlSeconds: 3600 }) ?? '' },
-  preview: (doc) => previewUrl({ path: pathFor(doc.slug), edit: true, ttlSeconds: 3600 }),
+export const previewAdmin = (pathFor: PathFor, key = 'slug'): Pick<NonNullable<CollectionConfig['admin']>, 'livePreview' | 'preview'> => ({
+  livePreview: { url: ({ data }) => previewUrl({ path: pathFor(data?.[key]), edit: true, ttlSeconds: 3600 }) ?? '' },
+  preview: (doc) => previewUrl({ path: pathFor(doc[key]), edit: true, ttlSeconds: 3600 }),
 })

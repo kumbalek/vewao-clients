@@ -228,6 +228,8 @@ export interface Media {
   focalY?: number | null;
 }
 /**
+ * Texty produktů. Cenu, sklad, název a fotografie upravujte v administraci e-shopu (Medusa).
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "products".
  */
@@ -236,6 +238,14 @@ export interface Product {
   medusaId: string;
   handle: string;
   title: string;
+  /**
+   * Platí 7 dní. Zobrazí rozpracovanou verzi bez možnosti úprav.
+   */
+  shareLink?: string | null;
+  /**
+   * Krátký text pod názvem produktu.
+   */
+  subtitle?: string | null;
   description?: {
     root: {
       type: string;
@@ -252,6 +262,42 @@ export interface Product {
     [k: string]: unknown;
   } | null;
   dosage?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Alergeny vyznačte tučně (nařízení EU 1169/2011, čl. 21).
+   */
+  ingredients?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Upozornění, skladování, hmotnost apod.
+   */
+  information?: {
     root: {
       type: string;
       children: {
@@ -1081,8 +1127,12 @@ export interface ProductsSelect<T extends boolean = true> {
   medusaId?: T;
   handle?: T;
   title?: T;
+  shareLink?: T;
+  subtitle?: T;
   description?: T;
   dosage?: T;
+  ingredients?: T;
+  information?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
