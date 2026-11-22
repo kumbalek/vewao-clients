@@ -90,7 +90,7 @@ export default function MobileMenu({
           <div className="flex h-16 flex-none items-center justify-between border-b border-line px-6">
             <LocalizedClientLink href="/">
               <Image
-                src="/logo_gold.svg"
+                src="/logo.svg"
                 alt={t("logoAlt")}
                 width={160}
                 height={202}

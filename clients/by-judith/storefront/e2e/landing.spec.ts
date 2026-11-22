@@ -159,7 +159,7 @@ test.describe("with reduced motion", () => {
 test("the header logo is the diamond and leads home", async ({ page }) => {
   await page.goto("/cz/shop")
   const logo = page.getByRole("banner").getByRole("link", { name: "JuditH – úvodní stránka" })
-  await expect(logo.getByRole("img")).toHaveAttribute("src", "/logo_gold.svg")
+  await expect(logo.getByRole("img")).toHaveAttribute("src", "/logo.svg")
   await logo.click()
   await expect(page).toHaveURL(/\/cz$/)
   await expect(page.getByTestId("landing-hero")).toBeVisible()

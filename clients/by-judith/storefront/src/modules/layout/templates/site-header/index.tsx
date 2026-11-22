@@ -158,7 +158,7 @@ export default function SiteHeader({
             className="focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink overlay:focus-visible:outline-white"
           >
             <Image
-              src="/logo_gold.svg"
+              src="/logo.svg"
               alt={t("logoAlt")}
               width={160}
               height={202}
