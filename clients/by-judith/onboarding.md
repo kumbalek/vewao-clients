@@ -48,6 +48,14 @@ The owner confirmed the old instance's setup for launch:
   portal. Packeta stays off.
 - Payment: Comgate for every order; pay on site only with clinic pickup. Free
   PPL delivery is still paid online. No cash on delivery.
+- Comgate connections, one per currency (owner, 2026-11-22; vewao-platform#39):
+  CZK merchant 525121 for region CZ (`pp_comgate_comgate`), EUR merchant 525122
+  for region Slovensko (`pp_comgate_eur`). Each connection's return URLs are
+  `https://<shop>/<cz|sk>/checkout/payment-return?id=${id}&refId=${refId}` (paid,
+  cancelled and pending alike) and its PUSH URL is
+  `https://<api>/hooks/payment/comgate_comgate` or `…/comgate_eur`. Passwords
+  live only in the server's `platform.env`. The portal's Checkout IDs belong to
+  Comgate's embedded Checkout SDK, which the redirect integration does not use.
 - Enforced in the storefront and at cart completion
   (`FEATURE_PAY_ON_SITE_PICKUP_ONLY`). `seed/` sets this up on local/dev.
 
