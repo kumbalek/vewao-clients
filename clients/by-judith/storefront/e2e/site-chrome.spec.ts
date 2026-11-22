@@ -89,6 +89,49 @@ test("the desktop header offers the wireframe navigation", async ({ page, isMobi
   await expect(shop).toHaveAttribute("aria-expanded", "false")
 })
 
+test("the desktop Shop menu lists the categories, with DP Dermaceuticals' subcategories", async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, "desktop layout")
+  await page.goto("/cz")
+  const header = page.getByRole("banner")
+  const shop = header.getByRole("navigation", { name: "Hlavní navigace" }).getByRole("button", { name: "Shop" })
+  await waitForHydration(page, shop)
+  await shop.hover()
+  await expect(shop).toHaveAttribute("aria-expanded", "true")
+
+  await expect(header.getByRole("link", { name: "Herbs", exact: true })).toHaveAttribute("href", "/cz/categories/herbs")
+  await expect(header.getByRole("link", { name: "TCM", exact: true })).toHaveAttribute("href", "/cz/categories/tcm")
+  const dp = header.getByRole("list", { name: "DP Dermaceuticals" })
+  // Admin order (rank), not the order the API returns them in.
+  await expect(dp.getByRole("link")).toHaveText(["Čištění a exfoliace", "DP Masky"])
+  await expect(dp.getByRole("link", { name: "DP Masky" })).toHaveAttribute("href", "/cz/categories/dp-masky")
+})
+
+test("the mobile Shop menu lists the categories, with DP Dermaceuticals' subcategories", async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(!isMobile, "mobile layout")
+  await page.goto("/cz")
+  const open = page.getByRole("button", { name: "Otevřít menu" })
+  await waitForHydration(page, open)
+  await open.click()
+  const menu = page.getByRole("dialog", { name: "Menu" })
+  await menu.getByText("Shop", { exact: true }).click()
+
+  await expect(menu.getByRole("link", { name: "Herbs", exact: true })).toHaveAttribute("href", "/cz/categories/herbs")
+  await expect(menu.getByRole("link", { name: "DP Dermaceuticals", exact: true })).toHaveAttribute(
+    "href",
+    "/cz/categories/dp-dermaceuticals"
+  )
+  await expect(menu.getByRole("list", { name: "DP Dermaceuticals" }).getByRole("link")).toHaveText([
+    "Čištění a exfoliace",
+    "DP Masky",
+  ])
+})
+
 test("the mobile header opens a full-screen menu", async ({ page, isMobile }) => {
   test.skip(!isMobile, "mobile layout")
   await page.goto("/cz")
@@ -171,6 +214,9 @@ test("the footer shows the real contact details and marks missing content", asyn
   )
   // The test build enables analytics, so the consent settings are offered.
   await expect(footer.getByRole("button", { name: "Nastavení cookies" })).toBeVisible()
+  // The top-level categories, not their subcategories.
+  await expect(footer.getByRole("link", { name: "Herbs", exact: true })).toHaveAttribute("href", "/cz/categories/herbs")
+  await expect(footer.getByRole("link", { name: "DP Masky" })).toHaveCount(0)
   await expect(footer.getByRole("link", { name: "Doprava a platba" })).toHaveAttribute(
     "href",
     "/cz/content/shipping-and-payment"

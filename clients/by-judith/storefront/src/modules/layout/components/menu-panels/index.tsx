@@ -1,11 +1,10 @@
 import { useTranslations } from "next-intl"
 
 import type { ProcedureCategory } from "content/site"
+import type { MenuCategory } from "@lib/util/menu-categories"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { CopyText, Placeholder } from "@modules/common/components/placeholder"
 import { ArrowLink, Container, Text } from "@modules/design-system"
-
-export type MenuCollection = { id: string; handle: string; title: string }
 
 const pillClasses =
   "block rounded-full border border-line bg-white px-4 py-2 text-sm text-ink transition-colors hover:bg-surface-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink overlay:border-white/30 overlay:bg-transparent overlay:text-white overlay:hover:bg-white/10 overlay:focus-visible:outline-white"
@@ -89,8 +88,8 @@ export function ProceduresPanel({ categories }: { categories: ProcedureCategory[
   )
 }
 
-/** The e-shop's front page, its collections from the catalogue and the full product list. */
-export function ShopPanel({ collections }: { collections: MenuCollection[] }) {
+/** The e-shop's front page, its categories with their subcategories, and the full product list. */
+export function ShopPanel({ categories }: { categories: MenuCategory[] }) {
   const t = useTranslations("layout")
 
   return (
@@ -98,7 +97,7 @@ export function ShopPanel({ collections }: { collections: MenuCollection[] }) {
       <ArrowLink href="/shop" className={`text-sm ${overlayArrow}`}>
         {t("shopHome")}
       </ArrowLink>
-      {collections.length > 0 && (
+      {categories.length > 0 && (
         <>
           <Text
             as="span"
@@ -106,20 +105,40 @@ export function ShopPanel({ collections }: { collections: MenuCollection[] }) {
             tone="subtle"
             className={`uppercase tracking-widest ${overlayLabel}`}
           >
-            {t("collections")}
+            {t("categories")}
           </Text>
           <ul className="flex flex-wrap gap-2">
-            {collections.map((collection) => (
-              <li key={collection.id}>
-                <LocalizedClientLink
-                  href={`/collections/${collection.handle}`}
-                  className={pillClasses}
-                >
-                  {collection.title}
+            {categories.map((category) => (
+              <li key={category.id}>
+                <LocalizedClientLink href={`/categories/${category.handle}`} className={pillClasses}>
+                  {category.title}
                 </LocalizedClientLink>
               </li>
             ))}
           </ul>
+          {categories
+            .filter((category) => category.children.length > 0)
+            .map((category) => (
+              <div key={category.id} className="flex flex-col gap-1">
+                <Text
+                  as="span"
+                  size="xs"
+                  tone="subtle"
+                  className={`uppercase tracking-widest ${overlayLabel}`}
+                >
+                  {category.title}
+                </Text>
+                <ul aria-label={category.title} className="flex flex-wrap gap-x-4">
+                  {category.children.map((child) => (
+                    <li key={child.id}>
+                      <LocalizedClientLink href={`/categories/${child.handle}`} className={subLinkClasses}>
+                        {child.title}
+                      </LocalizedClientLink>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
         </>
       )}
       <ArrowLink href="/store" className={`text-sm ${overlayArrow}`}>

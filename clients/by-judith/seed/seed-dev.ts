@@ -2,6 +2,8 @@ import Medusa from "@medusajs/js-sdk"
 import type { HttpTypes } from "@medusajs/types"
 import { readFileSync } from "node:fs"
 
+import { eurPriceFor, HERB_EUR_PRICES } from "./pricing.ts"
+
 /**
  * Local/dev seed for By Judith: clinic pickup, PPL delivery, the legacy
  * catalogue snapshot and dev stock, created through the Admin API. Slovakia
@@ -49,13 +51,12 @@ const SALES_CHANNEL = process.env.SEED_SALES_CHANNEL ?? "Local storefront"
 const DEV_STOCK = 100
 const FREE_DELIVERY_FROM = 5000
 
-// Slovakia pays in EUR (owner decision 2026-11-06, vewao-clients#45). The EUR
-// amounts below are DEV PLACEHOLDERS until the merchant sets real ones.
+// Slovakia pays in EUR (owner decision 2026-11-06, vewao-clients#45). Herb
+// prices are the owner's (pricing.ts, 2026-11-22); the delivery amounts below
+// and other products' EUR prices are DEV PLACEHOLDERS until the merchant sets them.
 const EUR = { currency: "eur", country: "sk", region: "Slovensko" }
 const FREE_DELIVERY_FROM_EUR = 200
 const PPL_SK_EUR = 8
-/** Placeholder EUR price: CZK at 25 Kč/€, up to a whole euro, minus 10 cents (1 890 Kč → 75,90 €). */
-const devEurPrice = (czk: number) => Math.ceil(czk / 25) - 0.1
 const DEFAULT_OPTION = { title: "Default option", value: "Default option value" }
 
 const LOCATION = {
@@ -424,7 +425,7 @@ async function ensureProducts(
           options: { [DEFAULT_OPTION.title]: DEFAULT_OPTION.value },
           prices: [
             { currency_code: CURRENCY, amount: p.variant.price_czk },
-            { currency_code: EUR.currency, amount: devEurPrice(p.variant.price_czk) },
+            { currency_code: EUR.currency, amount: eurPriceFor(p.collection, p.variant.price_czk) },
           ],
         },
       ],
@@ -433,7 +434,7 @@ async function ensureProducts(
   }
 }
 
-/** An EUR price (dev placeholder) on every catalogue variant that has none. */
+/** An EUR price on every catalogue variant that has none: the owner's for herbs, else a placeholder. */
 async function ensureEurPrices(catalogue: Catalogue) {
   for (const p of catalogue.products) {
     const { products } = await sdk.admin.product.list({
@@ -451,7 +452,7 @@ async function ensureEurPrices(catalogue: Catalogue) {
     }
     // From the variant's current CZK price: admin edits since the snapshot count.
     const czk = prices.find((price) => price.currency_code === CURRENCY)?.amount ?? p.variant.price_czk
-    const amount = devEurPrice(czk)
+    const amount = eurPriceFor(p.collection, czk)
     // A variant's prices are replaced as a set: keep the existing ones.
     await sdk.admin.product.updateVariant(products[0].id, variant.id, {
       prices: [
@@ -459,7 +460,8 @@ async function ensureEurPrices(catalogue: Catalogue) {
         { currency_code: EUR.currency, amount },
       ],
     })
-    log("created", `EUR price for SKU ${p.variant.sku}: ${amount} € (placeholder)`)
+    const kind = p.collection && p.collection in HERB_EUR_PRICES ? "owner" : "placeholder"
+    log("created", `EUR price for SKU ${p.variant.sku}: ${amount} € (${kind})`)
   }
 }
 

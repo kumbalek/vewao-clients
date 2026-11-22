@@ -2,7 +2,7 @@ import { Metadata } from "next"
 
 import { listCartOptions, retrieveCart } from "@lib/data/cart"
 import { listProcedureMenu } from "@lib/data/procedures"
-import { listCollections } from "@lib/data/collections"
+import { listMenuCategories } from "@lib/data/categories"
 import { retrieveCustomer } from "@lib/data/customer"
 import { listRegions } from "@lib/data/regions"
 import { isShopOnly } from "@lib/site-mode"
@@ -34,12 +34,9 @@ export default async function PageLayout(props: {
     shippingOptions = shipping_options
   }
 
-  // Navigation must not take a page down with it; without collections the
+  // Navigation must not take a page down with it; without categories the
   // menus still offer the full product list.
-  const { collections } = await listCollections({ fields: "id,handle,title" }).catch(
-    () => ({ collections: [] })
-  )
-  const menuCollections = collections.map(({ id, handle, title }) => ({ id, handle, title }))
+  const shopCategories = await listMenuCategories().catch(() => [])
   // While only the e-shop is live (#47), the clinic's menu is not shown or read.
   const shopOnly = isShopOnly()
   const procedureMenu = shopOnly ? [] : await listProcedureMenu().catch(() => [])
@@ -55,7 +52,7 @@ export default async function PageLayout(props: {
         currencyCode={currencyCode}
         regionOptions={regionOptions(regions, deliveryCountries)}
         cart={cart}
-        collections={menuCollections}
+        shopCategories={shopCategories}
         procedureMenu={procedureMenu}
         shopOnly={shopOnly}
       />
@@ -71,7 +68,7 @@ export default async function PageLayout(props: {
         />
       )}
       <main id="main">{props.children}</main>
-      <SiteFooter collections={menuCollections} shopOnly={shopOnly} />
+      <SiteFooter shopCategories={shopCategories} shopOnly={shopOnly} />
     </>
   )
 }

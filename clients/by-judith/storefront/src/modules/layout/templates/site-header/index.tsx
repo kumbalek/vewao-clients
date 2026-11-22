@@ -2,6 +2,8 @@ import { HttpTypes } from "@medusajs/types"
 import Image from "next/image"
 import { useTranslations } from "next-intl"
 
+import type { MenuCategory } from "@lib/util/menu-categories"
+
 import {
   bookingPath,
   isFullSitePath,
@@ -21,7 +23,6 @@ import HeaderShell from "@modules/layout/components/header-shell"
 import {
   ProceduresPanel,
   ShopPanel,
-  type MenuCollection,
 } from "@modules/layout/components/menu-panels"
 import MobileMenu from "@modules/layout/components/mobile-menu"
 import type { RegionOption } from "@lib/util/region-options"
@@ -50,7 +51,7 @@ export default function SiteHeader({
   currencyCode,
   regionOptions,
   cart,
-  collections,
+  shopCategories,
   procedureMenu,
   shopOnly = false,
 }: {
@@ -60,7 +61,8 @@ export default function SiteHeader({
   /** Delivery countries to switch between (Česko, Slovensko). */
   regionOptions: RegionOption[]
   cart: HttpTypes.StoreCart | null
-  collections: MenuCollection[]
+  /** The shop's product categories with their subcategories. */
+  shopCategories: MenuCategory[]
   procedureMenu: ProcedureCategory[]
   /** The e-shop alone (SITE_MODE=shop, #47): no clinic menu, booking or full-site links. */
   shopOnly?: boolean
@@ -116,7 +118,7 @@ export default function SiteHeader({
               <MobileMenu
                 countryCode={countryCode}
                 categories={procedureMenu}
-                collections={collections}
+                shopCategories={shopCategories}
                 links={links}
                 cartCount={cartCount}
                 bookingPath={bookingPath}
@@ -134,7 +136,7 @@ export default function SiteHeader({
                 </HeaderMenu>
               )}
               <HeaderMenu label={t("shop")}>
-                <ShopPanel collections={collections} />
+                <ShopPanel categories={shopCategories} />
               </HeaderMenu>
               {links.map((link) =>
                 link.href ? (

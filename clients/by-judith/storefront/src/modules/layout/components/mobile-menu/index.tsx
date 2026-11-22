@@ -12,7 +12,7 @@ import { ButtonLink } from "@modules/design-system"
 import type { RegionOption } from "@lib/util/region-options"
 import RegionSwitch from "@modules/layout/components/region-switch"
 import { ChevronIcon, CloseIcon, MenuIcon } from "@modules/design-system/components/icons"
-import type { MenuCollection } from "@modules/layout/components/menu-panels"
+import type { MenuCategory } from "@lib/util/menu-categories"
 import SearchForm from "@modules/layout/components/search-form"
 
 const rowClasses = "flex w-full items-center justify-between py-4 text-lg text-ink"
@@ -36,7 +36,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 export default function MobileMenu({
   countryCode,
   categories,
-  collections,
+  shopCategories,
   links,
   cartCount,
   bookingPath,
@@ -45,7 +45,8 @@ export default function MobileMenu({
 }: {
   countryCode: string
   categories: ProcedureCategory[]
-  collections: MenuCollection[]
+  /** The shop's product categories with their subcategories. */
+  shopCategories: MenuCategory[]
   links: NavLink[]
   cartCount: number
   bookingPath: string
@@ -167,14 +168,25 @@ export default function MobileMenu({
                           {t("allProducts")}
                         </LocalizedClientLink>
                       </li>
-                      {collections.map((collection) => (
-                        <li key={collection.id}>
+                      {shopCategories.map((category) => (
+                        <li key={category.id}>
                           <LocalizedClientLink
-                            href={`/collections/${collection.handle}`}
+                            href={`/categories/${category.handle}`}
                             className={subLinkClasses}
                           >
-                            {collection.title}
+                            {category.title}
                           </LocalizedClientLink>
+                          {category.children.length > 0 && (
+                            <ul aria-label={category.title} className="border-l border-line pl-4">
+                              {category.children.map((child) => (
+                                <li key={child.id}>
+                                  <LocalizedClientLink href={`/categories/${child.handle}`} className={subLinkClasses}>
+                                    {child.title}
+                                  </LocalizedClientLink>
+                                </li>
+                              ))}
+                            </ul>
+                          )}
                         </li>
                       ))}
                     </ul>

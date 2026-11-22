@@ -8,7 +8,7 @@ import { CookieSettingsButton } from "@modules/common/components/cookie-consent"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { CopyText, Placeholder } from "@modules/common/components/placeholder"
 import { Container, Heading, Text } from "@modules/design-system"
-import type { MenuCollection } from "@modules/layout/components/menu-panels"
+import type { MenuCategory } from "@lib/util/menu-categories"
 
 const linkClasses =
   "hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
@@ -39,10 +39,11 @@ function Column({
 
 /** Global footer (wireframe 00 · D). */
 export default function SiteFooter({
-  collections,
+  shopCategories,
   shopOnly = false,
 }: {
-  collections: MenuCollection[]
+  /** The shop's product categories; the footer links the top level. */
+  shopCategories: MenuCategory[]
   /** The e-shop alone (SITE_MODE=shop, #47): no links to the full site's pages. */
   shopOnly?: boolean
 }) {
@@ -50,7 +51,7 @@ export default function SiteFooter({
 
   const allLinks = [
     { label: t("allProducts"), href: "/store" },
-    ...collections.slice(0, 3).map((c) => ({ label: c.title, href: `/collections/${c.handle}` })),
+    ...shopCategories.map((c) => ({ label: c.title, href: `/categories/${c.handle}` })),
     { label: t("magazin"), href: "/magazin" },
     { label: t("about"), href: "/o-nas" },
     { label: t("customerService"), href: "/content/customer-service" },
