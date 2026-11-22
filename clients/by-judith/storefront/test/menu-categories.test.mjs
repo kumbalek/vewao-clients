@@ -1,7 +1,7 @@
 import assert from "node:assert/strict"
 import test from "node:test"
 
-import { categoryImage, menuCategories } from "../src/lib/util/menu-categories.ts"
+import { categoryCta, categoryImage, menuCategories } from "../src/lib/util/menu-categories.ts"
 
 const category = (id, name, rank, parent = null) => ({
   id,
@@ -60,4 +60,29 @@ test("only http(s) URLs and site paths count as images", () => {
   }
   assert.equal(categoryImage(null), null)
   assert.equal(categoryImage({}), null)
+})
+
+test("a category's call to action needs a label and a URL; a path drops its country code", () => {
+  assert.deepEqual(categoryCta({ cta_label: " Objednat ", cta_url: "/kontakt" }), { label: "Objednat", href: "/kontakt", external: false })
+  assert.deepEqual(categoryCta({ cta_label: "Objednat", cta_url: "/cz/kontakt" }), { label: "Objednat", href: "/kontakt", external: false })
+  assert.deepEqual(categoryCta({ cta_label: "Objednat", cta_url: "/SK" }), { label: "Objednat", href: "/", external: false })
+  assert.deepEqual(categoryCta({ cta_label: "Objednat", cta_url: "/czech-herbs" }), { label: "Objednat", href: "/czech-herbs", external: false })
+  assert.deepEqual(categoryCta({ cta_label: "Rezervovat", cta_url: "https://booking.example/judith" }), {
+    label: "Rezervovat",
+    href: "https://booking.example/judith",
+    external: true,
+  })
+  for (const metadata of [
+    null,
+    {},
+    { cta_label: "Objednat" },
+    { cta_url: "/kontakt" },
+    { cta_label: "  ", cta_url: "/kontakt" },
+    { cta_label: "Objednat", cta_url: "javascript:alert(1)" },
+    { cta_label: "Objednat", cta_url: "//evil.example" },
+    { cta_label: "Objednat", cta_url: "kontakt" },
+    { cta_label: 5, cta_url: "/kontakt" },
+  ]) {
+    assert.equal(categoryCta(metadata), null, JSON.stringify(metadata))
+  }
 })

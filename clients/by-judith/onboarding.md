@@ -66,7 +66,12 @@ The owner confirmed the old instance's setup for launch:
   category:
   - the subtitle is the **Description**;
   - the image is a URL under **Metadata**, key `image` (https://… or a path
-    such as /static/…). Subcategories show their image and name only.
+    such as /static/…). Admin shows the URL, not the picture. Subcategories
+    show their image and name in the menu; the category page lists them as
+    boxes with their subtitles;
+  - the category page's button is **Metadata** `cta_label` (its text) and
+    `cta_url` (https://… or a shop path such as /content/shipping-and-payment,
+    without /cz). Without both there is no button.
   The logo leads to the e-shop's front page; the menu lists only the categories.
 - Admin changes to products, prices, stock, categories, regions and payment or
   shipping options appear in the shop within about a minute (#65). The shop

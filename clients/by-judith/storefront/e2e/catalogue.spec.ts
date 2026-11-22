@@ -49,6 +49,32 @@ test("a category's subcategory boxes stack on a phone and sit in a row on a larg
   }
 })
 
+test("a category page shows its call to action beside the title and subtitle", async ({ page, isMobile }) => {
+  await page.goto("/cz/categories/herbs")
+
+  const title = page.getByTestId("category-page-title")
+  const subtitle = page.getByTestId("category-description")
+  const cta = page.getByTestId("category-cta")
+  await expect(cta).toHaveText("Objednat konzultaci")
+  await expect(cta).toHaveAttribute("href", "/cz/kontakt")
+  // The title is 15 % above text-2xl (24 px), the subtitle close under it.
+  expect(await title.evaluate((el) => parseFloat(getComputedStyle(el).fontSize))).toBeCloseTo(27.6, 0)
+  const [t, s, c] = await Promise.all([title.boundingBox(), subtitle.boundingBox(), cta.boundingBox()])
+  expect(s!.y - (t!.y + t!.height)).toBeLessThanOrEqual(12)
+  if (isMobile) {
+    expect(c!.y).toBeGreaterThanOrEqual(s!.y + s!.height)
+  } else {
+    expect(c!.x).toBeGreaterThan(Math.max(t!.x + t!.width, s!.x + s!.width))
+    expect(c!.y).toBeLessThan(s!.y + s!.height)
+    expect(c!.y + c!.height).toBeGreaterThan(t!.y)
+  }
+
+  // A category without one has no button.
+  await page.goto("/cz/categories/dp-dermaceuticals")
+  await expect(page.getByTestId("category-page-title")).toHaveText("DP Dermaceuticals")
+  await expect(page.getByTestId("category-cta")).toHaveCount(0)
+})
+
 test("a product's breadcrumb is its category path", async ({ page }) => {
   await page.goto("/cz/products/akcni-produkt")
 
