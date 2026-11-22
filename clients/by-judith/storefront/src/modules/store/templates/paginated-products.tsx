@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server"
 
-import { listProductsWithSort } from "@lib/data/products"
+import { listProductsWithSort, searchProducts } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
 import { ArrowLink, Text } from "@modules/design-system"
 import ProductPreview from "@modules/products/components/product-preview"
@@ -22,6 +22,7 @@ export default async function PaginatedProducts({
   sortBy,
   page,
   query,
+  searchCategoryIds = [],
   categoryIds,
   productsIds,
   countryCode,
@@ -30,6 +31,8 @@ export default async function PaginatedProducts({
   page: number
   /** Full-text product search, passed to Medusa as `q`. */
   query?: string
+  /** Categories whose names match the search: their products join the results. */
+  searchCategoryIds?: string[]
   /** A category and its subcategories: products in any of them. */
   categoryIds?: string[]
   productsIds?: string[]
@@ -63,12 +66,14 @@ export default async function PaginatedProducts({
 
   let {
     response: { products, count },
-  } = await listProductsWithSort({
-    page,
-    queryParams,
-    sortBy,
-    countryCode,
-  })
+  } = query
+    ? await searchProducts({ query, categoryIds: searchCategoryIds, page, sortBy, countryCode, limit: PRODUCT_LIMIT })
+    : await listProductsWithSort({
+        page,
+        queryParams,
+        sortBy,
+        countryCode,
+      })
 
   const totalPages = Math.ceil(count / PRODUCT_LIMIT)
 

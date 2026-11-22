@@ -5,6 +5,8 @@ import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-g
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import Breadcrumbs from "@modules/common/components/breadcrumbs"
 import type { MenuCategory } from "@lib/util/menu-categories"
+import { searchCategories } from "@lib/util/category-search"
+import CategoryBox from "@modules/layout/components/category-box"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 import PaginatedProducts from "./paginated-products"
@@ -27,6 +29,8 @@ const StoreTemplate = ({
   const sort = sortBy || "created_at"
   const t = useTranslations("product")
   const tSearch = useTranslations("search")
+  // Category names are searched too (vewao-clients#70).
+  const found = query ? searchCategories(categories, query) : null
 
   return (
     <div
@@ -65,11 +69,31 @@ const StoreTemplate = ({
             </div>
           )}
         </div>
+        {!!found?.matches.length && (
+          <ul
+            data-testid="search-categories"
+            aria-label={tSearch("categories")}
+            className="mb-8 grid grid-cols-1 gap-3 small:grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] small:gap-4"
+          >
+            {found.matches.map((category) => (
+              <li key={category.id}>
+                <CategoryBox
+                  href={`/categories/${category.handle}`}
+                  title={category.title}
+                  subtitle={category.subtitle}
+                  image={category.image}
+                  className="h-full"
+                />
+              </li>
+            ))}
+          </ul>
+        )}
         <Suspense fallback={<SkeletonProductGrid />}>
           <PaginatedProducts
             sortBy={sort}
             page={pageNumber}
             query={query}
+            searchCategoryIds={found?.ids}
             countryCode={countryCode}
           />
         </Suspense>

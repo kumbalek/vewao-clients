@@ -334,7 +334,8 @@
   "search": {
     "title": "Výsledky hledání „{query}“",
     "empty": "Pro „{query}“ jsme nic nenašli. Zkuste jiné slovo nebo si prohlédněte všechny produkty.",
-    "browseShop": "Prohlédnout e-shop"
+    "browseShop": "Prohlédnout e-shop",
+    "categories": "Nalezené kategorie"
   },
   "account": {
     "title": "Můj účet",

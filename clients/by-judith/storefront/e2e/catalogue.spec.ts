@@ -156,3 +156,16 @@ test("a price changed in admin reaches the product page within the cache window"
     )
     .toContain("59,90 €")
 })
+
+// Category names are searched too (vewao-clients#70): the category appears as a
+// box above the results, and its products, with its subcategories', join them.
+test("searching a category's name finds the category and its products", async ({ page }) => {
+  await page.goto("/cz/store?q=gold%20edition")
+  const found = page.getByTestId("search-categories")
+  await expect(found.getByRole("link", { name: /^Gold Edition/ })).toHaveAttribute("href", "/cz/categories/gold-edition")
+  await expect(page.getByTestId("products-list")).toContainText("Akční produkt")
+
+  // Diacritics do not matter.
+  await page.goto("/cz/store?q=cisteni")
+  await expect(page.getByTestId("search-categories").getByRole("link", { name: /^Čištění a exfoliace/ })).toBeVisible()
+})
