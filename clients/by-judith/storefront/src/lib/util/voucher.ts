@@ -13,6 +13,17 @@ export function productVoucherTitle(product: ProductLike | null | undefined): st
   return product?.type?.value === VOUCHER_PRODUCT_TYPE ? product.title?.trim() || null : null
 }
 
+/**
+ * Several variants at once (owner, 2026-11-22): a voucher whose variants differ
+ * in one option, such as Ultherapy's areas. Each chosen variant is its own
+ * cart line, so its own voucher.
+ */
+export function allowsSeveralVariants(
+  product: (ProductLike & { options?: unknown[] | null; variants?: unknown[] | null }) | null | undefined
+): boolean {
+  return productVoucherTitle(product) !== null && product?.options?.length === 1 && (product.variants?.length ?? 0) > 1
+}
+
 /** The same for a cart or order line, from its product snapshot. */
 export function itemVoucherTitle(item: LineItemLike | null | undefined): string | null {
   return item?.product_type === VOUCHER_PRODUCT_TYPE ? (item.product_title ?? item.title)?.trim() || null : null

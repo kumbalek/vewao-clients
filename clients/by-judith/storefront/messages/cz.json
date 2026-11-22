@@ -94,7 +94,8 @@
     "goToCheckout": "Přejít k objednávce",
     "shipping": "Doprava",
     "discount": "Sleva",
-    "backToTheShop": "Zpátky do obchodu"
+    "backToTheShop": "Zpátky do obchodu",
+    "addToCartCount": "Přidat do košíku ({count})"
   },
   "signIn": {
     "title": "Zeregistrujte se",
@@ -237,7 +238,8 @@
     "collection": "Kolekce",
     "referencePrice": "Nejnižší cena za 30 dní před slevou:",
     "voucher": "Dárkový poukaz",
-    "selectOption": "Vyberte {option}"
+    "selectOption": "Vyberte {option}",
+    "severalAllowed": "lze vybrat více"
   },
   "payment": {
     "title": "Zpracováváme vaši platbu. Vyčkejte prosím."

@@ -546,6 +546,21 @@ const server = createServer(async (req, res) => {
       recalcCart(current)
       return send({ cart: current })
     }
+    // An Ultherapy area: each one its own voucher line (vewao-clients#70).
+    const area = partieProduct.variants.find((v) => v.id === data.variant_id)
+    if (area) {
+      const amount = area.calculated_price.calculated_amount
+      if (!current.items.some((item) => item.variant_id === area.id)) {
+        current.items.push({
+          id: `item_${area.id}`, variant_id: area.id, title: area.title, product_title: partieProduct.title, product_handle: partieProduct.handle,
+          product_type: "Dárkový poukaz", subtitle: area.title, quantity: 1, unit_price: amount, total: amount, original_total: amount,
+          is_discountable: true, requires_shipping: false, thumbnail: partieProduct.thumbnail,
+          variant: { id: area.id, title: area.title, options: area.options }, product: { id: partieProduct.id, handle: partieProduct.handle }, metadata: {},
+        })
+      }
+      recalcCart(current)
+      return send({ cart: current })
+    }
     if (data.variant_id !== "variant_sale") {
       return send({ type: "invalid_data", message: "Variantu se nepodařilo najít." }, 404)
     }
