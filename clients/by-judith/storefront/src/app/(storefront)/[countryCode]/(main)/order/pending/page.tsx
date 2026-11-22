@@ -22,8 +22,9 @@ export default async function OrderPendingPage(props: Props) {
   const t = await getTranslations("confirm")
   const { countryCode } = await props.params
   const { cart } = await props.searchParams
-  // Without the cart cookie the storefront cannot check the payment; the
-  // gateway webhook still completes a paid order and the email confirms it.
+  // Without the cart cookie (another browser, cleared cookies) the storefront
+  // cannot check the payment. The gateway's webhook still completes a paid
+  // order and the e-mail confirms it, so the page claims neither outcome.
   const cartKnown = cart !== "missing"
 
   return (
@@ -37,18 +38,20 @@ export default async function OrderPendingPage(props: Props) {
             level="h1"
             className="flex flex-col gap-y-3 text-ui-fg-base text-3xl mb-4"
           >
-            {t("pendingTitle")}
+            {cartKnown ? t("pendingTitle") : t("pendingUnknown")}
           </Heading>
-          <p>{cartKnown ? t("pendingSentToEmail") : t("pendingUnknown")}</p>
           {cartKnown && (
-            // A plain link: prefetching this route would re-run completion.
-            <a
-              href={`/${countryCode}/checkout/payment-return`}
-              className="w-fit underline text-ui-fg-interactive hover:text-ui-fg-interactive-hover"
-              data-testid="check-payment-link"
-            >
-              {t("checkPayment")}
-            </a>
+            <>
+              <p>{t("pendingSentToEmail")}</p>
+              {/* A plain link: prefetching this route would re-run completion. */}
+              <a
+                href={`/${countryCode}/checkout/payment-return`}
+                className="w-fit underline text-ui-fg-interactive hover:text-ui-fg-interactive-hover"
+                data-testid="check-payment-link"
+              >
+                {t("checkPayment")}
+              </a>
+            </>
           )}
           <Help />
         </div>
