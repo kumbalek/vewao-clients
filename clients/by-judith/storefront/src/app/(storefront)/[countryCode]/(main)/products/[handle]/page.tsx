@@ -1,6 +1,7 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
-import { listProducts, PRODUCT_LIST_FIELDS } from "@lib/data/products"
+import { listProducts } from "@lib/data/products"
+import { PRODUCT_LIST_FIELDS } from "@lib/util/product-fields"
 import { getRegion, listRegions } from "@lib/data/regions"
 import ProductTemplate from "@modules/products/templates"
 import { GIFT_PACKAGING_HANDLE } from "@lib/util/gift-packaging"

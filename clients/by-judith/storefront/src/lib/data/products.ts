@@ -6,9 +6,7 @@ import { HttpTypes } from "@medusajs/types"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import { getAuthHeaders, getCacheOptions } from "./cookies"
 import { getRegion, retrieveRegion } from "./regions"
-
-/** What product listings read; a caller's `fields` replaces it, so extend this rather than restate it. */
-export const PRODUCT_LIST_FIELDS = "*variants.calculated_price,+variants.inventory_quantity,+metadata,+tags"
+import { PRODUCT_LIST_FIELDS } from "@lib/util/product-fields"
 
 export const listProducts = async ({
   pageParam = 1,
