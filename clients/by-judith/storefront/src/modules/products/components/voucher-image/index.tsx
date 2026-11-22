@@ -8,8 +8,9 @@ import React from "react"
 const CARD_RATIO = "2480 / 1748"
 const TEXT_AREA: React.CSSProperties = { left: "37%", right: "8%", top: "29%", bottom: "15%" }
 
-// A printed card lying slightly turned towards the viewer.
-const TILT = "perspective(1400px) rotateX(6deg) rotateY(-10deg) rotate(-3deg)"
+// A printed card turned towards the viewer: mostly around its vertical axis,
+// so its left edge is nearer, a little around Z, hardly around X (owner, 2026-11-22).
+const TILT = "perspective(1000px) rotateX(2deg) rotateY(-20deg) rotate(-5deg)"
 // Drawn around the card's own outline, after the tilt: a contact shadow and a soft one.
 const SHADOW = "drop-shadow(0 2px 3px rgb(64 44 20 / 0.14)) drop-shadow(0 16px 24px rgb(64 44 20 / 0.18))"
 
