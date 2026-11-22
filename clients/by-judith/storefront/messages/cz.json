@@ -268,7 +268,6 @@
     "shop": "Shop",
     "collections": "Kolekce",
     "showSubcategories": "Zobrazit podkategorie: {category}",
-    "allProducts": "Všechny produkty",
     "showMore": "Zobrazit více",
     "book": "Rezervovat",
     "search": "Hledat",
@@ -334,7 +333,8 @@
   },
   "search": {
     "title": "Výsledky hledání „{query}“",
-    "empty": "Pro „{query}“ jsme nic nenašli. Zkuste jiné slovo nebo si prohlédněte všechny produkty."
+    "empty": "Pro „{query}“ jsme nic nenašli. Zkuste jiné slovo nebo si prohlédněte všechny produkty.",
+    "browseShop": "Prohlédnout e-shop"
   },
   "account": {
     "title": "Můj účet",

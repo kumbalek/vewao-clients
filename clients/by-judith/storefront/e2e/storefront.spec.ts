@@ -313,7 +313,7 @@ test("product photos are named after the product; product thumbnails are decorat
   await expect(page.getByRole("img", { name: "Akční produkt – foto 2" })).toBeAttached()
   await expect(page.locator('img[alt="Thumbnail"], img[alt^="Product image"]')).toHaveCount(0)
 
-  await page.goto("/cz/store")
+  await page.goto("/cz/shop")
   const card = page.getByTestId("product-wrapper").filter({ hasText: "Akční produkt" })
   // The name is right below the photo, so the photo itself is not announced again.
   await expect(card.locator("img").first()).toHaveAttribute("alt", "")

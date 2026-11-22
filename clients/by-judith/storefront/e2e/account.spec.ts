@@ -39,7 +39,7 @@ test.beforeEach(async ({ context, request }) => {
 })
 
 test("header account link opens the sign-in form", async ({ page }) => {
-  await page.goto("/cz/store")
+  await page.goto("/cz/shop")
   await page.getByRole("link", { name: "Můj účet" }).first().click()
 
   await expect(page).toHaveURL(/\/cz\/account$/)

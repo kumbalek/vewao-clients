@@ -87,12 +87,18 @@ test("a product's breadcrumb is its category path", async ({ page }) => {
   await expect(main.getByText(/Kolekce/)).toHaveCount(0)
 })
 
-test("the product list links the categories", async ({ page }) => {
-  await page.goto("/cz/store")
+test("the list of all products is gone; its address leads to the e-shop's front page and serves search", async ({ page, request }) => {
+  // Categories replaced it (owner, 2026-11-22).
+  const response = await request.get("/cz/store", { maxRedirects: 0 })
+  expect(response.status()).toBe(308)
+  expect(response.headers().location).toBe("/cz/shop")
 
-  const categories = page.getByTestId("store-categories")
-  await expect(categories).toContainText("Kategorie:")
-  await expect(categories.getByRole("link", { name: "Herbs" })).toHaveAttribute("href", "/cz/categories/herbs")
+  await page.goto("/cz/store?q=akční")
+  await expect(page.getByTestId("store-page-title")).toContainText("akční")
+  await expect(page.getByRole("contentinfo").getByRole("link", { name: "Všechny produkty" })).toHaveCount(0)
+
+  await page.goto("/cz/products/akcni-produkt")
+  await expect(page.getByRole("main").getByRole("link", { name: "Všechny produkty" })).toHaveCount(0)
 })
 
 test("the old collection addresses redirect to the herb subcategories", async ({ request }) => {

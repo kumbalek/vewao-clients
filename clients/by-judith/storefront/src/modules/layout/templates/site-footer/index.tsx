@@ -50,7 +50,6 @@ export default function SiteFooter({
   const t = useTranslations("layout")
 
   const allLinks = [
-    { label: t("allProducts"), href: "/store" },
     ...shopCategories.map((c) => ({ label: c.title, href: `/categories/${c.handle}` })),
     { label: t("magazin"), href: "/magazin" },
     { label: t("about"), href: "/o-nas" },

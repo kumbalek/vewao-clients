@@ -286,10 +286,10 @@ export default function DesignSystemPage() {
           <div>
             <Label>ButtonLink (navigation) · ArrowLink</Label>
             <div className="mt-3 flex flex-wrap items-center gap-6">
-              <ButtonLink href="/store" variant="secondary">
+              <ButtonLink href="/shop" variant="secondary">
                 Všechny produkty
               </ButtonLink>
-              <ArrowLink href="/store">Zobrazit kolekci</ArrowLink>
+              <ArrowLink href="/shop">Zobrazit kolekci</ArrowLink>
             </div>
           </div>
         </div>

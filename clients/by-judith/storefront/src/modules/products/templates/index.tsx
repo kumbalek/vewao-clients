@@ -45,10 +45,6 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
       name: t("home"),
       href: "/",
     },
-    {
-      name: t("allProducts"),
-      href: "/store",
-    },
   ]
 
   // The category path, e.g. Herbs › Gold Edition (vewao-clients#67).

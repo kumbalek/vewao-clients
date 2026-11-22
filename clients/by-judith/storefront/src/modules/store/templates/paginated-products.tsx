@@ -78,15 +78,13 @@ export default async function PaginatedProducts({
   )
 
   if (query && filteredProducts.length === 0) {
-    const [t, tLayout] = await Promise.all([
-      getTranslations("search"),
-      getTranslations("layout"),
-    ])
+    const t = await getTranslations("search")
 
+    // Back to the e-shop's front page: the list of all products is gone (vewao-clients#70).
     return (
       <div className="flex flex-col items-start gap-4 py-12" data-testid="search-empty">
         <Text tone="subtle">{t("empty", { query })}</Text>
-        <ArrowLink href="/store">{tLayout("allProducts")}</ArrowLink>
+        <ArrowLink href="/shop">{t("browseShop")}</ArrowLink>
       </div>
     )
   }

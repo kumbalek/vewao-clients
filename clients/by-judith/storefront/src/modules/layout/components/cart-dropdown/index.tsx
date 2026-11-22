@@ -229,7 +229,7 @@ const CartDropdown = ({
           ) : (
             <div className="flex py-16 flex-col gap-y-4 items-center justify-center">
               <span>{t("cartIsEmpty")}</span>
-              <ButtonLink href="/store" variant="secondary">
+              <ButtonLink href="/shop" variant="secondary">
                 {t("exploreProductsButton")}
               </ButtonLink>
             </div>
