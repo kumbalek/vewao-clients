@@ -239,7 +239,9 @@
     "referencePrice": "Nejnižší cena za 30 dní před slevou:",
     "voucher": "Dárkový poukaz",
     "selectOption": "Vyberte {option}",
-    "severalAllowed": "lze vybrat více"
+    "severalAllowed": "lze vybrat více",
+    "tierFrom": "od {count} ks",
+    "tierApplies": "(sleva platí)"
   },
   "payment": {
     "title": "Zpracováváme vaši platbu. Vyčkejte prosím."

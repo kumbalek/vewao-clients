@@ -14,6 +14,7 @@ import ProductActionsWrapper from "./product-actions-wrapper"
 import { HttpTypes } from "@medusajs/types"
 import { useTranslations } from "next-intl"
 import type { ProductTexts } from "@lib/cms/product-texts"
+import type { ProductTier } from "@lib/util/product-tiers"
 import { productCategoryPath } from "@lib/util/category-path"
 
 type ProductTemplateProps = {
@@ -22,6 +23,8 @@ type ProductTemplateProps = {
   countryCode: string
   /** Subtitle, description and tab texts from the CMS (vewao-clients#50). */
   texts: ProductTexts
+  /** Volume discounts on this product (vewao-platform#45). */
+  productTiers?: ProductTier[]
 }
 
 const ProductTemplate: React.FC<ProductTemplateProps> = ({
@@ -29,6 +32,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
   region,
   countryCode,
   texts,
+  productTiers = [],
 }) => {
   const t = useTranslations("product")
 
@@ -57,7 +61,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
       <div className="w-full max-w-[1440px] mt-6 pl-6">
         <Breadcrumbs path={brPath} />
       </div>
-      <VariantOptionsProvider product={product}>
+      <VariantOptionsProvider product={product} tiers={productTiers}>
       <div
         className="content-container flex flex-col small:flex-row small:justify-center items-center small:items-start py-6 relative"
         data-testid="product-container"

@@ -4,7 +4,9 @@ import { HttpTypes } from "@medusajs/types"
 import { clx } from "@medusajs/ui"
 import React, { createContext, useContext, useState } from "react"
 
+import type { ProductTier } from "@lib/util/product-tiers"
 import { allowsSeveralVariants } from "@lib/util/voucher"
+import DiscountBoxes from "./discount-boxes"
 import OptionSelect from "./option-select"
 
 /**
@@ -28,6 +30,8 @@ type VariantOptionsState = {
   /** Adding to the cart: the options wait. */
   busy: boolean
   setBusy: (busy: boolean) => void
+  /** Volume discounts on this product, shown under the options (vewao-platform#45). */
+  tiers: ProductTier[]
 }
 
 const VariantOptionsContext = createContext<VariantOptionsState | null>(null)
@@ -40,9 +44,11 @@ export const optionsAsKeymap = (variantOptions: HttpTypes.StoreProductVariant["o
 
 export function VariantOptionsProvider({
   product,
+  tiers = [],
   children,
 }: {
   product: HttpTypes.StoreProduct
+  tiers?: ProductTier[]
   children: React.ReactNode
 }) {
   // A single variant is chosen during render, not in an effect: otherwise the
@@ -64,7 +70,7 @@ export function VariantOptionsProvider({
 
   return (
     <VariantOptionsContext.Provider
-      value={{ options, setOptionValue, multiple: allowsSeveralVariants(product), chosen, toggleVariant, busy, setBusy }}
+      value={{ options, setOptionValue, multiple: allowsSeveralVariants(product), chosen, toggleVariant, busy, setBusy, tiers }}
     >
       {children}
     </VariantOptionsContext.Provider>
@@ -87,7 +93,7 @@ export function VariantOptions({
   disabled?: boolean
   className?: string
 }) {
-  const { options, setOptionValue, multiple, chosen, toggleVariant, busy } = useVariantOptions()
+  const { options, setOptionValue, multiple, chosen, toggleVariant, busy, tiers } = useVariantOptions()
   const variants = product.variants ?? []
   if (variants.length < 2) return null
 
@@ -119,6 +125,8 @@ export function VariantOptions({
           disabled={disabled || busy}
         />
       ))}
+      {/* How many the choice holds: the chosen variants, or one once an option is picked. */}
+      <DiscountBoxes tiers={tiers} count={multiple ? chosen.length : Object.values(options).some(Boolean) ? 1 : 0} />
     </div>
   )
 }

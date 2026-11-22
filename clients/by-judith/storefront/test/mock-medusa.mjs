@@ -95,6 +95,8 @@ const partieProduct = {
 const byHandleOrIdOnly = [voucherProduct, partieProduct]
 // Active quantity-tier promotions as vewao-platform's GET /store/promotion-tiers returns them.
 let promotionTiers = []
+// Volume discounts on one product (vewao-platform#45), empty unless a test sets them.
+let productTiers = []
 // Magazine articles as the Content plugin serves them: newest first, body_html
 // only on the detail route (the plugin renders and sanitises Markdown).
 const photo = { image: "http://localhost:9101/static/dn.webp", image_width: 1200, image_height: 1798, gallery: [] }
@@ -288,7 +290,7 @@ const server = createServer(async (req, res) => {
     eurPrices[data.variant] = [data.amount, data.original ?? data.amount]
     return send({ ok: true })
   }
-  if (url.pathname === "/__reset") { Object.assign(eurPrices, structuredClone(EUR_PRICES)); carts.clear(); orders.clear(); requests.length = 0; gatewayOutcome = "PAID"; Object.assign(cartControls, { delayMs: 0, status: 200, message: "Košík se nepodařilo aktualizovat." }); promotionTiers = []; priceHistory = { current_amount: 1490, reference_price: 1690, history_complete: true }; customers.clear(); tokens.clear(); lastResetToken = null; return send({ ok: true }) }
+  if (url.pathname === "/__reset") { Object.assign(eurPrices, structuredClone(EUR_PRICES)); carts.clear(); orders.clear(); requests.length = 0; gatewayOutcome = "PAID"; Object.assign(cartControls, { delayMs: 0, status: 200, message: "Košík se nepodařilo aktualizovat." }); promotionTiers = []; productTiers = []; priceHistory = { current_amount: 1490, reference_price: 1690, history_complete: true }; customers.clear(); tokens.clear(); lastResetToken = null; return send({ ok: true }) }
   if (url.pathname === "/__cart/seed") {
     const current = cart(data.cartId)
     if (data.quantity > 1) {
@@ -298,8 +300,8 @@ const server = createServer(async (req, res) => {
     recalcCart(current)
     return send({ cart: current })
   }
-  if (url.pathname === "/__promotion-tiers") { promotionTiers = data.tiers ?? []; return send({ ok: true }) }
-  if (url.pathname === "/store/promotion-tiers") return send({ tiers: promotionTiers })
+  if (url.pathname === "/__promotion-tiers") { promotionTiers = data.tiers ?? []; productTiers = data.product_tiers ?? []; return send({ ok: true }) }
+  if (url.pathname === "/store/promotion-tiers") return send({ tiers: promotionTiers, product_tiers: productTiers })
   if (url.pathname === "/__cart/controls") {
     Object.assign(cartControls, data)
     return send({ ok: true })

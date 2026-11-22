@@ -137,6 +137,37 @@ test.describe("Ultherapy's single areas", () => {
     }
   })
 
+  // The Christmas sale (vewao-platform#45): −10 % for one area, −20 % for two or more.
+  test("the sale boxes light up for the tier the choice reaches, and the price follows", async ({ page, request }) => {
+    const tier = (code: string, min_count: number, value: number, teaser: string) =>
+      ({ code, min_count, type: "percentage", value, currency_code: null, message: null, teaser, product_id: "prod_partie" })
+    await request.post(`${MOCK}/__promotion-tiers`, {
+      data: { tiers: [], product_tiers: [tier("VANOCE-20", 2, 20, "při výběru 2 a více partií"), tier("VANOCE-10", 1, 10, "při výběru 1 partie")] },
+    })
+    await page.goto("/cz/products/ultherapy-aplikace-na-jednotlive-partie")
+    const product = page.getByTestId("product-container")
+    const buttons = product.getByTestId("product-options").filter({ visible: true }).getByTestId("option-button")
+    const boxes = product.getByTestId("discount-boxes").filter({ visible: true }).getByTestId("discount-box")
+    const price = product.getByTestId("product-price").filter({ visible: true }).first()
+
+    await expect(boxes).toHaveText([/−10 %\s*při výběru 1 partie/, /−20 %\s*při výběru 2 a více partií/])
+    await expect(boxes.nth(0)).toHaveAttribute("data-active", "false")
+    await expect(boxes.nth(1)).toHaveAttribute("data-active", "false")
+
+    await buttons.filter({ hasText: /^Krk$/ }).click()
+    await expect(boxes.nth(0)).toHaveAttribute("data-active", "true")
+    await expect(boxes.nth(1)).toHaveAttribute("data-active", "false")
+    await expect(price).toContainText("13.500")
+    await expect(product.getByTestId("reference-product-price").first()).toContainText("15.000")
+
+    await buttons.filter({ hasText: /^Dekolt$/ }).click()
+    await expect(boxes.nth(0)).toHaveAttribute("data-active", "false")
+    await expect(boxes.nth(1)).toHaveAttribute("data-active", "true")
+    await expect(price).toContainText("25.600")
+    await expect(product.getByTestId("reference-product-price").first()).toContainText("32.000")
+    await expect(product.getByTestId("product-price-discount").first()).toHaveText("-20 %")
+  })
+
   test("several can be chosen; their prices add up and each goes into the cart", async ({ page }) => {
     await page.goto("/cz/products/ultherapy-aplikace-na-jednotlive-partie")
     const product = page.getByTestId("product-container")

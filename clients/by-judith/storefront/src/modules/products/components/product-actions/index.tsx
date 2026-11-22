@@ -4,6 +4,7 @@ import { addToCart } from "@lib/data/cart"
 import type { PriceReference } from "@lib/util/discount-claim"
 import { useIntersection } from "@lib/hooks/use-in-view"
 import { convertToLocale } from "@lib/util/money"
+import { discounted, reachedTier } from "@lib/util/product-tiers"
 import { HttpTypes } from "@medusajs/types"
 import { Button } from "@medusajs/ui"
 import { isEqual } from "lodash"
@@ -26,17 +27,39 @@ type ProductActionsProps = {
 const inStock = (variant: HttpTypes.StoreProductVariant) =>
   !variant.manage_inventory || !!variant.allow_backorder || (variant.inventory_quantity ?? 0) > 0
 
-/** The chosen variants' prices added up, shown like a single price. */
-function TotalPrice({ variants }: { variants: HttpTypes.StoreProductVariant[] }) {
-  const total = variants.reduce((sum, v) => sum + (v.calculated_price?.calculated_amount ?? 0), 0)
+const totalOf = (variants: HttpTypes.StoreProductVariant[]) =>
+  variants.reduce((sum, v) => sum + (v.calculated_price?.calculated_amount ?? 0), 0)
+
+/**
+ * The chosen variants' prices added up, shown like a single price; with a
+ * volume discount reached (vewao-platform#45), the discounted total and the
+ * regular one struck through, as the cart will charge it.
+ */
+function TotalPrice({ variants, percent }: { variants: HttpTypes.StoreProductVariant[]; percent?: number }) {
+  const t = useTranslations("product")
+  const total = totalOf(variants)
   const currency = variants[0]?.calculated_price?.currency_code ?? ""
+  const price = percent ? discounted(total, percent) : total
   return (
-    <div className="flex flex-col text-ui-fg-base">
-      <span className="text-2xl">
-        <span data-testid="product-price" data-value={total}>
-          {convertToLocale({ amount: total, currency_code: currency })}
+    <div className="flex flex-col items-center text-ui-fg-base">
+      <span className={percent ? "text-2xl text-ui-fg-interactive" : "text-2xl"}>
+        <span data-testid="product-price" data-value={price}>
+          {convertToLocale({ amount: price, currency_code: currency })}
         </span>
       </span>
+      {!!percent && (
+        <>
+          <p>
+            <span className="text-ui-fg-subtle">{t("referencePrice")} </span>
+            <span className="line-through" data-testid="reference-product-price" data-value={total}>
+              {convertToLocale({ amount: total, currency_code: currency })}
+            </span>
+          </p>
+          <span className="text-ui-fg-interactive" data-testid="product-price-discount">
+            -{percent} %
+          </span>
+        </>
+      )}
     </div>
   )
 }
@@ -48,7 +71,7 @@ export default function ProductActions({
 }: ProductActionsProps) {
   const t = useTranslations("cart")
   // Shared with the option buttons, which the page places (vewao-clients#70).
-  const { options, setBusy, multiple, chosen } = useVariantOptions()
+  const { options, setBusy, multiple, chosen, tiers } = useVariantOptions()
   const [isAdding, setIsAdding] = useState(false)
   const countryCode = useParams().countryCode as string
   const { delayedRefresh, isRefreshing } = useDelayedRefresh()
@@ -69,6 +92,8 @@ export default function ProductActions({
 
   const count = chosenVariants.length
   const available = count > 0 && chosenVariants.every(inStock)
+  // The volume discount the choice reaches, which the cart will apply.
+  const percent = count > 0 ? reachedTier(tiers, count)?.value : undefined
 
   const actionsRef = useRef<HTMLDivElement>(null)
 
@@ -109,9 +134,9 @@ export default function ProductActions({
     ? chosenVariants.map((v) => (v.options ?? []).map((o) => o.value).join(" / ")).join(", ")
     : null
   const totalLabel =
-    count > 1
+    count > 1 || percent
       ? convertToLocale({
-          amount: chosenVariants.reduce((sum, v) => sum + (v.calculated_price?.calculated_amount ?? 0), 0),
+          amount: percent ? discounted(totalOf(chosenVariants), percent) : totalOf(chosenVariants),
           currency_code: chosenVariants[0]?.calculated_price?.currency_code ?? "",
         })
       : null
@@ -122,8 +147,8 @@ export default function ProductActions({
         {/* On a phone the options come first; from `small` up they are under the description. */}
         <VariantOptions product={product} disabled={!!disabled} className="small:hidden" />
 
-        {count > 1 ? (
-          <TotalPrice variants={chosenVariants} />
+        {count > 1 || percent ? (
+          <TotalPrice variants={chosenVariants} percent={percent} />
         ) : (
           <ProductPrice
             product={product}
