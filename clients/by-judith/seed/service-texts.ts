@@ -98,8 +98,33 @@ Object.assign(html, {
     "<p>Prémiový botulotoxin pro uvolnění vrásek na čele, mezi obočím (glabela) a v okolí očí. Výsledkem je odpočatý, mladistvý výraz při zachování přirozené mimiky, který potěší nejen pod stromečkem.</p>",
   blefaroplastika:
     "<p>Plastická operace horních očních víček. Precizní chirurgický zákrok pod vedením zkušeného plastického chirurga, který odstraní nadbytečnou kůži víček, otevře pohled a zbaví obličej unaveného výrazu na mnoho let, nejen na Vánoce.</p>",
-  "vstupni-osobni-diagnostika-judity-halvove":
-    "<p>Komplexní 45minutové vyšetření podle principů tradiční čínské medicíny (diagnostika z jazyka, pulzu a celkové konstituce), na jehož základě stanovíme přesný plán terapie a úpravy životosprávy na míru.</p>",
+  // The owner's longer text added 2026-11-22: the quote as an italic paragraph
+  // (no quote block in the converter), double spaces removed.
+  "vstupni-osobni-diagnostika-judity-halvove": `<p>Komplexní 45minutové vyšetření podle principů tradiční čínské medicíny (diagnostika z jazyka, pulzu a celkové konstituce), na jehož základě stanovíme přesný plán terapie a úpravy životosprávy na míru.</p>
+<h2>Osobní diagnostika tradiční čínské medicíny s Juditou Halvovou v Praze</h2>
+<p>Trápí vás atopický ekzém, padání vlasů (alopecie), bolesti zad a kloubů, migrény, ženské potíže nebo vleklá onemocnění, se kterými si váš lékař už neví rady?</p>
+<p>Máme řešení, které neléčí pouze symptomy, ale odstraňuje skutečnou příčinu.</p>
+<p>Vstupní diagnostika v konceptu by JuditH představuje klíč k pochopení toho, proč vaše tělo vysílá varovné signály. Propojujeme autentické diagnostické postupy ověřené tisíciletími s bylinnou léčbou na míru a cílenou akupunkturou.</p>
+<h2>Proč právě diagnostika u Judity Halvové?</h2>
+<p><em>„Během své dlouhodobé stáže v nemocnici čisté tradiční čínské medicíny v Číně u MUDr. Penga jsem si uvědomila zásadní věc: základem úspěchu vyléčení jakéhokoliv zdravotního problému je detailní vstupní diagnostika. Teprve když přesně určíme kořen nerovnováhy, můžeme sestavit cílenou recepturu bylinných odvarů na míru a zvolit správné akupunkturní body. Díky této přesnosti vidíme u klientů výrazné zlepšení stavu již po několika málo aplikacích.“</em></p>
+<p>— Judita Halvová, zakladatelka konceptu by JuditH</p>
+<h2>S jakými problémy vám dokážeme pomoci?</h2>
+<p>Naše specializace se zaměřuje na stavy, kde běžná medicína často naráží na limity a opakovaně nasazuje kortikoidy či analgetika:</p>
+${included([
+  ["Kožní onemocnění", "Atopický ekzém, akné v dospělosti, lupénka, periorální dermatitida."],
+  ["Péče o vlasy", "Difúzní padání vlasů, ložisková i androgenní alopecie."],
+  ["Bolesti těla a hlavy", "Chronické bolesti zad a šíje, migrény, záněty šlach a kloubů."],
+  ["Ženské a hormonální potíže", "Bolestivá a nepravidelná menstruace, projevy PMS, příprava na početí, klimakterium."],
+  ["Psychosomatika a imunita", "Chronická únava, nespavost, oslabená imunita, trávicí disbalance."],
+])}
+<h2>Co přesně osobní diagnostika TČM obsahuje?</h2>
+<p>Během konzultace získáte komplexní obraz o fungování svého organismu:</p>
+${included([
+  ["Diagnostika z pulzu", "Čtení stavu vnitřních orgánových okruhů, hladiny životní energie Qi a kvality krve."],
+  ["Diagnostika z jazyka", "Vyhodnocení barvy, tvaru, rýh a povlaku, které odhalují přítomnost toxinů, vnitřní horkosti či vlhkosti v těle."],
+  ["Podrobný rozbor životního stylu a symptomů", "Prověření stravovacích návyků, spánku, termoregulace těla a emoční zátěže."],
+  ["Individuální léčebný plán", "Návrh přesné receptury bylinných odvarů Herbs by JuditH a doporučení frekvence tradiční či permanentní akupunktury Acupuncture by JuditH."],
+])}`,
   "balicek-5x-akupunktura-u-senior-terapeuta":
     "<p>Ucelená terapeutická kúra zaměřená na odstranění chronických bolestí, harmonizaci nervového systému, podporu spánku a hlubokou regeneraci organismu pod vedením našich senior terapeutů.</p>",
   // "Zvažujete", "k MUDr. Jegorovovi" (dative), a closing full stop.
