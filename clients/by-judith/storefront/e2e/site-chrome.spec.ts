@@ -84,12 +84,12 @@ test("the desktop header offers the wireframe navigation", async ({ page, isMobi
   const shop = nav.getByRole("button", { name: "Shop" })
   await shop.hover()
   await expect(shop).toHaveAttribute("aria-expanded", "true")
-  await page.getByRole("link", { name: "Všechny produkty" }).first().click()
-  await expect(page).toHaveURL(/\/cz\/store$/, NAVIGATION)
+  await header.getByRole("link", { name: /^Herbs/ }).click()
+  await expect(page).toHaveURL(/\/cz\/categories\/herbs$/, NAVIGATION)
   await expect(shop).toHaveAttribute("aria-expanded", "false")
 })
 
-test("the desktop Shop menu lists the categories, with DP Dermaceuticals' subcategories", async ({
+test("the desktop Shop menu shows the categories as boxes; hovering one shows its subcategories", async ({
   page,
   isMobile,
 }) => {
@@ -101,15 +101,26 @@ test("the desktop Shop menu lists the categories, with DP Dermaceuticals' subcat
   await shop.hover()
   await expect(shop).toHaveAttribute("aria-expanded", "true")
 
-  await expect(header.getByRole("link", { name: "Herbs", exact: true })).toHaveAttribute("href", "/cz/categories/herbs")
+  // A box: image, title and subtitle (the category's description).
+  const herbs = header.getByRole("link", { name: /^Herbs/ })
+  await expect(herbs).toHaveAttribute("href", "/cz/categories/herbs")
+  await expect(herbs).toContainText("Bylinné tablety")
+  await expect(herbs.locator("img")).toHaveAttribute("src", "/logo.webp")
   await expect(header.getByRole("link", { name: "TCM", exact: true })).toHaveAttribute("href", "/cz/categories/tcm")
+  // Only the categories: the logo leads to the shop front, the footer to all products.
+  await expect(header.getByRole("link", { name: "Úvod e-shopu" })).toHaveCount(0)
+  await expect(header.getByRole("link", { name: "Všechny produkty" })).toHaveCount(0)
+
   const dp = header.getByRole("list", { name: "DP Dermaceuticals" })
-  // Admin order (rank), not the order the API returns them in.
+  await expect(dp).toBeHidden()
+  await header.getByRole("link", { name: /^DP Dermaceuticals/ }).hover()
+  await expect(dp).toBeVisible()
+  // Smaller boxes without subtitles, in admin order (rank), not the API's order.
   await expect(dp.getByRole("link")).toHaveText(["Čištění a exfoliace", "DP Masky"])
   await expect(dp.getByRole("link", { name: "DP Masky" })).toHaveAttribute("href", "/cz/categories/dp-masky")
 })
 
-test("the mobile Shop menu lists the categories, with DP Dermaceuticals' subcategories", async ({
+test("the mobile Shop menu shows the category boxes; an arrow opens a category's subcategories", async ({
   page,
   isMobile,
 }) => {
@@ -121,15 +132,22 @@ test("the mobile Shop menu lists the categories, with DP Dermaceuticals' subcate
   const menu = page.getByRole("dialog", { name: "Menu" })
   await menu.getByText("Shop", { exact: true }).click()
 
-  await expect(menu.getByRole("link", { name: "Herbs", exact: true })).toHaveAttribute("href", "/cz/categories/herbs")
-  await expect(menu.getByRole("link", { name: "DP Dermaceuticals", exact: true })).toHaveAttribute(
-    "href",
-    "/cz/categories/dp-dermaceuticals"
-  )
-  await expect(menu.getByRole("list", { name: "DP Dermaceuticals" }).getByRole("link")).toHaveText([
-    "Čištění a exfoliace",
-    "DP Masky",
-  ])
+  const herbs = menu.getByRole("link", { name: /^Herbs/ })
+  await expect(herbs).toHaveAttribute("href", "/cz/categories/herbs")
+  await expect(herbs).toContainText("Bylinné tablety")
+  await expect(menu.getByRole("link", { name: "Úvod e-shopu" })).toHaveCount(0)
+  // Only categories with subcategories get an arrow.
+  await expect(menu.getByRole("button", { name: /TCM/ })).toHaveCount(0)
+
+  const dp = menu.getByRole("list", { name: "DP Dermaceuticals" })
+  const toggle = menu.getByRole("button", { name: "Zobrazit podkategorie: DP Dermaceuticals" })
+  await expect(dp).toBeHidden()
+  await expect(toggle).toHaveAttribute("aria-expanded", "false")
+  await toggle.click()
+  await expect(toggle).toHaveAttribute("aria-expanded", "true")
+  await expect(dp.getByRole("link")).toHaveText(["Čištění a exfoliace", "DP Masky"])
+  await toggle.click()
+  await expect(dp).toBeHidden()
 })
 
 test("the mobile header opens a full-screen menu", async ({ page, isMobile }) => {
