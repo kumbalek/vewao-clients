@@ -34,9 +34,11 @@ channel. Keep the secret key out of shell history and git; revoke it when done.
 | Gift packaging | Product `darkove-baleni` (the legacy handle), 199 Kč, _Discountable_ off: promotions neither discount nor count it |
 | Quantity tiers | Automatic promotions `TIER_10`/`TIER_20`/`TIER_30` (10/20/30 % from 1/2/3+ discountable items), created as **draft** with the legacy progress-bar texts; activate them in admin once the merchant confirms values (vewao-platform#14) |
 | Tax | Prices are VAT-inclusive; **no tax rates** until verified with the accountant |
-| Slovakia (EUR) | Region `Slovensko` (EUR, `sk`), EUR among the store's currencies, Comgate only (no pay-on-site: Slovakia has no pickup); `Přepravce PPL – Slovensko` (8 €, free from 200 €); an EUR price on every variant (CZK ÷ 25, up to a whole euro, minus 10 cents). All EUR amounts are **dev placeholders** until the merchant sets them (vewao-clients#45) |
+| Slovakia (EUR) | Region `Slovensko` (EUR, `sk`), EUR among the store's currencies, Comgate's EUR connection `pp_comgate_eur` when the backend has it, otherwise the Czech region's Comgate (no pay-on-site: Slovakia has no pickup); `Přepravce PPL – Slovensko` (8 €, free from 200 €); an EUR price on every variant (CZK ÷ 25, up to a whole euro, minus 10 cents). All EUR amounts are **dev placeholders** until the merchant sets them (vewao-clients#45) |
 
-The Slovak region builds on the Czech region's payment providers. The
+A new Slovak region gets Comgate's EUR connection (vewao-platform#39) or, on a
+backend without one, the Czech region's online payment providers. An existing
+region keeps its providers; the seed warns when it lacks the EUR connection. The
 platform's local seed sets the store's currencies to CZK only; re-running it
 drops EUR until this seed runs again.
 
