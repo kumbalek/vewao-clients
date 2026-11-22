@@ -1,0 +1,762 @@
+{
+  "source": "Owner's texts, 2026-11-22",
+  "products": {
+    "online-konzultace-fytoterapie-s-nasi-specialistkou-lucii": {
+      "subtitle": null,
+      "description": {
+        "root": {
+          "type": "root",
+          "version": 1,
+          "direction": "ltr",
+          "format": "",
+          "indent": 0,
+          "children": [
+            {
+              "type": "paragraph",
+              "version": 1,
+              "direction": "ltr",
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": "",
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "text": "Získejte odbornou podporu na cestě k přirozenému zdraví. Během individuální online konzultace se naše certifikovaná fytoterapeutka Lucia komplexně zaměří na vaše zdravotní potíže a navrhne řešení pomocí bylinných odvarů na míru, které bude přesně odpovídat vašim potřebám.",
+                  "format": 0,
+                  "detail": 0,
+                  "mode": "normal",
+                  "style": ""
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "version": 1,
+              "direction": "ltr",
+              "format": "",
+              "indent": 0,
+              "tag": "h2",
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "text": "Objevte léčivou sílu bylin a odvarů na míru",
+                  "format": 0,
+                  "detail": 0,
+                  "mode": "normal",
+                  "style": ""
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "direction": "ltr",
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": "",
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "text": "Fytoterapie je jednou z nejstarších a nejpřirozenějších metod péče o zdraví. Na rozdíl od syntetických přípravků působí léčivé rostliny komplexně – pomáhají tělu nenásilně navrátit ztracenou rovnováhu a probouzejí jeho přirozenou schopnost regenerace.",
+                  "format": 0,
+                  "detail": 0,
+                  "mode": "normal",
+                  "style": ""
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "direction": "ltr",
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": "",
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "text": "Ať už řešíte dlouhodobou únavu, oslabenou imunitu, trávicí potíže, hormonální disbalanci nebo chronický stres, správně zvolené byliny nabízejí šetrné a účinné řešení. Lucia ve své praxi vychází z hlubokých principů tradiční čínské medicíny (TCM) a úzce navazuje na celostní filozofii naší kliniky. Neřeší pouze povrchové symptomy, ale empaticky a pečlivě hledá skutečnou příčinu problému uvnitř těla.",
+                  "format": 0,
+                  "detail": 0,
+                  "mode": "normal",
+                  "style": ""
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "direction": "ltr",
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": "",
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "text": "Vrcholem této individuální péče jsou bylinné odvary sestavené přesně na míru. Neexistuje univerzální recept pro všechny – po detailní diagnostice pro vás Lucia navrhne unikátní kombinaci bylin. Tradiční forma odvarů zajišťuje maximální možnou koncentraci a vstřebatelnost účinných látek, což tělu dodává přesně ten impuls, který k uzdravení v danou chvíli potřebuje.",
+                  "format": 0,
+                  "detail": 0,
+                  "mode": "normal",
+                  "style": ""
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "version": 1,
+              "direction": "ltr",
+              "format": "",
+              "indent": 0,
+              "tag": "h2",
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "text": "Co konzultace zahrnuje",
+                  "format": 0,
+                  "detail": 0,
+                  "mode": "normal",
+                  "style": ""
+                }
+              ]
+            },
+            {
+              "type": "list",
+              "version": 1,
+              "direction": "ltr",
+              "format": "",
+              "indent": 0,
+              "listType": "bullet",
+              "start": 1,
+              "tag": "ul",
+              "children": [
+                {
+                  "type": "listitem",
+                  "version": 1,
+                  "direction": "ltr",
+                  "format": "",
+                  "indent": 0,
+                  "value": 1,
+                  "children": [
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "text": "Individuální diagnostiku:",
+                      "format": 1,
+                      "detail": 0,
+                      "mode": "normal",
+                      "style": ""
+                    },
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "text": " Podrobný rozbor vašeho aktuálního zdravotního stavu, životního stylu a stravovacích návyků.",
+                      "format": 0,
+                      "detail": 0,
+                      "mode": "normal",
+                      "style": ""
+                    }
+                  ]
+                },
+                {
+                  "type": "listitem",
+                  "version": 1,
+                  "direction": "ltr",
+                  "format": "",
+                  "indent": 0,
+                  "value": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "text": "Odvary a bylinný protokol na míru:",
+                      "format": 1,
+                      "detail": 0,
+                      "mode": "normal",
+                      "style": ""
+                    },
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "text": " Odborné sestavení unikátní směsi bylin pro přípravu léčivých odvarů, doplněné případně o další bylinné čaje či doplňky stravy.",
+                      "format": 0,
+                      "detail": 0,
+                      "mode": "normal",
+                      "style": ""
+                    }
+                  ]
+                },
+                {
+                  "type": "listitem",
+                  "version": 1,
+                  "direction": "ltr",
+                  "format": "",
+                  "indent": 0,
+                  "value": 3,
+                  "children": [
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "text": "Empatický a holistický přístup:",
+                      "format": 1,
+                      "detail": 0,
+                      "mode": "normal",
+                      "style": ""
+                    },
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "text": " Dostatek času a prostoru pro vás. Vnímáme vaše tělo jako jeden propojený celek a nasloucháme vašim potřebám.",
+                      "format": 0,
+                      "detail": 0,
+                      "mode": "normal",
+                      "style": ""
+                    }
+                  ]
+                },
+                {
+                  "type": "listitem",
+                  "version": 1,
+                  "direction": "ltr",
+                  "format": "",
+                  "indent": 0,
+                  "value": 4,
+                  "children": [
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "text": "Pohodlí a flexibilitu:",
+                      "format": 1,
+                      "detail": 0,
+                      "mode": "normal",
+                      "style": ""
+                    },
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "text": " Vše probíhá bezpečně a v klidu z vašeho domova prostřednictvím videohovoru.",
+                      "format": 0,
+                      "detail": 0,
+                      "mode": "normal",
+                      "style": ""
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "version": 1,
+              "direction": "ltr",
+              "format": "",
+              "indent": 0,
+              "tag": "h2",
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "text": "Jak to funguje?",
+                  "format": 0,
+                  "detail": 0,
+                  "mode": "normal",
+                  "style": ""
+                }
+              ]
+            },
+            {
+              "type": "list",
+              "version": 1,
+              "direction": "ltr",
+              "format": "",
+              "indent": 0,
+              "listType": "number",
+              "start": 1,
+              "tag": "ol",
+              "children": [
+                {
+                  "type": "listitem",
+                  "version": 1,
+                  "direction": "ltr",
+                  "format": "",
+                  "indent": 0,
+                  "value": 1,
+                  "children": [
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "text": "Přidejte službu do košíku a dokončete objednávku.",
+                      "format": 0,
+                      "detail": 0,
+                      "mode": "normal",
+                      "style": ""
+                    }
+                  ]
+                },
+                {
+                  "type": "listitem",
+                  "version": 1,
+                  "direction": "ltr",
+                  "format": "",
+                  "indent": 0,
+                  "value": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "text": "V domluvený čas se propojíme online a po důkladném rozhovoru získáte svůj osobní bylinný plán.",
+                      "format": 0,
+                      "detail": 0,
+                      "mode": "normal",
+                      "style": ""
+                    }
+                  ]
+                },
+                {
+                  "type": "listitem",
+                  "version": 1,
+                  "direction": "ltr",
+                  "format": "",
+                  "indent": 0,
+                  "value": 3,
+                  "children": [
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "text": "Vaši osobní bylinnou směs pro přípravu odvaru vám následně můžeme zaslat až k vám domů.",
+                      "format": 0,
+                      "detail": 0,
+                      "mode": "normal",
+                      "style": ""
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "direction": "ltr",
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": "",
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "text": "Dopřejte svému tělu šetrnou péči z přírody pod vedením naší zkušené terapeutky.",
+                  "format": 0,
+                  "detail": 0,
+                  "mode": "normal",
+                  "style": ""
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "online-konzultace-fytoterapie-s-juditou-halvovou": {
+      "subtitle": null,
+      "description": {
+        "root": {
+          "type": "root",
+          "version": 1,
+          "direction": "ltr",
+          "format": "",
+          "indent": 0,
+          "children": [
+            {
+              "type": "paragraph",
+              "version": 1,
+              "direction": "ltr",
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": "",
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "text": "Získejte odbornou podporu na cestě k přirozenému zdraví. Během individuální online konzultace se Judita Halvová komplexně zaměří na vaše zdravotní potíže a navrhne řešení pomocí fytoterapeutických odvarů na míru, které bude odpovídat vašim konkrétním potřebám.",
+                  "format": 0,
+                  "detail": 0,
+                  "mode": "normal",
+                  "style": ""
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "version": 1,
+              "direction": "ltr",
+              "format": "",
+              "indent": 0,
+              "tag": "h2",
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "text": "Objevte léčivou sílu bylin a odvarů na míru",
+                  "format": 0,
+                  "detail": 0,
+                  "mode": "normal",
+                  "style": ""
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "direction": "ltr",
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": "",
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "text": "Fytoterapie je jednou z nejstarších a nejpřirozenějších metod péče o zdraví. Na rozdíl od syntetických přípravků působí léčivé rostliny komplexně – obsahují stovky účinných látek, které pracují v dokonalé synergii. Tělu tak nenásilně pomáhají navrátit ztracenou rovnováhu a probouzejí jeho přirozenou schopnost regenerace a samoléčby.",
+                  "format": 0,
+                  "detail": 0,
+                  "mode": "normal",
+                  "style": ""
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "direction": "ltr",
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": "",
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "text": "Ať už řešíte dlouhodobou únavu, oslabenou imunitu, trávicí potíže, hormonální disbalanci nebo chronický stres, správně zvolené byliny nabízejí šetrné a účinné řešení. Judita ve své praxi propojuje znalosti západního bylinkářství s hlubokými principy tradiční čínské medicíny (TCM). Díky tomu neřeší pouze povrchové symptomy, ale zaměřuje se na skutečnou příčinu problému uvnitř těla.",
+                  "format": 0,
+                  "detail": 0,
+                  "mode": "normal",
+                  "style": ""
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "direction": "ltr",
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": "",
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "text": "Vrcholem této individuální péče jsou bylinné odvary sestavené přesně na míru. Neexistuje univerzální recept pro všechny – na základě detailní diagnostiky pro vás Judita navrhne unikátní kombinaci bylin. Tradiční forma odvarů zajišťuje maximální možnou koncentraci a vstřebatelnost účinných látek, což tělu dodává přesně ten impuls, který v danou chvíli potřebuje.",
+                  "format": 0,
+                  "detail": 0,
+                  "mode": "normal",
+                  "style": ""
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "version": 1,
+              "direction": "ltr",
+              "format": "",
+              "indent": 0,
+              "tag": "h2",
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "text": "Co konzultace zahrnuje",
+                  "format": 0,
+                  "detail": 0,
+                  "mode": "normal",
+                  "style": ""
+                }
+              ]
+            },
+            {
+              "type": "list",
+              "version": 1,
+              "direction": "ltr",
+              "format": "",
+              "indent": 0,
+              "listType": "bullet",
+              "start": 1,
+              "tag": "ul",
+              "children": [
+                {
+                  "type": "listitem",
+                  "version": 1,
+                  "direction": "ltr",
+                  "format": "",
+                  "indent": 0,
+                  "value": 1,
+                  "children": [
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "text": "Individuální diagnostiku:",
+                      "format": 1,
+                      "detail": 0,
+                      "mode": "normal",
+                      "style": ""
+                    },
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "text": " Podrobný rozbor vašeho aktuálního zdravotního stavu, životního stylu a stravovacích návyků.",
+                      "format": 0,
+                      "detail": 0,
+                      "mode": "normal",
+                      "style": ""
+                    }
+                  ]
+                },
+                {
+                  "type": "listitem",
+                  "version": 1,
+                  "direction": "ltr",
+                  "format": "",
+                  "indent": 0,
+                  "value": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "text": "Bylinný protokol na míru:",
+                      "format": 1,
+                      "detail": 0,
+                      "mode": "normal",
+                      "style": ""
+                    },
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "text": " Odborné sestavení unikátní směsi bylin pro přípravu léčivých odvarů, doplněné případně o další čajové směsi (např. z řady Herbs by JuditH), tinktury či doplňky stravy.",
+                      "format": 0,
+                      "detail": 0,
+                      "mode": "normal",
+                      "style": ""
+                    }
+                  ]
+                },
+                {
+                  "type": "listitem",
+                  "version": 1,
+                  "direction": "ltr",
+                  "format": "",
+                  "indent": 0,
+                  "value": 3,
+                  "children": [
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "text": "Holistický přístup:",
+                      "format": 1,
+                      "detail": 0,
+                      "mode": "normal",
+                      "style": ""
+                    },
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "text": " Hledání skutečných příčin potíží a vnímání těla jako jednoho celku.",
+                      "format": 0,
+                      "detail": 0,
+                      "mode": "normal",
+                      "style": ""
+                    }
+                  ]
+                },
+                {
+                  "type": "listitem",
+                  "version": 1,
+                  "direction": "ltr",
+                  "format": "",
+                  "indent": 0,
+                  "value": 4,
+                  "children": [
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "text": "Pohodlí a flexibilitu:",
+                      "format": 1,
+                      "detail": 0,
+                      "mode": "normal",
+                      "style": ""
+                    },
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "text": " Vše probíhá bezpečně a v klidu z vašeho domova prostřednictvím videohovoru.",
+                      "format": 0,
+                      "detail": 0,
+                      "mode": "normal",
+                      "style": ""
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "heading",
+              "version": 1,
+              "direction": "ltr",
+              "format": "",
+              "indent": 0,
+              "tag": "h2",
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "text": "Jak to funguje?",
+                  "format": 0,
+                  "detail": 0,
+                  "mode": "normal",
+                  "style": ""
+                }
+              ]
+            },
+            {
+              "type": "list",
+              "version": 1,
+              "direction": "ltr",
+              "format": "",
+              "indent": 0,
+              "listType": "number",
+              "start": 1,
+              "tag": "ol",
+              "children": [
+                {
+                  "type": "listitem",
+                  "version": 1,
+                  "direction": "ltr",
+                  "format": "",
+                  "indent": 0,
+                  "value": 1,
+                  "children": [
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "text": "Přidejte službu do košíku a dokončete objednávku.",
+                      "format": 0,
+                      "detail": 0,
+                      "mode": "normal",
+                      "style": ""
+                    }
+                  ]
+                },
+                {
+                  "type": "listitem",
+                  "version": 1,
+                  "direction": "ltr",
+                  "format": "",
+                  "indent": 0,
+                  "value": 2,
+                  "children": [
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "text": "V domluvený čas se propojíme online a po důkladném rozhovoru získáte svůj osobní bylinný plán.",
+                      "format": 0,
+                      "detail": 0,
+                      "mode": "normal",
+                      "style": ""
+                    }
+                  ]
+                },
+                {
+                  "type": "listitem",
+                  "version": 1,
+                  "direction": "ltr",
+                  "format": "",
+                  "indent": 0,
+                  "value": 3,
+                  "children": [
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "text": "Vaši osobní bylinnou směs pro přípravu odvaru vám následně zašleme až k vám domů.",
+                      "format": 0,
+                      "detail": 0,
+                      "mode": "normal",
+                      "style": ""
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "direction": "ltr",
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": "",
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "text": "Cena konzultace nezahrnuje cenu odvaru.",
+                  "format": 1,
+                  "detail": 0,
+                  "mode": "normal",
+                  "style": ""
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "text": " Ta je individuální dle gramáže bylin atd.",
+                  "format": 0,
+                  "detail": 0,
+                  "mode": "normal",
+                  "style": ""
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "direction": "ltr",
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": "",
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "text": "Dopřejte svému tělu péči, která respektuje jeho přirozený rytmus.",
+                  "format": 0,
+                  "detail": 0,
+                  "mode": "normal",
+                  "style": ""
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  }
+}
