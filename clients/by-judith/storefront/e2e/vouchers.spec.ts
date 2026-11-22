@@ -166,6 +166,13 @@ test.describe("Ultherapy's single areas", () => {
     await expect(price).toContainText("25.600")
     await expect(product.getByTestId("reference-product-price").first()).toContainText("32.000")
     await expect(product.getByTestId("product-price-discount").first()).toHaveText("-20 %")
+
+    // Without a confirmed 30-day history the discounted price stands alone (§ 12a).
+    await request.post(`${MOCK}/__price-history`, { data: { history_complete: false } })
+    await page.reload()
+    await product.getByTestId("product-options").filter({ visible: true }).getByTestId("option-button").filter({ hasText: /^Krk$/ }).click()
+    await expect(price).toContainText("13.500")
+    await expect(product.getByTestId("reference-product-price")).toHaveCount(0)
   })
 
   test("several can be chosen; their prices add up and each goes into the cart", async ({ page }) => {

@@ -74,7 +74,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
               />
             }
           >
-            <ProductActionsWrapper id={product.id} region={region} />
+            <ProductActionsWrapper id={product.id} region={region} withReferences={productTiers.length > 0} />
           </Suspense>
         </div>
         <div className="flex flex-col items-center gap-4 block w-full small:max-w-[500px] small:pl-8 relative">

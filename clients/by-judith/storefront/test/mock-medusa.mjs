@@ -397,6 +397,16 @@ const server = createServer(async (req, res) => {
       [...url.searchParams].some(([key, value]) => key.startsWith("category_id") && saleProduct.categories.some((c) => c.id === value))
     return send(wanted ? { products: [pricedFor(saleProduct, regionId)], count: 1 } : { products: [], count: 0 })
   }
+  if (url.pathname === `/store/products/${partieProduct.id}/price-history`) {
+    // The areas' regular prices, confirmed unless a test switches history off.
+    return send({
+      product_id: partieProduct.id, region_id: region.id,
+      variants: partieProduct.variants.map((v) => ({
+        variant_id: v.id, currency_code: "czk", current_amount: v.calculated_price.calculated_amount,
+        reference_price: v.calculated_price.calculated_amount, history_complete: priceHistory.history_complete,
+      })),
+    })
+  }
   if (url.pathname === `/store/products/${saleProduct.id}/price-history`) {
     return send({ product_id: saleProduct.id, region_id: region.id, variants: [{ variant_id: "variant_sale", currency_code: "czk", ...priceHistory }] })
   }

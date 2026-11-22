@@ -1,4 +1,4 @@
-import { listSalePriceReferences } from "@lib/data/price-history"
+import { listPriceReferences, listSalePriceReferences } from "@lib/data/price-history"
 import { listProducts } from "@lib/data/products"
 import { HttpTypes } from "@medusajs/types"
 import ProductActions from "@modules/products/components/product-actions"
@@ -9,9 +9,12 @@ import ProductActions from "@modules/products/components/product-actions"
 export default async function ProductActionsWrapper({
   id,
   region,
+  withReferences = false,
 }: {
   id: string
   region: HttpTypes.StoreRegion
+  /** A volume discount may strike prices through: fetch the ledger regardless of a sale. */
+  withReferences?: boolean
 }) {
   const product = await listProducts({
     queryParams: { id: [id] },
@@ -22,7 +25,9 @@ export default async function ProductActionsWrapper({
     return null
   }
 
-  const priceReferences = await listSalePriceReferences(product, region.id)
+  const priceReferences = withReferences
+    ? await listPriceReferences(product.id, region.id)
+    : await listSalePriceReferences(product, region.id)
 
   return (
     <ProductActions

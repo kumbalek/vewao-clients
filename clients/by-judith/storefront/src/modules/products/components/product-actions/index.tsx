@@ -4,7 +4,7 @@ import { addToCart } from "@lib/data/cart"
 import type { PriceReference } from "@lib/util/discount-claim"
 import { useIntersection } from "@lib/hooks/use-in-view"
 import { convertToLocale } from "@lib/util/money"
-import { discounted, reachedTier } from "@lib/util/product-tiers"
+import { discounted, reachedTier, regularIsLowest } from "@lib/util/product-tiers"
 import { HttpTypes } from "@medusajs/types"
 import { Button } from "@medusajs/ui"
 import { isEqual } from "lodash"
@@ -36,11 +36,33 @@ const totalOf = (variants: HttpTypes.StoreProductVariant[]) =>
  * volume discount reached (vewao-platform#45), the discounted total and the
  * regular one struck through, as the cart will charge it.
  */
-function TotalPrice({ variants, percent }: { variants: HttpTypes.StoreProductVariant[]; percent?: number }) {
+function TotalPrice({
+  variants,
+  percent,
+  struck = false,
+}: {
+  variants: HttpTypes.StoreProductVariant[]
+  percent?: number
+  /** The ledger confirms the regular prices as the 30-day lowest (§ 12a). */
+  struck?: boolean
+}) {
   const total = totalOf(variants)
   const currency = variants[0]?.calculated_price?.currency_code ?? ""
-  if (percent) {
+  if (percent && struck) {
     return <SalePrice amount={discounted(total, percent)} reference={total} percentage={percent} currencyCode={currency} />
+  }
+  if (percent) {
+    // Unconfirmed: the discounted price alone, no struck price.
+    const price = discounted(total, percent)
+    return (
+      <div className="flex flex-col items-center text-ui-fg-base">
+        <span className="text-2xl text-ui-fg-interactive">
+          <span data-testid="product-price" data-value={price}>
+            {convertToLocale({ amount: price, currency_code: currency })}
+          </span>
+        </span>
+      </div>
+    )
   }
   return (
     <div className="flex flex-col items-center text-ui-fg-base">
@@ -137,7 +159,11 @@ export default function ProductActions({
         <VariantOptions product={product} disabled={!!disabled} className="small:hidden" />
 
         {count > 1 || percent ? (
-          <TotalPrice variants={chosenVariants} percent={percent} />
+          <TotalPrice
+            variants={chosenVariants}
+            percent={percent}
+            struck={regularIsLowest(chosenVariants, priceReferences ?? [])}
+          />
         ) : (
           <ProductPrice
             product={product}
