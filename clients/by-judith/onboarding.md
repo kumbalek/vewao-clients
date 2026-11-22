@@ -61,6 +61,10 @@ The owner confirmed the old instance's setup for launch:
   are shipped. EUR prices: herbs 75 € / 24 €, everything else Kč ÷ 25 rounded
   up; VAT 21 % in CZ and SK. The shop's menus, front-page rails and breadcrumbs
   follow the categories. `seed/setup-catalogue.ts` holds the structure.
+- Admin changes to products, prices, stock, categories, regions and payment or
+  shipping options appear in the shop within about a minute (#65). The shop
+  keeps that data for 60 s (`CATALOGUE_REVALIDATE_SECONDS`), then refreshes it
+  on the next visit. Payload texts appear on publish.
 - Comgate connections, one per currency (owner, 2026-11-22; vewao-platform#39):
   CZK merchant 525121 for region CZ (`pp_comgate_comgate`), EUR merchant 525122
   for region Slovensko (`pp_comgate_eur`). Each connection's return URLs are
