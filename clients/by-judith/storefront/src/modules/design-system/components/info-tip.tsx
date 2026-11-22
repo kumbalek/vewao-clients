@@ -36,7 +36,8 @@ export default function InfoTip({ label, className, children }: InfoTipProps) {
         id={panelId}
         role="tooltip"
         className={clx(
-          "absolute bottom-full left-1/2 z-20 mb-2 w-max max-w-[16rem] -translate-x-1/2 rounded-chip bg-ink px-3 py-2 text-left text-xs leading-snug text-white shadow-lg transition-[opacity,visibility] duration-200 motion-reduce:transition-none",
+          // Below the "i": above it, it would cover what it explains (the new price).
+          "absolute top-full left-1/2 z-20 mt-2 w-max max-w-[16rem] -translate-x-1/2 rounded-chip bg-ink px-3 py-2 text-left text-xs leading-snug text-white shadow-lg transition-[opacity,visibility] duration-200 motion-reduce:transition-none",
           open ? "visible opacity-100" : "invisible opacity-0"
         )}
       >

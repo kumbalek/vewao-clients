@@ -73,6 +73,15 @@ The owner confirmed the old instance's setup for launch:
     `cta_url` (https://… or a shop path such as /content/shipping-and-payment,
     without /cz). Without both there is no button.
   The logo leads to the e-shop's front page; the menu lists only the categories.
+- **Christmas sale 2026** (set up 2026-11-22 on localhost, no end dates yet):
+  - the sale price list "Vánoční ceny" covers five vouchers;
+  - `VANOCE-ULTHERAPY-10`/`-20` give −10 %/−20 % on Ultherapy's areas (vewao-platform#45);
+  - `VANOCE-HERBS-2PLUS1` makes every third herb free.
+  The struck-through price is the price ledger's 30-day lowest. The ledger
+  first saw the vouchers' prices on 2026-11-22, so the owner's statement that
+  they were sold at the regular prices before the sale is recorded in the
+  ledger as `source: manual` periods from 2026-10-01. Keep that statement on
+  file; correct the start date in the ledger if it is wrong.
 - Admin changes to products, prices, stock, categories, regions and payment or
   shipping options appear in the shop within about a minute (#65). The shop
   keeps that data for 60 s (`CATALOGUE_REVALIDATE_SECONDS`), then refreshes it
