@@ -62,7 +62,8 @@ up the new shop's catalogue structure on any backend (vewao-clients#64):
 - the services, as drafts in their category with one variant and the owner's
   CZK and EUR prices: TCM's diagnostics, acupuncture package and two online
   phytotherapy consultations; Estetika's lips, Baby Botox, blepharoplasty and two
-  consultations. Like the gift vouchers they have no shipping
+  consultations; Ultherapy® by area (six variants under "Partie", in the owner's
+  order), facelift and full facelift. Like the gift vouchers they have no shipping
   profile and no inventory, so a cart of services skips delivery.
 
 It is additive and idempotent. Production gets the catalogue prepared on

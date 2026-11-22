@@ -33,20 +33,20 @@ export const CATEGORIES: CategoryDef[] = [
   { name: "DP Dermaceuticals", handle: "dp-dermaceuticals" },
 ]
 
+type Price = { czk: number; eur: number }
+
+/** One price, or variants under one option (e.g. Ultherapy's treated areas). */
 type ServiceDef = {
   title: string
   handle: string
   /** Category handle. */
   category: string
-  czk: number
-  eur: number
-}
+} & (Price | { option: string; variants: (Price & { title: string })[] })
 
 /**
  * Services sold in the shop (owner, 2026-11-22). No shipping profile and no
  * inventory, like the gift vouchers: a cart of services skips delivery and pays
- * through Comgate. One variant each; created as drafts until their texts are
- * written in Payload.
+ * through Comgate. Created as drafts until their texts are written in Payload.
  */
 export const SERVICES: ServiceDef[] = [
   {
@@ -111,6 +111,35 @@ export const SERVICES: ServiceDef[] = [
     category: "estetika",
     czk: 1000,
     eur: 40,
+  },
+  {
+    title: "Aplikace na jednotlivé partie",
+    handle: "ultherapy-aplikace-na-jednotlive-partie",
+    category: "ultherapy",
+    option: "Partie",
+    // The owner gave CZK per area and "od 240 EUR"; like all their prices, EUR = Kč ÷ 25.
+    variants: [
+      { title: "Brow lift", czk: 6000, eur: 240 },
+      { title: "Brow lift a oční okolí", czk: 12000, eur: 480 },
+      { title: "Lower face", czk: 22000, eur: 880 },
+      { title: "Horní část krku/podbradek", czk: 15000, eur: 600 },
+      { title: "Krk", czk: 15000, eur: 600 },
+      { title: "Dekolt", czk: 17000, eur: 680 },
+    ],
+  },
+  {
+    title: "Facelift (tváře + horní část krku/podbradek)",
+    handle: "ultherapy-facelift",
+    category: "ultherapy",
+    czk: 35000,
+    eur: 1400,
+  },
+  {
+    title: "Full facelift (facelift s browliftem)",
+    handle: "ultherapy-full-facelift",
+    category: "ultherapy",
+    czk: 40000,
+    eur: 1600,
   },
 ]
 
@@ -235,27 +264,34 @@ async function ensureService(def: ServiceDef, categoryId: string, salesChannelId
     log("exists", `product ${products[0].title} (${products[0].status})`)
     return
   }
+  // A single price is one variant under Medusa's default option.
+  const option = "variants" in def ? def.option : DEFAULT_OPTION.title
+  const variants =
+    "variants" in def
+      ? def.variants.map((v) => ({ ...v, value: v.title }))
+      : [{ title: def.title, czk: def.czk, eur: def.eur, value: DEFAULT_OPTION.value }]
   await sdk.admin.product.create({
     title: def.title,
     handle: def.handle,
     status: "draft",
     categories: [{ id: categoryId }],
     sales_channels: salesChannelIds.map((id) => ({ id })),
-    options: [{ title: DEFAULT_OPTION.title, values: [DEFAULT_OPTION.value] }],
-    variants: [
-      {
-        title: def.title,
-        manage_inventory: false,
-        allow_backorder: false,
-        options: { [DEFAULT_OPTION.title]: DEFAULT_OPTION.value },
-        prices: [
-          { currency_code: "czk", amount: def.czk },
-          { currency_code: "eur", amount: def.eur },
-        ],
-      },
-    ],
+    options: [{ title: option, values: variants.map((v) => v.value) }],
+    variants: variants.map((v, rank) => ({
+      title: v.title,
+      // The owner's order, in admin and in the shop's selector.
+      variant_rank: rank,
+      manage_inventory: false,
+      allow_backorder: false,
+      options: { [option]: v.value },
+      prices: [
+        { currency_code: "czk", amount: v.czk },
+        { currency_code: "eur", amount: v.eur },
+      ],
+    })),
   })
-  log("created", `product ${def.title} (draft, ${def.czk} Kč, ${def.eur} €)`)
+  const prices = variants.map((v) => `${v.czk} Kč / ${v.eur} €`).join(", ")
+  log("created", `product ${def.title} (draft, ${prices})`)
 }
 
 const categoryIds = new Map<string, string>()
