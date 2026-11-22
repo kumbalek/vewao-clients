@@ -1,5 +1,6 @@
 "use client"
 
+import { itemVoucherTitle } from "@lib/util/voucher"
 import { Transition } from "@headlessui/react"
 import { convertToLocale } from "@lib/util/money"
 import { HttpTypes } from "@medusajs/types"
@@ -147,6 +148,7 @@ const CartDropdown = ({
                             <Thumbnail
                               thumbnail={item.thumbnail}
                               images={item.variant?.product?.images}
+                              voucherTitle={itemVoucherTitle(item)}
                               size="square"
                             />
                           </LocalizedClientLink>

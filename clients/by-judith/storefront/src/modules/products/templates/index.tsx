@@ -1,6 +1,7 @@
 import React, { Suspense } from "react"
 
 import ImageGallery from "@modules/products/components/image-gallery"
+import { productVoucherTitle } from "@lib/util/voucher"
 import ProductActions from "@modules/products/components/product-actions"
 import ProductTabs from "@modules/products/components/product-tabs"
 import RelatedProducts from "@modules/products/components/related-products"
@@ -60,7 +61,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
         data-testid="product-container"
       >
         <div className="flex flex-col small:sticky small:top-24 small:py-0 max-w-[420px] w-full pb-8 gap-y-1">
-          <ImageGallery images={product?.images || []} title={product.title} />
+          <ImageGallery images={product?.images || []} title={product.title} voucherTitle={productVoucherTitle(product)} />
           {/* <ProductOnboardingCta /> */}
           <Suspense
             fallback={

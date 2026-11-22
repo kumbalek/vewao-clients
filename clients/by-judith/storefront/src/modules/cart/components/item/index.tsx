@@ -1,5 +1,6 @@
 "use client"
 
+import { itemVoucherTitle } from "@lib/util/voucher"
 import { Table, Text, clx } from "@medusajs/ui"
 import { updateLineItem } from "@lib/data/cart"
 import { HttpTypes } from "@medusajs/types"
@@ -75,6 +76,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
             <Thumbnail
               thumbnail={item.thumbnail}
               images={item.variant?.product?.images}
+              voucherTitle={itemVoucherTitle(item)}
               size="square"
             />
           </LocalizedClientLink>

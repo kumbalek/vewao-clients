@@ -71,3 +71,30 @@ test.describe("a voucher with goods", () => {
     await expect(page.getByTestId("delivery-not-needed")).toHaveCount(0)
   })
 })
+
+// The voucher picture (vewao-clients#70): the empty voucher with the product's
+// name on it, tilted with a shadow like a printed card.
+test("a voucher's product page shows the voucher card with its name", async ({ page }) => {
+  await page.goto("/cz/products/darkovy-poukaz")
+
+  const card = page.getByRole("img", { name: "Vstupní osobní diagnostika Judity Halvové" })
+  await expect(card).toBeVisible()
+  await expect(card.getByTestId("voucher-title")).toHaveText("Vstupní osobní diagnostika Judity Halvové")
+  await expect(card).toContainText("Dárkový poukaz")
+  const { transform, filter } = await card.locator("[style*='aspect-ratio']").evaluate((el) => ({
+    transform: getComputedStyle(el).transform,
+    filter: getComputedStyle(el.parentElement!).filter,
+  }))
+  expect(transform).not.toBe("none")
+  expect(filter).toContain("drop-shadow")
+})
+
+test.describe("the voucher line in the cart", () => {
+  test.beforeEach(useCart("cart_voucher"))
+
+  test("shows the voucher card with the product's name", async ({ page }) => {
+    await page.goto("/cz/cart")
+    const row = page.getByTestId("product-row").filter({ has: page.getByTestId("voucher-image") })
+    await expect(row.getByTestId("voucher-title")).toHaveText("Dárkový poukaz")
+  })
+})

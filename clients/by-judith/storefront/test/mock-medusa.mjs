@@ -72,6 +72,13 @@ const giftProduct = {
     calculated_price: { calculated_amount: 199, original_amount: 199, currency_code: "czk", calculated_price: { price_list_type: null }, original_price: { price_list_type: null } },
   }],
 }
+// A gift voucher product (vewao-clients#70), served by handle only so listings stay as they are.
+const voucherProduct = {
+  ...giftProduct,
+  id: "prod_voucher", handle: "darkovy-poukaz", title: "Vstupní osobní diagnostika Judity Halvové", description: null,
+  thumbnail: "/logo.webp", images: [{ id: "img_voucher", url: "/logo.webp", rank: 0 }], type: { id: "ptyp_voucher", value: "Dárkový poukaz" },
+  variants: [{ ...giftProduct.variants[0], id: "variant_voucher", title: "Poukaz", sku: "POUKAZ-DIAGNOSTIKA" }],
+}
 // Active quantity-tier promotions as vewao-platform's GET /store/promotion-tiers returns them.
 let promotionTiers = []
 // Magazine articles as the Content plugin serves them: newest first, body_html
@@ -138,7 +145,8 @@ function shippingFor(id) {
 const voucherItem = () => ({
   id: "item_voucher", variant_id: "variant_voucher", title: "Dárkový poukaz", product_title: "Dárkový poukaz", product_handle: "darkovy-poukaz",
   subtitle: "1 000 Kč", quantity: 1, unit_price: 1000, total: 1000, original_total: 1000, is_discountable: true, requires_shipping: false,
-  thumbnail: null, variant: { id: "variant_voucher", title: "1 000 Kč", options: [] }, product: { id: "prod_voucher", handle: "darkovy-poukaz" }, metadata: {},
+  thumbnail: "/logo.webp", product_type: "Dárkový poukaz",
+  variant: { id: "variant_voucher", title: "1 000 Kč", options: [] }, product: { id: "prod_voucher", handle: "darkovy-poukaz" }, metadata: {},
 })
 function cart(id) {
   if (!carts.has(id) && id.startsWith("cart_voucher")) {
@@ -359,6 +367,9 @@ const server = createServer(async (req, res) => {
     const regionId = url.searchParams.get("region_id")
     if (url.searchParams.get("handle") === giftProduct.handle) {
       return send({ products: [pricedFor(giftProduct, regionId)], count: 1 })
+    }
+    if (url.searchParams.get("handle") === voucherProduct.handle) {
+      return send({ products: [pricedFor(voucherProduct, regionId)], count: 1 })
     }
     // An unfiltered listing (Novinky's sale section) holds the sale product.
     const unfiltered = !url.searchParams.get("handle") && !url.searchParams.get("q") && ![...url.searchParams.keys()].some((key) => key.startsWith("id") || key.startsWith("collection_id") || key.startsWith("category_id"))

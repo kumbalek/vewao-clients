@@ -3,6 +3,7 @@ import { listPriceReferences } from "@lib/data/price-history"
 import { listProducts } from "@lib/data/products"
 import { claimForPrice } from "@lib/util/discount-claim"
 import { getProductPrice } from "@lib/util/get-product-price"
+import { productVoucherTitle } from "@lib/util/voucher"
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Thumbnail from "../thumbnail"
@@ -45,6 +46,7 @@ export default async function ProductPreview({
           images={product.images}
           size="full"
           isFeatured={isFeatured}
+          voucherTitle={productVoucherTitle(product)}
         />
         <div className="flex txt-compact-medium mt-4 justify-between px-8">
           <Text className="text-ui-fg-subtle" data-testid="product-title">
