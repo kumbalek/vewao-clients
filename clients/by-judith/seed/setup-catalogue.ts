@@ -2,7 +2,7 @@ import Medusa from "@medusajs/js-sdk"
 import { readFileSync } from "node:fs"
 
 import type { DpCatalogue, DpProduct } from "./extract-dp.ts"
-import { eurFromCzk, HERB_EUR_PRICES, ownerEurPriceUpdate } from "./pricing.ts"
+import { eurFromCzk, HERB_EUR_PRICES, ownerEurPriceUpdate, roundedEurUpdate } from "./pricing.ts"
 
 /**
  * The new shop's catalogue (vewao-clients#64): product categories, the owner's
@@ -156,6 +156,26 @@ const VOUCHER_TYPE = "Dárkový poukaz"
 /** Physical goods ship from the clinic; stock starts at 0 until the merchant counts it. */
 const STOCK_LOCATION = "Beauty Body Clinic"
 const DP_PARENT = "dp-dermaceuticals"
+
+/**
+ * The owner's corrections to the old shop's DP titles (2026-11-22), by the
+ * snapshot's handle. "CBD VISSSAGE" is DP Dermaceuticals' own spelling and stays.
+ */
+const DP_TITLE_FIXES: Record<string, { title: string; handle: string }> = {
+  "antioxidant-coctail-50ml": { title: "ANTIOXIDANT COCKTAIL™ 50ML", handle: "antioxidant-cocktail-50ml" },
+  "antioxidant-coctail-30ml": { title: "ANTIOXIDANT COCKTAIL™ 30ML", handle: "antioxidant-cocktail-30ml" },
+  "dermapem-home-jehlickove-naplne": {
+    title: "Dermapen HOME™ jehličkové náplně",
+    handle: "dermapen-home-jehlickove-naplne",
+  },
+}
+
+/** Products the owner files in fewer DP subcategories than the old shop did (2026-11-22). */
+const DP_ONLY_IN: Record<string, string[]> = { "cbd-uber-calm-balm-30-ml": ["cbd-kolekce"] }
+
+/** VAT on everything, in Czechia and Slovakia alike (owner, 2026-11-22); prices include it. */
+const VAT = { rate: 21, name: "DPH 21 %", code: "DPH21" }
+const VAT_COUNTRIES = ["cz", "sk"]
 
 const dp = JSON.parse(readFileSync(new URL("./dp-catalogue.json", import.meta.url), "utf8")) as DpCatalogue
 
@@ -357,11 +377,14 @@ async function uploadImage(url: string, handle: string): Promise<string | undefi
   }
 }
 
+const PRODUCT_FIELDS = "id,title,handle,status,thumbnail,variants.id,variants.title,*variants.prices"
+
 /**
  * Creates a missing DP Dermaceuticals product as a draft: shipped goods with a
  * shipping profile and managed stock, the old shop's codes as SKUs, EUR at
- * Kč ÷ 25. An existing product is left as it is, except that it gets the old
- * shop's image if it has none.
+ * Kč ÷ 25 rounded up. An existing product keeps everything else, but gets the
+ * owner's title fix, the old shop's image if it has none, and rounded EUR
+ * prices in place of the earlier unrounded ones.
  */
 async function ensureDpProduct(
   p: DpProduct,
@@ -369,23 +392,54 @@ async function ensureDpProduct(
   salesChannelIds: string[],
   shippingProfileId: string
 ): Promise<string> {
-  const { products } = await sdk.admin.product.list({ handle: p.handle, fields: "id,title,status,thumbnail" })
+  const fix = DP_TITLE_FIXES[p.handle]
+  const title = fix?.title ?? p.title
+  const handle = fix?.handle ?? p.handle
+  const variantTitle = (v: { title: string }) => (v.title === p.title ? title : v.title)
+
+  let { products } = await sdk.admin.product.list({ handle, fields: PRODUCT_FIELDS })
+  if (!products[0] && fix) {
+    ;({ products } = await sdk.admin.product.list({ handle: p.handle, fields: PRODUCT_FIELDS }))
+    const old = products[0]
+    if (old) {
+      await sdk.admin.product.update(old.id, { title, handle })
+      for (const variant of old.variants ?? []) {
+        if (variant.title === p.title) await sdk.admin.product.updateVariant(old.id, variant.id, { title })
+      }
+      log("updated", `product ${old.title} → ${title} (${handle})`)
+    }
+  }
   const existing = products[0]
   if (existing) {
-    const image = !existing.thumbnail && p.image ? await uploadImage(p.image, p.handle) : undefined
+    const image = !existing.thumbnail && p.image ? await uploadImage(p.image, handle) : undefined
     if (image) {
       await sdk.admin.product.update(existing.id, { thumbnail: image, images: [{ url: image }] })
-      log("updated", `product ${existing.title}: image from the old shop`)
-    } else {
-      log("exists", `product ${existing.title} (${existing.status})`)
+      log("updated", `product ${title}: image from the old shop`)
     }
+    for (const variant of existing.variants ?? []) {
+      const prices = variant.prices ?? []
+      const eur = prices.find((price) => price.currency_code === "eur")
+      const czk = prices.find((price) => price.currency_code === "czk")?.amount
+      const amount = czk == null ? undefined : roundedEurUpdate(eur?.amount, czk)
+      if (amount === undefined) continue
+      await sdk.admin.product.updateVariant(existing.id, variant.id, {
+        prices: [
+          ...prices
+            .filter((price) => price.currency_code !== "eur")
+            .map((price) => ({ id: price.id, currency_code: price.currency_code, amount: price.amount })),
+          { ...(eur ? { id: eur.id } : {}), currency_code: "eur", amount },
+        ],
+      })
+      log("updated", `product ${title} ${variant.title}: ${eur?.amount ?? "no"} € → ${amount} €`)
+    }
+    if (!image) log("exists", `product ${title} (${existing.status})`)
     return existing.id
   }
   const option = p.option ?? DEFAULT_OPTION.title
-  const image = p.image ? await uploadImage(p.image, p.handle) : undefined
+  const image = p.image ? await uploadImage(p.image, handle) : undefined
   const { product } = await sdk.admin.product.create({
-    title: p.title,
-    handle: p.handle,
+    title,
+    handle,
     status: "draft",
     categories: categoryIds.map((id) => ({ id })),
     sales_channels: salesChannelIds.map((id) => ({ id })),
@@ -394,7 +448,7 @@ async function ensureDpProduct(
     metadata: { source_url: p.source_url, ...(p.image ? { source_image: p.image } : {}) },
     options: [{ title: option, values: p.option ? p.variants.map((v) => v.title) : [DEFAULT_OPTION.value] }],
     variants: p.variants.map((v, rank) => ({
-      title: v.title,
+      title: variantTitle(v),
       sku: v.sku,
       variant_rank: rank,
       manage_inventory: true,
@@ -407,8 +461,39 @@ async function ensureDpProduct(
     })),
   })
   const prices = p.variants.map((v) => `${v.price_czk} Kč / ${eurFromCzk(v.price_czk)} €`).join(", ")
-  log("created", `product ${p.title} (draft, ${prices}${image ? "" : ", no image"})`)
+  log("created", `product ${title} (draft, ${prices}${image ? "" : ", no image"})`)
   return product.id
+}
+
+/** Takes the product out of the given categories it is in (the owner's DP_ONLY_IN). */
+async function removeFromCategories(productId: string, categories: { id: string; name: string }[]) {
+  const { product } = await sdk.admin.product.retrieve(productId, { fields: "id,handle,*categories" })
+  for (const category of categories) {
+    if (!product.categories?.some((c) => c?.id === category.id)) continue
+    await sdk.admin.productCategory.updateProducts(category.id, { remove: [productId] })
+    log("updated", `${category.name}: removed ${product.handle}`)
+  }
+}
+
+/** A tax region with the default VAT rate for each country; an existing default rate stays. */
+async function ensureVat() {
+  for (const country of VAT_COUNTRIES) {
+    const { tax_regions } = await sdk.admin.taxRegion.list({ country_code: country, fields: "id,province_code,*tax_rates" })
+    const region = tax_regions.find((r) => !r.province_code)
+    if (!region) {
+      await sdk.admin.taxRegion.create({ country_code: country, provider_id: "tp_system", default_tax_rate: VAT })
+      log("created", `tax region ${country}: ${VAT.name}`)
+      continue
+    }
+    const current = region.tax_rates?.find((rate) => rate.is_default)
+    if (current) {
+      if (current.rate === VAT.rate) log("exists", `tax region ${country}: ${current.name}`)
+      else log("warning", `tax region ${country} keeps its default ${current.rate} % (owner's VAT ${VAT.rate} %)`)
+      continue
+    }
+    await sdk.admin.taxRate.create({ tax_region_id: region.id, ...VAT, is_default: true })
+    log("created", `tax rate ${country}: ${VAT.name}`)
+  }
 }
 
 /** Adds listed products missing from the category; products already in it stay. */
@@ -449,6 +534,8 @@ async function ensureStockLevels(skus: string[]) {
   log(created ? "created" : "exists", `stock levels at ${STOCK_LOCATION}: ${created} new (0 in stock)`)
 }
 
+await ensureVat()
+
 const categoryIds = new Map<string, string>()
 for (let rank = 0; rank < CATEGORIES.length; rank++) {
   const def = CATEGORIES[rank]!
@@ -471,11 +558,13 @@ for (const def of VOUCHER_PRODUCTS) {
 // DP Dermaceuticals: the old shop's subcategories under DP_PARENT, then its products.
 const dpParent = categoryIds.get(DP_PARENT)
 if (!dpParent) throw new Error(`Category ${DP_PARENT} missing`)
-const dpCategories: { id: string; name: string; products: string[] }[] = []
+const dpCategories: { id: string; name: string; handle: string; products: string[] }[] = []
 for (let rank = 0; rank < dp.categories.length; rank++) {
   const c = dp.categories[rank]!
   const category = await ensureCategory({ name: c.title, handle: c.handle }, rank, dpParent)
-  dpCategories.push({ id: category.id, name: c.title, products: c.products })
+  // The snapshot's product handles, minus the products the owner files elsewhere.
+  const products = c.products.filter((handle) => !DP_ONLY_IN[handle] || DP_ONLY_IN[handle]!.includes(c.handle))
+  dpCategories.push({ id: category.id, name: c.title, handle: c.handle, products })
 }
 const { shipping_profiles } = await sdk.admin.shippingProfile.list({ type: "default", fields: "id" })
 const shippingProfileId = shipping_profiles[0]?.id
@@ -487,5 +576,9 @@ for (const p of dp.products) {
 }
 for (const c of dpCategories) {
   await addProducts(c, c.products.map((handle) => dpProductIds.get(handle)!))
+}
+for (const [handle, keep] of Object.entries(DP_ONLY_IN)) {
+  const productId = dpProductIds.get(handle)
+  if (productId) await removeFromCategories(productId, dpCategories.filter((c) => !keep.includes(c.handle)))
 }
 await ensureStockLevels(dp.products.flatMap((p) => p.variants.map((v) => v.sku)))

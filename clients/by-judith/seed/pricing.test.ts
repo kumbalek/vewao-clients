@@ -1,7 +1,15 @@
 import assert from "node:assert/strict"
 import test from "node:test"
 
-import { devEurPrice, eurFromCzk, eurPriceFor, HERB_EUR_PRICES, ownerEurPriceUpdate } from "./pricing.ts"
+import {
+  devEurPrice,
+  eurFromCzk,
+  eurPriceFor,
+  exactEurFromCzk,
+  HERB_EUR_PRICES,
+  ownerEurPriceUpdate,
+  roundedEurUpdate,
+} from "./pricing.ts"
 
 test("the herb lines have the owner's EUR prices", () => {
   assert.deepEqual(HERB_EUR_PRICES, { gold: 75, acute: 24 })
@@ -25,10 +33,20 @@ test("the owner's price replaces only a missing price or the placeholder", () =>
   assert.equal(ownerEurPriceUpdate(79, 1890, 75), undefined)
 })
 
-test("the other ranges cost Kč ÷ 25, to the cent", () => {
+test("the other ranges cost Kč ÷ 25, rounded up to a whole euro", () => {
   assert.equal(eurFromCzk(6000), 240)
-  assert.equal(eurFromCzk(760), 30.4)
-  assert.equal(eurFromCzk(1522), 60.88)
-  assert.equal(eurFromCzk(1249), 49.96)
-  assert.equal(eurFromCzk(14990), 599.6)
+  assert.equal(eurFromCzk(760), 31)
+  assert.equal(eurFromCzk(1522), 61)
+  assert.equal(eurFromCzk(1249), 50)
+  assert.equal(eurFromCzk(14990), 600)
+  assert.equal(eurFromCzk(1225), 49)
+  assert.equal(exactEurFromCzk(2362), 94.48)
+})
+
+test("the rounded price replaces only a missing or the earlier unrounded one", () => {
+  assert.equal(roundedEurUpdate(undefined, 760), 31)
+  assert.equal(roundedEurUpdate(94.48, 2362), 95)
+  // Already rounded, or set in admin: left alone.
+  assert.equal(roundedEurUpdate(95, 2362), undefined)
+  assert.equal(roundedEurUpdate(99, 2362), undefined)
 })

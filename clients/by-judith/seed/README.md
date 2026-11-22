@@ -33,7 +33,7 @@ channel. Keep the secret key out of shell history and git; revoke it when done.
 | Stock | 100 per SKU at Beauty Body Clinic (dev value, not real stock) |
 | Gift packaging | Product `darkove-baleni` (the legacy handle), 199 Kč, _Discountable_ off: promotions neither discount nor count it |
 | Quantity tiers | Automatic promotions `TIER_10`/`TIER_20`/`TIER_30` (10/20/30 % from 1/2/3+ discountable items), created as **draft** with the legacy progress-bar texts; activate them in admin once the merchant confirms values (vewao-platform#14) |
-| Tax | Prices are VAT-inclusive; **no tax rates** until verified with the accountant |
+| Tax | Prices are VAT-inclusive. VAT 21 % in CZ and SK comes from `setup-catalogue.ts` (owner, 2026-11-22) |
 | Slovakia (EUR) | Region `Slovensko` (EUR, `sk`), EUR among the store's currencies, Comgate's EUR connection `pp_comgate_eur` when the backend has it, otherwise the Czech region's Comgate (no pay-on-site: Slovakia has no pickup); `Přepravce PPL – Slovensko` (8 €, free from 200 €); an EUR price on every variant: the owner's for the herbs (Gold Edition 75 €, Acute 24 €; `pricing.ts`), otherwise CZK ÷ 25, up to a whole euro, minus 10 cents. Delivery amounts and non-herb EUR prices are **dev placeholders** until the merchant sets them (vewao-clients#45) |
 
 A new Slovak region gets Comgate's EUR connection (vewao-platform#39) or, on a
@@ -67,12 +67,18 @@ up the new shop's catalogue on any backend (vewao-clients#64):
 - **DP Dermaceuticals** from `dp-catalogue.json`: the old shop's ten
   subcategories under DP Dermaceuticals in its order, and its 41 products with
   their codes as SKUs, variants (R.E.R EYE SERUM™ by Množství, COVER RECOVER™ by
-  Odstín), Kč prices, EUR at Kč ÷ 25 and main image (uploaded to the backend's
+  Odstín), Kč prices, EUR at Kč ÷ 25 rounded up and main image (uploaded to the backend's
   file storage; the source URL stays in the product's metadata). They are
   shipped goods with managed stock, 0 at Beauty Body Clinic until counted.
 
+The owner's decisions on top of the snapshot: three title fixes (ANTIOXIDANT
+COCKTAIL™, Dermapen HOME™ jehličkové náplně; "CBD VISSSAGE" is DP's own
+spelling), CBD ÜBER CALM BALM only in CBD Kolekce, and VAT 21 % on everything in
+Czechia and Slovakia (tax regions `cz`, `sk`).
+
 Everything new is a **draft** until its texts are written in Payload. EUR prices
-other than the herbs' follow the owner's rule Kč ÷ 25 (`pricing.ts`). The
+other than the herbs' follow the owner's rule Kč ÷ 25 rounded up to a whole euro
+(`pricing.ts`). The
 script is additive and idempotent. Production gets the catalogue prepared on
 localhost and dev (D23), so it isn't seeded from this script.
 
