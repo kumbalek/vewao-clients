@@ -49,6 +49,7 @@ test("the footer links only to pages that exist", async ({ page }) => {
   await page.goto("/cz")
   const footer = page.getByRole("contentinfo")
   await expect(footer.getByRole("link", { name: "Všechny produkty" })).toBeVisible()
+  await expect(footer.getByRole("link", { name: "Doprava a platba" })).toBeVisible()
   await expect(footer.getByRole("link", { name: "Magazín" })).toHaveCount(0)
   await expect(footer.getByRole("link", { name: "O nás" })).toHaveCount(0)
 })
@@ -90,6 +91,7 @@ test("the e-shop's pages are served", async ({ page }) => {
     "/cz/account",
     "/cz/content/contact",
     "/cz/content/terms-of-use",
+    "/cz/content/shipping-and-payment",
     "/cz/odstoupeni-od-smlouvy",
     "/sk/products/akcni-produkt",
   ]) {

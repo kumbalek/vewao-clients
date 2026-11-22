@@ -35,7 +35,9 @@
     "privacyTitle": "Zásady ochrany osobních údajů",
     "termsTitle": "Obchodní podmínky",
     "customerServiceTitle": "Zákaznická podpora",
-    "customerServiceDescription": "Informace pro zákazníky, způsoby dopravy, platby a možnosti vrácení."
+    "customerServiceDescription": "Informace pro zákazníky, způsoby dopravy, platby a možnosti vrácení.",
+    "shippingPaymentTitle": "Doprava a platba",
+    "shippingPaymentDescription": "Možnosti dopravy a platby – osobní odběr, PPL, bankovní převod, platba kartou a rychlé online platby."
   },
   "hero": {
     "claim": "Objevte moudrost mistrů tradiční čínské medicíny a sílu bylin ukrytou v každé tabletě.",
@@ -127,7 +129,8 @@
     "customerServiceLink": "Zákaznická podpora",
     "title": "Zákaznická podpora",
     "privacyLink": "Zásady ochrany osobních údajů",
-    "termsLink": "Obchodní podmínky"
+    "termsLink": "Obchodní podmínky",
+    "shippingPaymentLink": "Doprava a platba"
   },
   "contact": {
     "title": "Kontakt"
@@ -137,6 +140,11 @@
   },
   "privacyPolicy": {
     "title": "Zásady ochrany osobních údajů"
+  },
+  "shippingPayment": {
+    "title": "Doprava a platba",
+    "shippingOptions": "Možnosti dopravy",
+    "paymentOptions": "Možnosti platby"
   },
   "checkout": {
     "backToCart": "Zpět do košíku",
@@ -269,7 +277,9 @@
     "contact": "Kontakt",
     "magazin": "Magazín",
     "about": "O nás",
-    "copyright": "© {year} Herbs by JuditH"
+    "copyright": "© {year} Herbs by JuditH",
+    "shippingPayment": "Doprava a platba",
+    "paymentMethods": "Podporované platební metody: Comgate, Visa, Mastercard, Google Pay a Apple Pay"
   },
   "magazin": {
     "title": "Magazín",

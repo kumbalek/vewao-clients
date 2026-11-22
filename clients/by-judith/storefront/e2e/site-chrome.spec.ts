@@ -171,6 +171,14 @@ test("the footer shows the real contact details and marks missing content", asyn
   )
   // The test build enables analytics, so the consent settings are offered.
   await expect(footer.getByRole("button", { name: "Nastavení cookies" })).toBeVisible()
+  await expect(footer.getByRole("link", { name: "Doprava a platba" })).toHaveAttribute(
+    "href",
+    "/cz/content/shipping-and-payment"
+  )
+  await expect(footer.getByTestId("footer-payment-methods")).toHaveAttribute(
+    "alt",
+    "Podporované platební metody: Comgate, Visa, Mastercard, Google Pay a Apple Pay"
+  )
   // Content the merchant has not supplied yet is visibly marked, never invented.
-  await expect(footer.locator("[data-placeholder]")).toHaveCount(4)
+  await expect(footer.locator("[data-placeholder]")).toHaveCount(3)
 })
