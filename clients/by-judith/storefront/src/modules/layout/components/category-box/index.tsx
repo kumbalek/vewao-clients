@@ -88,7 +88,8 @@ export default function CategoryBox({
         >
           {image && (
             // The URL is the merchant's (category metadata), so any host: shown as is.
-            <Image src={image} alt="" fill sizes={`${s.image}px`} unoptimized className="object-cover" />
+            // Whole, not cropped: the owner's images are on white, like the tile.
+            <Image src={image} alt="" fill sizes={`${s.image}px`} unoptimized className="object-contain" />
           )}
         </span>
         <span className={clx("flex min-w-0 flex-col gap-0.5", s.text)}>
