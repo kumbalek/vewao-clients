@@ -64,7 +64,6 @@ export const footer = {
   about: pending("krátký popis značky a kliniky") as Copy,
   social: pending("odkazy na sociální sítě") as Copy,
   newsletter: pending("poskytovatel newsletteru a souhlas GDPR") as Copy,
-  paymentMethods: pending("loga platebních metod") as Copy,
   legal: [
     { label: "Ochrana osobních údajů", href: "/content/privacy-policy" },
     { label: "Obchodní podmínky", href: "/content/terms-of-use" },

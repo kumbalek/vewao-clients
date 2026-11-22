@@ -54,6 +54,7 @@ export default function SiteFooter({
     { label: t("magazin"), href: "/magazin" },
     { label: t("about"), href: "/o-nas" },
     { label: t("customerService"), href: "/content/customer-service" },
+    { label: t("shippingPayment"), href: "/content/shipping-and-payment" },
     { label: t("contact"), href: "/content/contact" },
   ]
   const quickLinks = shopOnly ? allLinks.filter((link) => !isFullSitePath(link.href)) : allLinks
@@ -143,7 +144,15 @@ export default function SiteFooter({
             )}
             <li>{t("copyright", { year: new Date().getFullYear() })}</li>
           </ul>
-          <CopyText value={footer.paymentMethods} />
+          {/* The payment providers' logos, from the legacy shop (bbc-ng 3c88698). */}
+          <Image
+            src="/pws.png"
+            alt={t("paymentMethods")}
+            width={330}
+            height={30}
+            className="h-auto w-full max-w-[330px]"
+            data-testid="footer-payment-methods"
+          />
         </Container>
       </div>
     </footer>
