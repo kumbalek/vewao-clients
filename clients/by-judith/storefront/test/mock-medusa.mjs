@@ -73,6 +73,15 @@ let promotionTiers = []
 // Magazine articles as the Content plugin serves them: newest first, body_html
 // only on the detail route (the plugin renders and sanitises Markdown).
 const photo = { image: "http://localhost:9101/static/dn.webp", image_width: 1200, image_height: 1798, gallery: [] }
+// The shop's categories (vewao-clients#64), out of order: the menus sort by rank.
+const CATEGORIES = [
+  { id: "pcat_dp", handle: "dp-dermaceuticals", name: "DP Dermaceuticals", rank: 4, parent_category_id: null },
+  { id: "pcat_dp_masky", handle: "dp-masky", name: "DP Masky", rank: 5, parent_category_id: "pcat_dp" },
+  { id: "pcat_herbs", handle: "herbs", name: "Herbs", rank: 0, parent_category_id: null },
+  { id: "pcat_cisteni", handle: "cisteni-a-exfoliace", name: "Čištění a exfoliace", rank: 0, parent_category_id: "pcat_dp" },
+  { id: "pcat_tcm", handle: "tcm", name: "TCM", rank: 1, parent_category_id: null },
+]
+
 // Clinic collections (seed/import-clinic.ts): the team and O nás. Procedures
 // come from the CMS (#43).
 const clinic = {
@@ -324,7 +333,11 @@ const server = createServer(async (req, res) => {
   if (url.pathname === "/store/regions/reg_test") return send({ region })
   if (url.pathname === "/store/regions/reg_sk") return send({ region: regionSk })
   if (url.pathname === "/store/collections") return send({ collections: [], count: 0 })
-  if (url.pathname === "/store/product-categories") return send({ product_categories: [], count: 0 })
+  if (url.pathname === "/store/product-categories") {
+    const handle = url.searchParams.get("handle")
+    const categories = handle ? CATEGORIES.filter((c) => c.handle === handle) : CATEGORIES
+    return send({ product_categories: categories, count: categories.length })
+  }
   if (url.pathname === "/store/products") {
     // The SDK encodes id arrays as id[0]=…; accept any id key.
     const regionId = url.searchParams.get("region_id")
