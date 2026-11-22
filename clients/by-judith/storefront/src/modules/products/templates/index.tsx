@@ -3,6 +3,7 @@ import React, { Suspense } from "react"
 import ImageGallery from "@modules/products/components/image-gallery"
 import { productVoucherTitle } from "@lib/util/voucher"
 import ProductActions from "@modules/products/components/product-actions"
+import { VariantOptions, VariantOptionsProvider } from "@modules/products/components/product-actions/variant-options"
 import ProductTabs from "@modules/products/components/product-tabs"
 import RelatedProducts from "@modules/products/components/related-products"
 import ProductInfo from "@modules/products/templates/product-info"
@@ -56,6 +57,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
       <div className="w-full max-w-[1440px] mt-6 pl-6">
         <Breadcrumbs path={brPath} />
       </div>
+      <VariantOptionsProvider product={product}>
       <div
         className="content-container flex flex-col small:flex-row small:justify-center items-center small:items-start py-6 relative"
         data-testid="product-container"
@@ -77,9 +79,12 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
         </div>
         <div className="flex flex-col items-center gap-4 block w-full small:max-w-[500px] small:pl-8 relative">
           <ProductInfo product={product} texts={texts} />
+          {/* Right under the description, with room for whole words (vewao-clients#70). */}
+          <VariantOptions product={product} className="hidden small:flex" />
           <ProductTabs texts={texts} />
         </div>
       </div>
+      </VariantOptionsProvider>
       <div
         className="content-container my-16 small:my-32"
         data-testid="related-products-container"

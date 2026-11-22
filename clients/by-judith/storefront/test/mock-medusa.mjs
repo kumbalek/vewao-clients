@@ -79,6 +79,20 @@ const voucherProduct = {
   thumbnail: "/logo.webp", images: [{ id: "img_voucher", url: "/logo.webp", rank: 0 }], type: { id: "ptyp_voucher", value: "Dárkový poukaz" },
   variants: [{ ...giftProduct.variants[0], id: "variant_voucher", title: "Poukaz", sku: "POUKAZ-DIAGNOSTIKA" }],
 }
+// Ultherapy's single areas (vewao-clients#70): one voucher, a variant per area.
+const PARTIE = [["Brow lift", 6000], ["Brow lift a oční okolí", 12000], ["Lower face", 22000], ["Horní část krku/podbradek", 15000], ["Krk", 15000], ["Dekolt", 17000]]
+const partieProduct = {
+  ...voucherProduct,
+  id: "prod_partie", handle: "ultherapy-aplikace-na-jednotlive-partie", title: "Aplikace na jednotlivé partie",
+  options: [{ id: "opt_partie", title: "Partie", values: PARTIE.map(([value], i) => ({ id: `optval_partie_${i}`, value })) }],
+  variants: PARTIE.map(([value, amount], i) => ({
+    ...giftProduct.variants[0], id: `variant_partie_${i}`, title: value, sku: `ULTHERAPY-PARTIE-${i}`,
+    options: [{ id: `optval_partie_${i}`, option_id: "opt_partie", value }],
+    calculated_price: { ...giftProduct.variants[0].calculated_price, calculated_amount: amount, original_amount: amount },
+  })),
+}
+// Products served by handle or id only, so listings stay as they are.
+const byHandleOrIdOnly = [voucherProduct, partieProduct]
 // Active quantity-tier promotions as vewao-platform's GET /store/promotion-tiers returns them.
 let promotionTiers = []
 // Magazine articles as the Content plugin serves them: newest first, body_html
@@ -368,9 +382,10 @@ const server = createServer(async (req, res) => {
     if (url.searchParams.get("handle") === giftProduct.handle) {
       return send({ products: [pricedFor(giftProduct, regionId)], count: 1 })
     }
-    if (url.searchParams.get("handle") === voucherProduct.handle) {
-      return send({ products: [pricedFor(voucherProduct, regionId)], count: 1 })
-    }
+    const extra = byHandleOrIdOnly.find(
+      (p) => url.searchParams.get("handle") === p.handle || [...url.searchParams].some(([key, value]) => key.startsWith("id") && value === p.id)
+    )
+    if (extra) return send({ products: [pricedFor(extra, regionId)], count: 1 })
     // An unfiltered listing (Novinky's sale section) holds the sale product.
     const unfiltered = !url.searchParams.get("handle") && !url.searchParams.get("q") && ![...url.searchParams.keys()].some((key) => key.startsWith("id") || key.startsWith("collection_id") || key.startsWith("category_id"))
     if (unfiltered) return send({ products: [pricedFor(saleProduct, regionId)], count: 1 })

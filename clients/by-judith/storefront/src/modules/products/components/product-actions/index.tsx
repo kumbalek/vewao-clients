@@ -5,8 +5,7 @@ import type { PriceReference } from "@lib/util/discount-claim"
 import { useIntersection } from "@lib/hooks/use-in-view"
 import { HttpTypes } from "@medusajs/types"
 import { Button } from "@medusajs/ui"
-import Divider from "@modules/common/components/divider"
-import OptionSelect from "@modules/products/components/product-actions/option-select"
+import { VariantOptions, optionsAsKeymap, useVariantOptions } from "./variant-options"
 import { isEqual } from "lodash"
 import { useParams } from "next/navigation"
 import { useEffect, useMemo, useRef, useState } from "react"
@@ -23,40 +22,20 @@ type ProductActionsProps = {
   priceReferences?: PriceReference[]
 }
 
-const optionsAsKeymap = (
-  variantOptions: HttpTypes.StoreProductVariant["options"]
-) => {
-  return variantOptions?.reduce((acc: Record<string, string>, varopt: any) => {
-    acc[varopt.option_id] = varopt.value
-    return acc
-  }, {})
-}
-
 export default function ProductActions({
   product,
   disabled,
   priceReferences,
 }: ProductActionsProps) {
   const t = useTranslations("cart")
-  // Preselect a single variant during render, not in an effect: otherwise the
-  // server HTML shows every single-variant product as sold out.
-  const [options, setOptions] = useState<Record<string, string | undefined>>(
-    () =>
-      product.variants?.length === 1
-        ? optionsAsKeymap(product.variants[0].options) ?? {}
-        : {}
-  )
+  // Shared with the option buttons, which the page places (vewao-clients#70).
+  const { options, setOptionValue, setBusy } = useVariantOptions()
   const [isAdding, setIsAdding] = useState(false)
   const countryCode = useParams().countryCode as string
   const { delayedRefresh, isRefreshing } = useDelayedRefresh()
 
-  // If there is only 1 variant, preselect the options
-  useEffect(() => {
-    if (product.variants?.length === 1) {
-      const variantOptions = optionsAsKeymap(product.variants[0].options)
-      setOptions(variantOptions ?? {})
-    }
-  }, [product.variants])
+  // The options wait while the item is added.
+  useEffect(() => setBusy(isAdding || isRefreshing), [isAdding, isRefreshing, setBusy])
 
   const selectedVariant = useMemo(() => {
     if (!product.variants || product.variants.length === 0) {
@@ -68,14 +47,6 @@ export default function ProductActions({
       return isEqual(variantOptions, options)
     })
   }, [product.variants, options])
-
-  // update the options when a variant is selected
-  const setOptionValue = (optionId: string, value: string) => {
-    setOptions((prev) => ({
-      ...prev,
-      [optionId]: value,
-    }))
-  }
 
   //check if the selected options produce a valid variant
   const isValidVariant = useMemo(() => {
@@ -133,27 +104,8 @@ export default function ProductActions({
   return (
     <>
       <div className="flex flex-col items-center gap-y-4" ref={actionsRef}>
-        <div>
-          {(product.variants?.length ?? 0) > 1 && (
-            <div className="flex flex-col gap-y-4">
-              {(product.options || []).map((option) => {
-                return (
-                  <div key={option.id}>
-                    <OptionSelect
-                      option={option}
-                      current={options[option.id]}
-                      updateOption={setOptionValue}
-                      title={option.title ?? ""}
-                      data-testid="product-options"
-                      disabled={!!disabled || isAdding || isRefreshing}
-                    />
-                  </div>
-                )
-              })}
-              <Divider />
-            </div>
-          )}
-        </div>
+        {/* On a phone the options come first; from `small` up they are under the description. */}
+        <VariantOptions product={product} disabled={!!disabled} className="small:hidden" />
 
         <ProductPrice
           product={product}

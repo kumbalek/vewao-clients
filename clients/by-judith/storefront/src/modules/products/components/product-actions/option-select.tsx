@@ -1,5 +1,6 @@
 import { HttpTypes } from "@medusajs/types"
 import { clx } from "@medusajs/ui"
+import { useTranslations } from "next-intl"
 import React from "react"
 
 type OptionSelectProps = {
@@ -19,13 +20,14 @@ const OptionSelect: React.FC<OptionSelectProps> = ({
   "data-testid": dataTestId,
   disabled,
 }) => {
+  const t = useTranslations("product")
   const filteredOptions = (option.values ?? []).map((v) => v.value)
 
   return (
     <div className="flex flex-col gap-y-3">
-      <span className="text-sm">Select {title}</span>
+      <span className="text-sm">{t("selectOption", { option: title.toLocaleLowerCase("cs") })}</span>
       <div
-        className="flex flex-wrap justify-between gap-2"
+        className="flex flex-wrap gap-2"
         data-testid={dataTestId}
       >
         {filteredOptions.map((v) => {
@@ -34,7 +36,8 @@ const OptionSelect: React.FC<OptionSelectProps> = ({
               onClick={() => updateOption(option.id, v)}
               key={v}
               className={clx(
-                " bg-ui-bg-subtle border text-small-regular h-10 rounded-[3rem] p-2 flex-1 ",
+                // As wide as its words, never broken; buttons wrap onto rows (vewao-clients#70).
+                "bg-ui-bg-subtle border text-small-regular h-10 rounded-[3rem] px-4 whitespace-nowrap",
                 {
                   "border-ui-border-interactive": v === current,
                   "hover:shadow-elevation-card-rest transition-shadow ease-in-out duration-150":

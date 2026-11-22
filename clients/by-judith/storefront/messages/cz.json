@@ -236,7 +236,8 @@
     "category": "Kategorie",
     "collection": "Kolekce",
     "referencePrice": "Nejnižší cena za 30 dní před slevou:",
-    "voucher": "Dárkový poukaz"
+    "voucher": "Dárkový poukaz",
+    "selectOption": "Vyberte {option}"
   },
   "payment": {
     "title": "Zpracováváme vaši platbu. Vyčkejte prosím."

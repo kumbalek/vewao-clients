@@ -98,3 +98,37 @@ test.describe("the voucher line in the cart", () => {
     await expect(row.getByTestId("voucher-title")).toHaveText("Dárkový poukaz")
   })
 })
+
+// Ultherapy's single areas (vewao-clients#70): the options sit right under the
+// description on a large screen and above the price on a phone, in Czech, each
+// button as wide as its words.
+test("a product's options are in Czech, whole words, under the description on a large screen", async ({ page, isMobile }) => {
+  await page.goto("/cz/products/ultherapy-aplikace-na-jednotlive-partie")
+
+  const options = page.getByTestId("product-options").filter({ visible: true })
+  await expect(options).toHaveCount(1)
+  await expect(page.getByText("Vyberte partie").filter({ visible: true })).toBeVisible()
+  const buttons = options.getByTestId("option-button")
+  await expect(buttons).toHaveText(["Brow lift", "Brow lift a oční okolí", "Lower face", "Horní část krku/podbradek", "Krk", "Dekolt"])
+  for (const button of await buttons.all()) {
+    const whole = await button.evaluate((el) => getComputedStyle(el).whiteSpace === "nowrap" && el.scrollWidth <= el.clientWidth)
+    expect(whole, await button.textContent()).toBe(true)
+  }
+
+  const [title, group, price] = await Promise.all([
+    page.getByTestId("product-title").boundingBox(),
+    options.boundingBox(),
+    page.getByTestId("product-price").filter({ visible: true }).first().boundingBox(),
+  ])
+  if (isMobile) {
+    expect(group!.y + group!.height).toBeLessThanOrEqual(price!.y)
+  } else {
+    expect(group!.y).toBeGreaterThan(title!.y + title!.height)
+    expect(group!.x).toBeGreaterThan(price!.x + price!.width)
+  }
+
+  // Choosing an area prices it under the image and lets it into the cart.
+  await buttons.filter({ hasText: /^Krk$/ }).click()
+  await expect(page.getByTestId("product-price").filter({ visible: true }).first()).toContainText("15.000")
+  await expect(page.getByTestId("add-product-button").first()).toBeEnabled()
+})
