@@ -1,13 +1,15 @@
 import { notFound } from "next/navigation"
 import { Suspense } from "react"
 
-import InteractiveLink from "@modules/common/components/interactive-link"
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
 import RefinementList from "@modules/store/components/refinement-list"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import PaginatedProducts from "@modules/store/templates/paginated-products"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { HttpTypes } from "@medusajs/types"
+
+import { categoryImage } from "@lib/util/menu-categories"
+import CategoryBox from "@modules/layout/components/category-box"
 
 export default function CategoryTemplate({
   category,
@@ -69,17 +71,24 @@ export default function CategoryTemplate({
           </div>
         )}
         {children.length > 0 && (
-          <div className="mb-8 text-base-large">
-            <ul className="grid grid-cols-1 gap-2">
-              {children.map((c) => (
-                <li key={c.id}>
-                  <InteractiveLink href={`/categories/${c.handle}`}>
-                    {c.name}
-                  </InteractiveLink>
-                </li>
-              ))}
-            </ul>
-          </div>
+          // The subcategories as category boxes with their subtitles (vewao-clients#70):
+          // a column on a phone, a wrapping row from `small` up, as in the Shop menu.
+          <ul
+            data-testid="subcategories"
+            className="mb-8 grid grid-cols-1 gap-3 small:grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] small:gap-4"
+          >
+            {children.map((child) => (
+              <li key={child.id}>
+                <CategoryBox
+                  href={`/categories/${child.handle}`}
+                  title={child.name}
+                  subtitle={child.description?.trim() || null}
+                  image={categoryImage(child.metadata)}
+                  className="h-full"
+                />
+              </li>
+            ))}
+          </ul>
         )}
         <Suspense
           fallback={

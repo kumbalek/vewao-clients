@@ -82,7 +82,7 @@ const CATEGORIES = [
   { id: "pcat_dp", handle: "dp-dermaceuticals", name: "DP Dermaceuticals", rank: 4, parent_category_id: null, description: "Profesionální kosmetika", metadata: { image: "/logo.webp" } },
   { id: "pcat_dp_masky", handle: "dp-masky", name: "DP Masky", rank: 5, parent_category_id: "pcat_dp" },
   { id: "pcat_herbs", handle: "herbs", name: "Herbs", rank: 0, parent_category_id: null, description: "Bylinné tablety", metadata: { image: "/logo.webp" } },
-  { id: "pcat_gold", handle: "gold-edition", name: "Gold Edition", rank: 0, parent_category_id: "pcat_herbs" },
+  { id: "pcat_gold", handle: "gold-edition", name: "Gold Edition", rank: 0, parent_category_id: "pcat_herbs", description: "Zlatá řada", metadata: { image: "/logo.webp" } },
   { id: "pcat_cisteni", handle: "cisteni-a-exfoliace", name: "Čištění a exfoliace", rank: 0, parent_category_id: "pcat_dp", metadata: { image: "/logo.webp" } },
   { id: "pcat_tcm", handle: "tcm", name: "TCM", rank: 1, parent_category_id: null },
 ]

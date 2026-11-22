@@ -23,11 +23,30 @@ test("a category page lists its subcategories and their products", async ({ page
 
   await expect(page.getByTestId("category-page-title")).toHaveText("Herbs")
   const main = page.getByRole("main")
-  await expect(main.getByRole("link", { name: "Gold Edition" })).toHaveAttribute("href", "/cz/categories/gold-edition")
+  // A category box with the subcategory's subtitle and image (vewao-clients#70).
+  const gold = main.getByTestId("subcategories").getByRole("link", { name: /^Gold Edition/ })
+  await expect(gold).toHaveAttribute("href", "/cz/categories/gold-edition")
+  await expect(gold).toContainText("Zlatá řada")
+  await expect(gold.locator("img")).toHaveAttribute("src", "/logo.webp")
   await expect(main.getByRole("link", { name: /Akční produkt/ }).first()).toHaveAttribute(
     "href",
     "/cz/products/akcni-produkt"
   )
+})
+
+test("a category's subcategory boxes stack on a phone and sit in a row on a large screen", async ({ page, isMobile }) => {
+  await page.goto("/cz/categories/dp-dermaceuticals")
+
+  const boxes = page.getByRole("main").getByTestId("subcategories").getByRole("link")
+  await expect(boxes).toHaveText(["Čištění a exfoliace", "DP Masky"])
+  const [first, second] = await Promise.all([boxes.nth(0).boundingBox(), boxes.nth(1).boundingBox()])
+  if (isMobile) {
+    expect(Math.abs(first!.x - second!.x)).toBeLessThan(2)
+    expect(second!.y).toBeGreaterThanOrEqual(first!.y + first!.height)
+  } else {
+    expect(Math.abs(first!.y - second!.y)).toBeLessThan(2)
+    expect(second!.x).toBeGreaterThan(first!.x + first!.width)
+  }
 })
 
 test("a product's breadcrumb is its category path", async ({ page }) => {
