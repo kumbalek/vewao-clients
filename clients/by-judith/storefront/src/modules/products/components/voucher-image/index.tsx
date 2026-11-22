@@ -8,16 +8,23 @@ import React from "react"
 const CARD_RATIO = "2480 / 1748"
 const TEXT_AREA: React.CSSProperties = { left: "37%", right: "8%", top: "29%", bottom: "15%" }
 
-// A printed card turned towards the viewer: mostly around its vertical axis,
-// so its left edge is nearer, a little around Z, hardly around X (owner, 2026-11-22).
-const TILT = "perspective(1000px) rotateX(2deg) rotateY(-20deg) rotate(-5deg)"
-// Drawn around the card's own outline, after the tilt: a contact shadow and a soft one.
-const SHADOW = "drop-shadow(0 2px 3px rgb(64 44 20 / 0.14)) drop-shadow(0 16px 24px rgb(64 44 20 / 0.18))"
+// After the owner's A4 mockup (bbclinic mockup-a4.jpg, 2026-11-22): the card
+// lies on a warm beige table, seen from above at an angle.
+const TABLE = "radial-gradient(120% 100% at 78% 18%, #E4D9C8 0%, #D9CBB6 55%, #CDBDA6 100%)"
+// The card turned in its plane, then the table tipped away from the viewer (its
+// far edge shorter). The perspective is in card widths (container units), so
+// the depth looks the same from the cart thumbnail to the product page.
+const TILT = "perspective(350cqw) rotateX(40deg) rotateY(-6deg) rotateZ(-18deg)"
+// Around the card's own outline, after the tilt: a contact shadow and a soft one.
+const SHADOW = "drop-shadow(0 3px 4px rgb(70 50 30 / 0.16)) drop-shadow(0 22px 28px rgb(70 50 30 / 0.2))"
+// Light falling from the top right across the paper.
+const LIGHT = "linear-gradient(120deg, rgb(255 255 255 / 0) 35%, rgb(60 40 20 / 0.07) 100%)"
 
 /**
  * A gift voucher's picture (vewao-clients#70): the empty voucher image with
- * the product's name written in its free area, tilted a little with a shadow,
- * like a printed card. The text scales with the card (container units), so it
+ * the product's name written in its free area, lying on a table in
+ * perspective with a shadow, like a photographed print. It fills its
+ * positioned parent. The text scales with the card (container units), so it
  * sits right at any size, from the cart thumbnail to the product page.
  *
  * Decorative by default (the name is shown beside it); give `alt` where the
@@ -44,11 +51,13 @@ export default function VoucherImage({
     <div
       {...(alt ? { role: "img", "aria-label": alt } : { "aria-hidden": true })}
       data-testid="voucher-image"
-      className={clx("flex h-full w-full items-center justify-center", className)}
+      className={clx("absolute inset-0 flex items-center justify-center p-[11%]", className)}
+      style={{ background: TABLE }}
     >
-      <div className="w-full" style={{ filter: SHADOW }}>
+      <div className="w-full" style={{ filter: SHADOW, containerType: "inline-size" }}>
         <div className="relative w-full" style={{ aspectRatio: CARD_RATIO, transform: TILT, containerType: "inline-size" }}>
           <Image src={src} alt="" fill sizes={sizes} priority={priority} className="object-contain" draggable={false} />
+          <div className="absolute inset-0" style={{ background: LIGHT }} />
           <div className="absolute flex flex-col items-center justify-center gap-[1.4cqw] text-center" style={TEXT_AREA}>
             <span className="uppercase tracking-[0.18em] text-ink-muted" style={{ fontSize: "2.3cqw" }}>
               {t("voucher")}

@@ -18,7 +18,7 @@ const ImageGallery = ({ images, title, voucherTitle }: ImageGalleryProps) => {
   const voucher = voucherTitle && images[0]?.url
   if (voucher) {
     return (
-      <Container className="relative aspect-[29/34] w-full overflow-hidden bg-ui-bg-subtle rounded-[3rem] p-[10%]">
+      <Container className="relative aspect-[29/34] w-full overflow-hidden bg-ui-bg-subtle rounded-[3rem]">
         <VoucherImage src={voucher} title={voucherTitle} alt={title} sizes={SIZES} priority />
       </Container>
     )

@@ -53,9 +53,7 @@ const Thumbnail: React.FC<ThumbnailProps> = ({
       data-testid={dataTestid}
     >
       {initialImage && voucherTitle ? (
-        <div className="absolute inset-0 p-[9%]">
-          <VoucherImage src={initialImage} title={voucherTitle} alt={alt} sizes={SIZES} />
-        </div>
+        <VoucherImage src={initialImage} title={voucherTitle} alt={alt} sizes={SIZES} />
       ) : (
         <ImageOrPlaceholder image={initialImage} size={size} alt={alt} />
       )}
