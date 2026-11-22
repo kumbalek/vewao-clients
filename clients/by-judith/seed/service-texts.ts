@@ -12,7 +12,7 @@ import { htmlToLexical } from "./payload/html-lexical.ts"
  *
  * Edits to the owner's text: the product name above it is the page title;
  * "[Jméno]" is Lucia, as the text names her; "hormonální disbalanci"; headings
- * without colons; Judita's capitalised price note in bold.
+ * without colons; the capitalised price note in bold, for both (owner).
  */
 
 const included = (items: [string, string][]) =>
@@ -24,6 +24,10 @@ const steps = (sendHome: string) => `<h2>Jak to funguje?</h2>
 <li>V domluvený čas se propojíme online a po důkladném rozhovoru získáte svůj osobní bylinný plán.</li>
 <li>Vaši osobní bylinnou směs pro přípravu odvaru vám následně ${sendHome} až k vám domů.</li>
 </ol>`
+
+// Owner, 2026-11-22: for both consultations.
+const priceNote =
+  "<p><strong>Cena konzultace nezahrnuje cenu odvaru.</strong> Ta je individuální dle gramáže bylin atd.</p>"
 
 const diagnosis: [string, string] = [
   "Individuální diagnostiku",
@@ -55,6 +59,7 @@ ${included([
   comfort,
 ])}
 ${steps("můžeme zaslat")}
+${priceNote}
 <p>Dopřejte svému tělu šetrnou péči z přírody pod vedením naší zkušené terapeutky.</p>`,
 
   "online-konzultace-fytoterapie-s-juditou-halvovou": `
@@ -74,7 +79,7 @@ ${included([
   comfort,
 ])}
 ${steps("zašleme")}
-<p><strong>Cena konzultace nezahrnuje cenu odvaru.</strong> Ta je individuální dle gramáže bylin atd.</p>
+${priceNote}
 <p>Dopřejte svému tělu péči, která respektuje jeho přirozený rytmus.</p>`,
 }
 
