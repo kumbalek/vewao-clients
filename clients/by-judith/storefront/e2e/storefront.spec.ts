@@ -229,6 +229,9 @@ test("shows a pending Comgate payment without claiming success", async ({
   await payWithComgate(page)
 
   await expect(page).toHaveURL(/\/cz\/order\/pending$/)
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Vaše platba ještě nebyla vyřízena."
+  )
   await expect(page.getByTestId("order-pending-container")).not.toContainText(
     "Děkujeme"
   )
@@ -236,6 +239,25 @@ test("shows a pending Comgate payment without claiming success", async ({
   await request.post(`${MOCK}/__comgate/outcome`, { data: { status: "PAID" } })
   await page.getByTestId("check-payment-link").click()
   await expect(page).toHaveURL(/\/cz\/order\/order_cart_test_.+\/confirmed$/)
+})
+
+test("a gateway return without the cart cookie says the payment awaits verification", async ({
+  page,
+  context,
+}) => {
+  // Another browser or cleared cookies: the webhook still completes a paid
+  // order, so the page must claim neither success nor a pending payment.
+  await context.clearCookies({ name: "_medusa_cart_id" })
+  await page.goto("/cz/checkout/payment-return?id=TEST-0000-0000&refId=payses_test")
+
+  await expect(page).toHaveURL(/\/cz\/order\/pending\?cart=missing$/)
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Vaše platba čeká na ověření, o stavu objednávky Vás informujeme e-mailem."
+  )
+  await expect(page.getByTestId("order-pending-container")).not.toContainText(
+    "nebyla vyřízena"
+  )
+  await expect(page.getByTestId("check-payment-link")).toHaveCount(0)
 })
 
 test("places a pay-on-site pickup order directly, but never from the gateway return link", async ({

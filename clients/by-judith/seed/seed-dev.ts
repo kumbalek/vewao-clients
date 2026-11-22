@@ -238,21 +238,35 @@ async function ensureEurCurrency() {
   log("created", `store currency ${EUR.currency}`)
 }
 
+/** Comgate's EUR connection (vewao-platform#39), registered when the backend has its merchant. */
+const EUR_COMGATE = "pp_comgate_eur"
+
 /**
- * Slovensko in EUR. It offers the Czech region's online payments; paying on
- * site belongs to clinic pickup, which Slovakia has no zone for.
+ * Slovensko in EUR. It pays through Comgate's EUR connection when the backend
+ * has one, otherwise through the Czech region's online payments. Paying on
+ * site belongs to clinic pickup, which Slovakia has no zone for. An existing
+ * region keeps its providers; the seed only points out a missing EUR connection.
  */
 async function ensureSlovakRegion(czechRegionId: string) {
-  const { regions } = await sdk.admin.region.list({ fields: "id,name,currency_code,*countries" })
+  const { regions } = await sdk.admin.region.list({ fields: "id,name,currency_code,*countries,*payment_providers" })
+  const { payment_providers: eurComgate } = await sdk.admin.payment.listPaymentProviders({
+    id: EUR_COMGATE,
+    is_enabled: true,
+  })
   const existing = regions.find((r) => r.countries?.some((c) => c.iso_2 === EUR.country))
   if (existing) {
     log("exists", `region ${existing.name} (${existing.currency_code})`)
+    if (eurComgate.length && !existing.payment_providers?.some((p) => p?.id === EUR_COMGATE)) {
+      console.warn(`warning region ${existing.name} does not offer ${EUR_COMGATE}; select it in admin → Settings → Regions`)
+    }
     return existing
   }
   const { region: czech } = await sdk.admin.region.retrieve(czechRegionId, { fields: "id,*payment_providers" })
-  const providers = (czech.payment_providers ?? [])
-    .map((p) => p?.id)
-    .filter((id): id is string => Boolean(id) && id !== "pp_system_default")
+  const providers = eurComgate.length
+    ? [EUR_COMGATE]
+    : (czech.payment_providers ?? [])
+        .map((p) => p?.id)
+        .filter((id): id is string => Boolean(id) && id !== "pp_system_default")
   if (!providers.length) {
     throw new Error("The Czech region has no online payment provider (Comgate) to offer in Slovakia.")
   }
