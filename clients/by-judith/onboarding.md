@@ -54,6 +54,13 @@ The owner confirmed the old instance's setup for launch:
   e-mail with a test parcel.
 - Payment: Comgate for every order; pay on site only with clinic pickup. Free
   PPL delivery is still paid online. No cash on delivery.
+- Catalogue (owner, 2026-11-22; #64, #67): categories Herbs (subcategories Gold
+  Edition and Acute, replacing the former collections), TCM, Estetika,
+  Ultherapy® and DP Dermaceuticals (ten subcategories from the clinic's old
+  shop). TCM, Estetika and Ultherapy® are sold as vouchers; only herbs and DP
+  are shipped. EUR prices: herbs 75 € / 24 €, everything else Kč ÷ 25 rounded
+  up; VAT 21 % in CZ and SK. The shop's menus, front-page rails and breadcrumbs
+  follow the categories. `seed/setup-catalogue.ts` holds the structure.
 - Comgate connections, one per currency (owner, 2026-11-22; vewao-platform#39):
   CZK merchant 525121 for region CZ (`pp_comgate_comgate`), EUR merchant 525122
   for region Slovensko (`pp_comgate_eur`). Each connection's return URLs are
