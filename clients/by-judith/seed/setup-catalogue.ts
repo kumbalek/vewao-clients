@@ -77,6 +77,41 @@ export const SERVICES: ServiceDef[] = [
     czk: 1000,
     eur: 40,
   },
+  {
+    title: "Modelace a hydratace rtů Lips by Boris Jegorov",
+    handle: "modelace-a-hydratace-rtu-lips-by-boris-jegorov",
+    category: "estetika",
+    czk: 7900,
+    eur: 316,
+  },
+  {
+    title: "Vyhlazení mimických vrásek – Baby Botox",
+    handle: "vyhlazeni-mimickych-vrasek-baby-botox",
+    category: "estetika",
+    czk: 6900,
+    eur: 276,
+  },
+  {
+    title: "Blefaroplastika",
+    handle: "blefaroplastika",
+    category: "estetika",
+    czk: 17000,
+    eur: 680,
+  },
+  {
+    title: "Osobní konzultace s MUDr. Jegorovem",
+    handle: "osobni-konzultace-s-mudr-jegorovem",
+    category: "estetika",
+    czk: 2000,
+    eur: 80,
+  },
+  {
+    title: "Osobní konzultace s pleťovou terapeutkou",
+    handle: "osobni-konzultace-s-pletovou-terapeutkou",
+    category: "estetika",
+    czk: 1000,
+    eur: 40,
+  },
 ]
 
 const DEFAULT_OPTION = { title: "Default option", value: "Default option value" }

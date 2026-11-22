@@ -61,7 +61,8 @@ up the new shop's catalogue structure on any backend (vewao-clients#64):
   replace only a missing or dev-placeholder EUR price; a price set in admin stays.
 - the services, as drafts in their category with one variant and the owner's
   CZK and EUR prices: TCM's diagnostics, acupuncture package and two online
-  phytotherapy consultations. Like the gift vouchers they have no shipping
+  phytotherapy consultations; Estetika's lips, Baby Botox, blepharoplasty and two
+  consultations. Like the gift vouchers they have no shipping
   profile and no inventory, so a cart of services skips delivery.
 
 It is additive and idempotent. Production gets the catalogue prepared on
