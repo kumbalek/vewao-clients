@@ -12,6 +12,7 @@ import ProductActionsWrapper from "./product-actions-wrapper"
 import { HttpTypes } from "@medusajs/types"
 import { useTranslations } from "next-intl"
 import type { ProductTexts } from "@lib/cms/product-texts"
+import { productCategoryPath } from "@lib/util/category-path"
 
 type ProductTemplateProps = {
   product: HttpTypes.StoreProduct
@@ -44,11 +45,9 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
     },
   ]
 
-  if (product.collection) {
-    brPath.push({
-      name: `${t("collection")} – ${product.collection.title}`,
-      href: `/collections/${product.collection.handle}`,
-    })
+  // The category path, e.g. Herbs › Gold Edition (vewao-clients#67).
+  for (const category of productCategoryPath(product.categories)) {
+    brPath.push({ name: category.name, href: `/categories/${category.handle}` })
   }
 
   return (

@@ -1,6 +1,7 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { listProducts } from "@lib/data/products"
+import { PRODUCT_LIST_FIELDS } from "@lib/util/product-fields"
 import { getRegion, listRegions } from "@lib/data/regions"
 import ProductTemplate from "@modules/products/templates"
 import { GIFT_PACKAGING_HANDLE } from "@lib/util/gift-packaging"
@@ -55,7 +56,8 @@ export default async function ProductPage(props: Props) {
 
   const pricedProduct = await listProducts({
     countryCode: params.countryCode,
-    queryParams: { handle: params.handle },
+    // The categories, with their parent, make the breadcrumb.
+    queryParams: { handle: params.handle, fields: `${PRODUCT_LIST_FIELDS},*categories,*categories.parent_category` },
   }).then(({ response }) => response.products[0])
 
   if (!pricedProduct) {

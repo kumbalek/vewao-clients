@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server"
 
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import StoreTemplate from "@modules/store/templates"
-import { listCollections } from "@lib/data/collections"
+import { listMenuCategories } from "@lib/data/categories"
 
 export async function generateMetadata({ params }: any): Promise<Metadata> {
   const { locale } = await params
@@ -27,9 +27,7 @@ type Params = {
 }
 
 export default async function StorePage(props: Params) {
-  const { collections } = await listCollections({
-    fields: "id, handle, title",
-  })
+  const categories = await listMenuCategories().catch(() => [])
 
   const params = await props.params
   const searchParams = await props.searchParams
@@ -43,7 +41,7 @@ export default async function StorePage(props: Params) {
       page={page}
       query={query}
       countryCode={params.countryCode}
-      collections={collections}
+      categories={categories}
     />
   )
 }

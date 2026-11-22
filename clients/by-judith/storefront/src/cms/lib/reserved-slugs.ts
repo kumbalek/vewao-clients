@@ -9,7 +9,6 @@ export const RESERVED_SLUGS = [
   "categories",
   "cenik",
   "cms",
-  "collections",
   "content",
   "magazin",
   "novinky",

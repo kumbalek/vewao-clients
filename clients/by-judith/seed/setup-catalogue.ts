@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs"
 
 import { DP_ONLY_IN, DP_TITLE_FIXES } from "./dp-decisions.ts"
 import type { DpCatalogue, DpProduct } from "./extract-dp.ts"
-import { eurFromCzk, HERB_EUR_PRICES, ownerEurPriceUpdate, roundedEurUpdate } from "./pricing.ts"
+import { eurFromCzk, HERB_LINES, ownerEurPriceUpdate, roundedEurUpdate } from "./pricing.ts"
 
 /**
  * The new shop's catalogue (vewao-clients#64): product categories, the owner's
@@ -13,25 +13,23 @@ import { eurFromCzk, HERB_EUR_PRICES, ownerEurPriceUpdate, roundedEurUpdate } fr
  * catalogue prepared on localhost and dev, without a legacy migration (D23);
  * this script sets up the same structure on any other backend.
  *
- * Additive and idempotent: it creates what is missing and never deletes. The
- * only changes to existing records: the owner's EUR price replaces a missing or
- * dev-placeholder one (a price set in admin stays), an untyped procedure gets
- * the voucher type, and a product joins a category it is listed in.
+ * Additive and idempotent: it creates what is missing. The only changes to
+ * existing records: the owner's EUR price replaces a missing or dev-placeholder
+ * one (a price set in admin stays), an untyped procedure gets the voucher type,
+ * a product joins a category it is listed in, and the owner's restructurings:
+ * herbs move from Herbs and the legacy collections into their line's
+ * subcategory, the emptied collections are deleted, and DP_ONLY_IN products
+ * leave other DP subcategories.
  *
  *   MEDUSA_BACKEND_URL=https://… MEDUSA_ADMIN_API_KEY=sk_… pnpm catalogue:setup
  */
 
-type CategoryDef = {
-  name: string
-  handle: string
-  /** Collections whose products belong in the category: the legacy product lines. */
-  collections?: string[]
-}
+type CategoryDef = { name: string; handle: string }
 
 /** Owner's order, 2026-11-22. */
 export const CATEGORIES: CategoryDef[] = [
-  // The herb lines: every Acute and Gold Edition product, including later ones.
-  { name: "Herbs", handle: "herbs", collections: ["acute", "gold"] },
+  // Subcategories Gold Edition and Acute, the herb lines (HERB_LINES in pricing.ts).
+  { name: "Herbs", handle: "herbs" },
   { name: "TCM", handle: "tcm" },
   { name: "Estetika", handle: "estetika" },
   { name: "Ultherapy®", handle: "ultherapy" },
@@ -201,52 +199,59 @@ async function ensureCategory(def: CategoryDef, rank: number, parentId?: string)
   return product_category
 }
 
-/** Adds the collections' products to the category; products already in it stay as they are. */
-async function addCollectionProducts(category: { id: string; name: string }, handles: string[]) {
-  const { collections } = await sdk.admin.productCollection.list({ handle: handles, fields: "id,handle" })
-  for (const handle of handles) {
-    if (!collections.some((collection) => collection.handle === handle)) {
-      log("warning", `collection ${handle} not found; its products are not in ${category.name}`)
-    }
-  }
-  if (!collections.length) return
-
-  const missing: { id: string; handle: string }[] = []
-  for (let offset = 0; ; offset += 100) {
-    const { products, count } = await sdk.admin.product.list({
-      collection_id: collections.map((collection) => collection.id),
-      fields: "id,handle,*categories",
-      limit: 100,
-      offset,
-    })
-    for (const product of products) {
-      if (!product.categories?.some((c) => c?.id === category.id)) {
-        missing.push({ id: product.id, handle: product.handle })
-      }
-    }
-    if (offset + products.length >= count) break
-  }
-
-  if (!missing.length) {
-    log("exists", `${category.name}: every product of ${handles.join(", ")}`)
-    return
-  }
-  await sdk.admin.productCategory.updateProducts(category.id, { add: missing.map((p) => p.id) })
-  log("updated", `${category.name}: added ${missing.map((p) => p.handle).join(", ")}`)
+/** catalogue.json, the legacy snapshot: each herb product's line (its legacy collection). */
+const herbCatalogue = JSON.parse(readFileSync(new URL("./catalogue.json", import.meta.url), "utf8")) as {
+  products: { handle: string; collection: string | null }[]
 }
 
-/** The owner's EUR price on every variant of the herb lines (Gold 75 €, Acute 24 €). */
-async function ensureHerbEurPrices() {
-  const lines = Object.keys(HERB_EUR_PRICES)
-  const { collections } = await sdk.admin.productCollection.list({ handle: lines, fields: "id,handle" })
-  for (const collection of collections) {
-    const ownerEur = HERB_EUR_PRICES[collection.handle]!
+/**
+ * Herbs' subcategories, one per herb line, replace the legacy collections
+ * (owner, 2026-11-22): each line's products, by catalogue.json and by any
+ * collection membership, move from Herbs into the line's subcategory, and the
+ * emptied collection is deleted. Returns the subcategories with their EUR price.
+ */
+async function ensureHerbLines(herbs: { id: string; name: string }) {
+  const lines: { id: string; name: string; eur: number }[] = []
+  for (let rank = 0; rank < HERB_LINES.length; rank++) {
+    const line = HERB_LINES[rank]!
+    const category = await ensureCategory({ name: line.title, handle: line.handle }, rank, herbs.id)
+    const { collections } = await sdk.admin.productCollection.list({ handle: line.line, fields: "id,handle,title" })
+    const collection = collections[0]
+    const ids = new Set<string>()
+    const handles = herbCatalogue.products.filter((p) => p.collection === line.line).map((p) => p.handle)
+    if (handles.length) {
+      const { products } = await sdk.admin.product.list({ handle: handles, fields: "id", limit: handles.length })
+      products.forEach((product) => ids.add(product.id))
+    }
+    if (collection) {
+      const { products } = await sdk.admin.product.list({ collection_id: [collection.id], fields: "id", limit: 200 })
+      products.forEach((product) => ids.add(product.id))
+    }
+    const productIds = [...ids]
+    if (productIds.length) {
+      await addProducts(category, productIds)
+      for (const id of productIds) await removeFromCategories(id, [herbs])
+    }
+    if (collection) {
+      if (productIds.length) await sdk.admin.productCollection.updateProducts(collection.id, { remove: productIds })
+      await sdk.admin.productCollection.delete(collection.id)
+      log("updated", `collection ${collection.title} removed; its products are in ${line.title}`)
+    }
+    lines.push({ id: category.id, name: category.name, eur: line.eur })
+  }
+  return lines
+}
+
+/** The owner's EUR price on every variant of the herb lines (Gold Edition 75 €, Acute 24 €). */
+async function ensureHerbEurPrices(lines: { id: string; name: string; eur: number }[]) {
+  for (const line of lines) {
+    const ownerEur = line.eur
     const { products, count } = await sdk.admin.product.list({
-      collection_id: [collection.id],
+      category_id: [line.id],
       fields: "id,handle,variants.id,*variants.prices",
       limit: 200,
     })
-    if (count > products.length) throw new Error(`More than ${products.length} products in ${collection.handle}`)
+    if (count > products.length) throw new Error(`More than ${products.length} products in ${line.name}`)
     for (const product of products) {
       for (const variant of product.variants ?? []) {
         const prices = variant.prices ?? []
@@ -526,9 +531,9 @@ for (let rank = 0; rank < CATEGORIES.length; rank++) {
   const def = CATEGORIES[rank]!
   const category = await ensureCategory(def, rank)
   categoryIds.set(def.handle, category.id)
-  if (def.collections) await addCollectionProducts(category, def.collections)
 }
-await ensureHerbEurPrices()
+const herbLines = await ensureHerbLines({ id: categoryIds.get("herbs")!, name: "Herbs" })
+await ensureHerbEurPrices(herbLines)
 
 const { sales_channels } = await sdk.admin.salesChannel.list({ fields: "id", limit: 50 })
 const salesChannelIds = sales_channels.map((channel) => channel.id)

@@ -1,7 +1,7 @@
 import { Heading } from "@medusajs/ui"
 import { getTranslations } from "next-intl/server"
 
-import { listCollections } from "@lib/data/collections"
+import { listMenuCategories } from "@lib/data/categories"
 import { getRegion } from "@lib/data/regions"
 import About from "@modules/home/components/about"
 import FeaturedProducts from "@modules/home/components/featured-products"
@@ -16,9 +16,9 @@ import Reviews from "@modules/home/components/reviews"
 export default async function ShopFront({ countryCode }: { countryCode: string }) {
   const t = await getTranslations("hero")
   const region = await getRegion(countryCode)
-  const { collections } = await listCollections({ fields: "id, handle, title" })
+  const categories = await listMenuCategories().catch(() => [])
 
-  if (!collections || !region) {
+  if (!region) {
     return null
   }
 
@@ -31,7 +31,7 @@ export default async function ShopFront({ countryCode }: { countryCode: string }
           {t("productsTitle")}
         </Heading>
         <ul className="flex flex-col gap-4 w-full">
-          <FeaturedProducts collections={collections} region={region} />
+          <FeaturedProducts categories={categories} region={region} />
         </ul>
       </div>
       <Reviews />

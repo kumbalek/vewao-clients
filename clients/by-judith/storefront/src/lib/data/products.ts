@@ -6,6 +6,7 @@ import { HttpTypes } from "@medusajs/types"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import { getAuthHeaders, getCacheOptions } from "./cookies"
 import { getRegion, retrieveRegion } from "./regions"
+import { PRODUCT_LIST_FIELDS } from "@lib/util/product-fields"
 
 export const listProducts = async ({
   pageParam = 1,
@@ -62,8 +63,7 @@ export const listProducts = async ({
           limit,
           offset,
           region_id: region?.id,
-          fields:
-            "*variants.calculated_price,+variants.inventory_quantity,+metadata,+tags",
+          fields: PRODUCT_LIST_FIELDS,
           ...queryParams,
         },
         headers,

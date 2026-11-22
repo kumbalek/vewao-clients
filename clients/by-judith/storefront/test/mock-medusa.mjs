@@ -48,6 +48,8 @@ const cartControls = { delayMs: 0, status: 200, message: "Košík se nepodařilo
 const saleProduct = {
   id: "prod_sale", handle: "akcni-produkt", title: "Akční produkt", subtitle: "Testovací akce", description: "Popis produktu",
   thumbnail: "/logo.webp", collection: null, collection_id: null, tags: [], type: null,
+  // A herb in Herbs › Gold Edition (vewao-clients#67).
+  categories: [{ id: "pcat_gold", name: "Gold Edition", handle: "gold-edition", parent_category: { id: "pcat_herbs", name: "Herbs", handle: "herbs" } }],
   images: [{ id: "img_sale_1", url: "/logo.webp", rank: 0 }, { id: "img_sale_2", url: "/logo.webp", rank: 1 }],
   metadata: { ingredients: JSON.stringify(["Meruňka obecná (extrakt ze semene) 960 mg", "**Hořčice** setá (extrakt ze semene) 640 mg"]) },
   options: [{ id: "opt_default", title: "Default option", values: [{ id: "optval_default", value: "Default option value" }] }],
@@ -78,6 +80,7 @@ const CATEGORIES = [
   { id: "pcat_dp", handle: "dp-dermaceuticals", name: "DP Dermaceuticals", rank: 4, parent_category_id: null },
   { id: "pcat_dp_masky", handle: "dp-masky", name: "DP Masky", rank: 5, parent_category_id: "pcat_dp" },
   { id: "pcat_herbs", handle: "herbs", name: "Herbs", rank: 0, parent_category_id: null },
+  { id: "pcat_gold", handle: "gold-edition", name: "Gold Edition", rank: 0, parent_category_id: "pcat_herbs" },
   { id: "pcat_cisteni", handle: "cisteni-a-exfoliace", name: "Čištění a exfoliace", rank: 0, parent_category_id: "pcat_dp" },
   { id: "pcat_tcm", handle: "tcm", name: "TCM", rank: 1, parent_category_id: null },
 ]
@@ -335,7 +338,14 @@ const server = createServer(async (req, res) => {
   if (url.pathname === "/store/collections") return send({ collections: [], count: 0 })
   if (url.pathname === "/store/product-categories") {
     const handle = url.searchParams.get("handle")
-    const categories = handle ? CATEGORIES.filter((c) => c.handle === handle) : CATEGORIES
+    // A category page asks by handle for the category with its children and parent.
+    const categories = handle
+      ? CATEGORIES.filter((c) => c.handle === handle).map((c) => ({
+          ...c,
+          category_children: CATEGORIES.filter((child) => child.parent_category_id === c.id),
+          parent_category: CATEGORIES.find((parent) => parent.id === c.parent_category_id) ?? null,
+        }))
+      : CATEGORIES
     return send({ product_categories: categories, count: categories.length })
   }
   if (url.pathname === "/store/products") {
@@ -347,7 +357,10 @@ const server = createServer(async (req, res) => {
     // An unfiltered listing (Novinky's sale section) holds the sale product.
     const unfiltered = !url.searchParams.get("handle") && !url.searchParams.get("q") && ![...url.searchParams.keys()].some((key) => key.startsWith("id") || key.startsWith("collection_id") || key.startsWith("category_id"))
     if (unfiltered) return send({ products: [pricedFor(saleProduct, regionId)], count: 1 })
-    const wanted = url.searchParams.get("handle") === saleProduct.handle || [...url.searchParams].some(([key, value]) => key.startsWith("id") && value === saleProduct.id)
+    const wanted =
+      url.searchParams.get("handle") === saleProduct.handle ||
+      [...url.searchParams].some(([key, value]) => key.startsWith("id") && value === saleProduct.id) ||
+      [...url.searchParams].some(([key, value]) => key.startsWith("category_id") && saleProduct.categories.some((c) => c.id === value))
     return send(wanted ? { products: [pricedFor(saleProduct, regionId)], count: 1 } : { products: [], count: 0 })
   }
   if (url.pathname === `/store/products/${saleProduct.id}/price-history`) {
