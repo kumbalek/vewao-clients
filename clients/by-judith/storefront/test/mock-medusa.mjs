@@ -553,7 +553,7 @@ const server = createServer(async (req, res) => {
       if (!current.items.some((item) => item.variant_id === area.id)) {
         current.items.push({
           id: `item_${area.id}`, variant_id: area.id, title: area.title, product_title: partieProduct.title, product_handle: partieProduct.handle,
-          product_type: "Dárkový poukaz", subtitle: area.title, quantity: 1, unit_price: amount, total: amount, original_total: amount,
+          product_type: "Dárkový poukaz", variant_title: area.title, subtitle: area.title, quantity: 1, unit_price: amount, total: amount, original_total: amount,
           is_discountable: true, requires_shipping: false, thumbnail: partieProduct.thumbnail,
           variant: { id: area.id, title: area.title, options: area.options }, product: { id: partieProduct.id, handle: partieProduct.handle }, metadata: {},
         })

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict"
 import test from "node:test"
 
-import { allowsSeveralVariants, itemVoucherTitle, productVoucherTitle, VOUCHER_PRODUCT_TYPE } from "../src/lib/util/voucher.ts"
+import { allowsSeveralVariants, itemVoucherTitle, itemVoucherVariant, productVoucherTitle, VOUCHER_PRODUCT_TYPE } from "../src/lib/util/voucher.ts"
 
 test("a product of the voucher type gets its name on the voucher; others get none", () => {
   assert.equal(VOUCHER_PRODUCT_TYPE, "Dárkový poukaz")
@@ -26,4 +26,12 @@ test("several variants at once: a voucher whose variants differ in one option", 
   assert.equal(allowsSeveralVariants({ ...voucher, options: [{}, {}], variants: [{}, {}] }), false)
   assert.equal(allowsSeveralVariants({ title: "Exo Grow", type: null, options: [{}], variants: [{}, {}] }), false)
   assert.equal(allowsSeveralVariants(null), false)
+})
+
+test("a voucher line names its variant when that says more than the product", () => {
+  const line = { product_type: "Dárkový poukaz", product_title: "Aplikace na jednotlivé partie" }
+  assert.equal(itemVoucherVariant({ ...line, variant_title: "Krk" }), "Krk")
+  assert.equal(itemVoucherVariant({ ...line, variant_title: null, variant: { title: "Dekolt" } }), "Dekolt")
+  assert.equal(itemVoucherVariant({ ...line, variant_title: "Aplikace na jednotlivé partie" }), null)
+  assert.equal(itemVoucherVariant({ product_type: null, product_title: "№ 1 Allergy", variant_title: "Allergy" }), null)
 })

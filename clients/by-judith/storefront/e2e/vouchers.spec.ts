@@ -157,12 +157,18 @@ test.describe("Ultherapy's single areas", () => {
     await buttons.filter({ hasText: /^Brow lift$/ }).click()
     await expect(price).toContainText("32.000")
 
+    // The button waits while both areas are added, one after the other.
     await add.click()
-    await expect(add).toHaveText("Přidat do košíku (2)")
-    await page.goto("/cz/cart")
+    await expect(add).toBeDisabled()
+    await expect(add).toBeEnabled({ timeout: 15_000 })
     const rows = page.getByTestId("product-row").filter({ hasText: "Aplikace na jednotlivé partie" })
-    await expect(rows).toHaveCount(2)
-    await expect(rows.filter({ hasText: "Krk" })).toHaveCount(1)
-    await expect(rows.filter({ hasText: "Dekolt" })).toHaveCount(1)
+    await expect
+      .poll(async () => {
+        await page.goto("/cz/cart")
+        return rows.count()
+      }, { timeout: 15_000 })
+      .toBe(2)
+    // Each line says which area it is.
+    await expect(rows.getByTestId("product-variant")).toHaveText(["Krk", "Dekolt"])
   })
 })

@@ -1,6 +1,6 @@
 "use client"
 
-import { itemVoucherTitle } from "@lib/util/voucher"
+import { itemVoucherTitle, itemVoucherVariant } from "@lib/util/voucher"
 import { Transition } from "@headlessui/react"
 import { convertToLocale } from "@lib/util/money"
 import { HttpTypes } from "@medusajs/types"
@@ -165,10 +165,15 @@ const CartDropdown = ({
                                       href={`/products/${item.product_handle}`}
                                       data-testid="product-link"
                                     >
-                                      {item.title}
+                                      {itemVoucherVariant(item) ? item.product_title : item.title}
                                     </LocalizedClientLink>
                                   )}
                                 </h3>
+                                {itemVoucherVariant(item) && (
+                                  <span className="text-ui-fg-subtle overflow-hidden text-ellipsis" data-testid="product-variant">
+                                    {itemVoucherVariant(item)}
+                                  </span>
+                                )}
                                 <span
                                   data-testid="cart-item-quantity"
                                   data-value={item.quantity}
