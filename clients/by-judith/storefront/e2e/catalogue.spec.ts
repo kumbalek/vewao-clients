@@ -78,5 +78,17 @@ test("a price changed in admin reaches the product page within the cache window"
       { timeout: 20_000, intervals: [1_500] }
     )
     .toContain("49,90 €")
+
+  // Restore the price and wait until the shop shows it: the next spec must not
+  // get this test's price from the cache.
   await request.post(`${MOCK}/__reset`)
+  await expect
+    .poll(
+      async () => {
+        await page.reload()
+        return page.getByTestId("product-price").first().textContent()
+      },
+      { timeout: 20_000, intervals: [1_500] }
+    )
+    .toContain("59,90 €")
 })
