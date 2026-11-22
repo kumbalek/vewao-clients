@@ -75,6 +75,19 @@ test("a category page shows its call to action beside the title and subtitle", a
   await expect(page.getByTestId("category-cta")).toHaveCount(0)
 })
 
+test("category pages have the product page's breadcrumbs, and the title stays put", async ({ page }) => {
+  await page.goto("/cz/categories/herbs")
+  const crumbs = page.getByTestId("category-breadcrumbs")
+  await expect(crumbs.getByRole("link")).toHaveText(["Hlavní stránka"])
+  const top = (await page.getByTestId("category-page-title").boundingBox())!.y
+
+  await page.goto("/cz/categories/gold-edition")
+  await expect(crumbs.getByRole("link")).toHaveText(["Hlavní stránka", "Herbs"])
+  await expect(crumbs.getByRole("link", { name: "Herbs" })).toHaveAttribute("href", "/cz/categories/herbs")
+  await expect(page.getByTestId("category-page-title")).toHaveText("Gold Edition")
+  expect((await page.getByTestId("category-page-title").boundingBox())!.y).toBeCloseTo(top, 0)
+})
+
 test("a product's breadcrumb is its category path", async ({ page }) => {
   await page.goto("/cz/products/akcni-produkt")
 

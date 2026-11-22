@@ -55,8 +55,8 @@ const FREE_DELIVERY_FROM = 5000
 // prices are the owner's (pricing.ts, 2026-11-22); the delivery amounts below
 // and other products' EUR prices are DEV PLACEHOLDERS until the merchant sets them.
 const EUR = { currency: "eur", country: "sk", region: "Slovensko" }
-const FREE_DELIVERY_FROM_EUR = 200
-const PPL_SK_EUR = 8
+const FREE_DELIVERY_FROM_EUR = 220
+const PPL_SK_EUR = 10
 const DEFAULT_OPTION = { title: "Default option", value: "Default option value" }
 
 const LOCATION = {
@@ -105,7 +105,7 @@ const SHIPPING: ShippingSpec[] = [
       },
     ],
   },
-  // Delivery to Slovakia in EUR; carrier, price and threshold await the merchant.
+  // Delivery to Slovakia in EUR: 10 €, free from 220 € (owner, 2026-11-22).
   {
     set: "Beauty Body Clinic shipping",
     type: "shipping",

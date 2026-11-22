@@ -15,8 +15,8 @@ const shippingOptions = [
   { id: "so_ppl", name: "Přepravce PPL", price_type: "flat", amount: 150, service_zone: { fulfillment_set: { type: "shipping" } }, prices: [] },
   { id: "so_pickup", name: "Pobočka Beauty Body Clinic", price_type: "flat", amount: 0, service_zone: { fulfillment_set: { type: "pickup", location: { address: { address_1: "Kosmická 19", postal_code: "149 00", city: "Praha 4 - Háje", country_code: "cz" } } } }, prices: [] },
 ]
-// PPL to Slovakia: 8 €, free from 200 € (the dev seed's placeholders).
-const shippingOptionSk = { id: "so_ppl_sk", name: "Přepravce PPL – Slovensko", price_type: "flat", amount: 8, service_zone: { fulfillment_set: { type: "shipping" } }, prices: [] }
+// PPL to Slovakia: 10 €, free from 220 € (owner, 2026-11-22).
+const shippingOptionSk = { id: "so_ppl_sk", name: "Přepravce PPL – Slovensko", price_type: "flat", amount: 10, service_zone: { fulfillment_set: { type: "shipping" } }, prices: [] }
 // The same variants in EUR: [calculated, original] per variant.
 const EUR_PRICES = { variant_test: [19.9, 19.9], variant_sale: [59.9, 75.9], variant_gift: [7.9, 7.9] }
 // Mutable through /__catalogue/price, like a price changed in admin (#65).
@@ -149,7 +149,7 @@ function relationsDepth(field) {
 function shippingFor(id) {
   if (isSk(carts.get(id)) || (!carts.has(id) && id.startsWith("cart_sk"))) {
     const itemSubtotal = (carts.get(id)?.items ?? [{ total: eurPrices.variant_test[0] }]).reduce((sum, item) => sum + item.total, 0)
-    return { option: shippingOptionSk, amount: itemSubtotal >= 200 ? 0 : 8 }
+    return { option: shippingOptionSk, amount: itemSubtotal >= 220 ? 0 : 10 }
   }
   if (id.startsWith("cart_pickup")) return { option: shippingOptions[1], amount: 0 }
   if (id.startsWith("cart_freeppl")) return { option: shippingOptions[0], amount: 0 }

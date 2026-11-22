@@ -1,11 +1,12 @@
 import { notFound } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { Suspense } from "react"
 
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
 import RefinementList from "@modules/store/components/refinement-list"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import PaginatedProducts from "@modules/store/templates/paginated-products"
-import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import Breadcrumbs from "@modules/common/components/breadcrumbs"
 import { HttpTypes } from "@medusajs/types"
 
 import { clx } from "@medusajs/ui"
@@ -27,6 +28,7 @@ export default function CategoryTemplate({
   page?: string
   countryCode: string
 }) {
+  const t = useTranslations("product")
   const pageNumber = page ? parseInt(page) : 1
   const sort = sortBy || "created_at"
 
@@ -43,14 +45,26 @@ export default function CategoryTemplate({
 
   getParents(category)
 
+  // The product page's breadcrumbs (vewao-clients#70): Hlavní stránka › parent
+  // categories. A top-level category shows the home link alone, so the title
+  // sits at the same height on every category page.
+  const brPath = [
+    { name: t("home"), href: "/" },
+    ...[...parents].reverse().map((parent) => ({ name: parent.name, href: `/categories/${parent.handle}` })),
+  ]
+
   // Subcategories in admin order; the page lists their products too (vewao-clients#67).
   const children = [...(category.category_children ?? [])].sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0))
   const categoryIds = [category.id, ...children.map((child) => child.id)]
   const cta = categoryCta(category.metadata)
 
   return (
+    <div className="flex flex-col items-center">
+    <div className="w-full max-w-[1440px] mt-6 pl-6" data-testid="category-breadcrumbs">
+      <Breadcrumbs path={brPath} />
+    </div>
     <div
-      className="flex flex-col small:flex-row small:items-start py-6 content-container"
+      className="flex w-full flex-col small:flex-row small:items-start py-6 content-container"
       data-testid="category-container"
     >
       {/* <RefinementList sortBy={sort} data-testid="sort-by-container" /> */}
@@ -60,20 +74,7 @@ export default function CategoryTemplate({
             title is 15 % above text-2xl. */}
         <div className="mb-8 flex flex-col gap-4 small:flex-row small:items-center small:justify-between small:gap-8">
           <div className="flex min-w-0 flex-col gap-2">
-            <div className="flex flex-row gap-4 text-[1.725rem] leading-tight">
-              {parents &&
-                parents.map((parent) => (
-                  <span key={parent.id} className="text-ui-fg-subtle">
-                    <LocalizedClientLink
-                      className="mr-4 hover:text-black"
-                      href={`/categories/${parent.handle}`}
-                      data-testid="sort-by-link"
-                    >
-                      {parent.name}
-                    </LocalizedClientLink>
-                    /
-                  </span>
-                ))}
+            <div className="text-[1.725rem] leading-tight">
               <h1 data-testid="category-page-title">{category.name}</h1>
             </div>
             {category.description && (
@@ -128,6 +129,7 @@ export default function CategoryTemplate({
           />
         </Suspense>
       </div>
+    </div>
     </div>
   )
 }

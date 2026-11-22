@@ -6,7 +6,6 @@ import { getRegion } from "@lib/data/regions"
 import About from "@modules/home/components/about"
 import FeaturedProducts from "@modules/home/components/featured-products"
 import Hero from "@modules/home/components/hero"
-import Icons from "@modules/home/components/icons"
 import Reviews from "@modules/home/components/reviews"
 
 /**
@@ -25,7 +24,6 @@ export default async function ShopFront({ countryCode }: { countryCode: string }
   return (
     <>
       <Hero />
-      <Icons />
       <div className="py-12 small:py-24 flex flex-col items-center">
         <Heading level="h2" className="text-2xl small:text-3xl text-ui-fg-base font-normal max-w-3xl pb-8">
           {t("productsTitle")}

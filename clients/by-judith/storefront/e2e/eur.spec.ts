@@ -47,7 +47,7 @@ test("the header switches delivery to Slovakia, with prices in EUR", async ({ pa
 
   await expect(page).toHaveURL(/\/sk\/products\/akcni-produkt$/, NAVIGATION)
   await expect(page.getByTestId("product-price").first()).toContainText("59,90 €")
-  await expect(header.getByTestId("free-delivery-note")).toHaveText("Doprava zdarma od 200 €")
+  await expect(header.getByTestId("free-delivery-note")).toHaveText("Doprava zdarma od 220 €")
   await expect(countries.locator('[aria-current="true"]')).toHaveText("Slovensko (€)")
 
   // The cart moved to the Slovak region with the page.
@@ -87,7 +87,7 @@ test("delivery to Slovakia is PPL in EUR, without clinic pickup", async ({ page,
   await page.goto("/sk/checkout?step=delivery")
   const options = page.getByTestId("delivery-options-container")
   await expect(options).toContainText("Přepravce PPL – Slovensko")
-  await expect(options).toContainText("8,00 €")
+  await expect(options).toContainText("10,00 €")
   await expect(options).not.toContainText("Pobočka Beauty Body Clinic")
 })
 
