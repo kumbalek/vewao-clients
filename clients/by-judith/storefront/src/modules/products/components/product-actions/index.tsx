@@ -12,6 +12,7 @@ import { useParams } from "next/navigation"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { useTranslations } from "next-intl"
 import ProductPrice from "../product-price"
+import SalePrice from "../product-price/sale-price"
 import MobileActions from "./mobile-actions"
 import { VariantOptions, optionsAsKeymap, useVariantOptions } from "./variant-options"
 
@@ -36,30 +37,18 @@ const totalOf = (variants: HttpTypes.StoreProductVariant[]) =>
  * regular one struck through, as the cart will charge it.
  */
 function TotalPrice({ variants, percent }: { variants: HttpTypes.StoreProductVariant[]; percent?: number }) {
-  const t = useTranslations("product")
   const total = totalOf(variants)
   const currency = variants[0]?.calculated_price?.currency_code ?? ""
-  const price = percent ? discounted(total, percent) : total
+  if (percent) {
+    return <SalePrice amount={discounted(total, percent)} reference={total} percentage={percent} currencyCode={currency} />
+  }
   return (
     <div className="flex flex-col items-center text-ui-fg-base">
-      <span className={percent ? "text-2xl text-ui-fg-interactive" : "text-2xl"}>
-        <span data-testid="product-price" data-value={price}>
-          {convertToLocale({ amount: price, currency_code: currency })}
+      <span className="text-2xl">
+        <span data-testid="product-price" data-value={total}>
+          {convertToLocale({ amount: total, currency_code: currency })}
         </span>
       </span>
-      {!!percent && (
-        <>
-          <p>
-            <span className="text-ui-fg-subtle">{t("referencePrice")} </span>
-            <span className="line-through" data-testid="reference-product-price" data-value={total}>
-              {convertToLocale({ amount: total, currency_code: currency })}
-            </span>
-          </p>
-          <span className="text-ui-fg-interactive" data-testid="product-price-discount">
-            -{percent} %
-          </span>
-        </>
-      )}
     </div>
   )
 }

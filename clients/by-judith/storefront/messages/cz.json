@@ -241,7 +241,9 @@
     "selectOption": "Vyberte {option}",
     "severalAllowed": "lze vybrat více",
     "tierFrom": "od {count} ks",
-    "tierApplies": "(sleva platí)"
+    "tierApplies": "(sleva platí)",
+    "priceInfo": "Informace o ceně",
+    "discountOf": "Sleva"
   },
   "payment": {
     "title": "Zpracováváme vaši platbu. Vyčkejte prosím."

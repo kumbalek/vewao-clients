@@ -294,6 +294,11 @@ test("announces a sale only against the 30-day lowest price", async ({
   // The reference is the ledger's 30-day lowest (1 690), not Medusa's list price (1 890).
   await expect(page.getByTestId("reference-product-price").first()).toHaveAttribute("data-value", "1690")
   await expect(page.getByTestId("product-price-discount").first()).toHaveText("-11 %")
+  // The struck price explains itself in a tooltip (owner, 2026-11-22).
+  const info = page.getByTestId("product-container").getByRole("button", { name: "Informace o ceně" })
+  await expect(info).toHaveAccessibleDescription(/Nejnižší cena za 30 dní před slevou: 1\.690 Kč\. Sleva -11 %/)
+  await info.click()
+  await expect(page.getByRole("tooltip").filter({ visible: true }).first()).toContainText("Nejnižší cena za 30 dní před slevou")
 
   await request.post(`${MOCK}/__price-history`, { data: { history_complete: false } })
   await page.goto("/cz/products/akcni-produkt?incomplete")
