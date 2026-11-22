@@ -33,6 +33,54 @@ export const CATEGORIES: CategoryDef[] = [
   { name: "DP Dermaceuticals", handle: "dp-dermaceuticals" },
 ]
 
+type ServiceDef = {
+  title: string
+  handle: string
+  /** Category handle. */
+  category: string
+  czk: number
+  eur: number
+}
+
+/**
+ * Services sold in the shop (owner, 2026-11-22). No shipping profile and no
+ * inventory, like the gift vouchers: a cart of services skips delivery and pays
+ * through Comgate. One variant each; created as drafts until their texts are
+ * written in Payload.
+ */
+export const SERVICES: ServiceDef[] = [
+  {
+    title: "Vstupní osobní diagnostika Judity Halvové",
+    handle: "vstupni-osobni-diagnostika-judity-halvove",
+    category: "tcm",
+    czk: 3000,
+    eur: 120,
+  },
+  {
+    title: "Balíček 5× akupunktura u senior terapeuta",
+    handle: "balicek-5x-akupunktura-u-senior-terapeuta",
+    category: "tcm",
+    czk: 15000,
+    eur: 600,
+  },
+  {
+    title: "Online konzultace fytoterapie s Juditou Halvovou",
+    handle: "online-konzultace-fytoterapie-s-juditou-halvovou",
+    category: "tcm",
+    czk: 1500,
+    eur: 60,
+  },
+  {
+    title: "Online konzultace fytoterapie s naší specialistkou Lucií",
+    handle: "online-konzultace-fytoterapie-s-nasi-specialistkou-lucii",
+    category: "tcm",
+    czk: 1000,
+    eur: 40,
+  },
+]
+
+const DEFAULT_OPTION = { title: "Default option", value: "Default option value" }
+
 function createClient() {
   const baseUrl = process.env.MEDUSA_BACKEND_URL
   const apiKey = process.env.MEDUSA_ADMIN_API_KEY
@@ -145,9 +193,48 @@ async function ensureHerbEurPrices() {
   }
 }
 
+/** Creates a missing service as a draft; an existing product is left as it is. */
+async function ensureService(def: ServiceDef, categoryId: string, salesChannelIds: string[]) {
+  const { products } = await sdk.admin.product.list({ handle: def.handle, fields: "id,title,status" })
+  if (products[0]) {
+    log("exists", `product ${products[0].title} (${products[0].status})`)
+    return
+  }
+  await sdk.admin.product.create({
+    title: def.title,
+    handle: def.handle,
+    status: "draft",
+    categories: [{ id: categoryId }],
+    sales_channels: salesChannelIds.map((id) => ({ id })),
+    options: [{ title: DEFAULT_OPTION.title, values: [DEFAULT_OPTION.value] }],
+    variants: [
+      {
+        title: def.title,
+        manage_inventory: false,
+        allow_backorder: false,
+        options: { [DEFAULT_OPTION.title]: DEFAULT_OPTION.value },
+        prices: [
+          { currency_code: "czk", amount: def.czk },
+          { currency_code: "eur", amount: def.eur },
+        ],
+      },
+    ],
+  })
+  log("created", `product ${def.title} (draft, ${def.czk} Kč, ${def.eur} €)`)
+}
+
+const categoryIds = new Map<string, string>()
 for (let rank = 0; rank < CATEGORIES.length; rank++) {
   const def = CATEGORIES[rank]!
   const category = await ensureCategory(def, rank)
+  categoryIds.set(def.handle, category.id)
   if (def.collections) await addCollectionProducts(category, def.collections)
 }
 await ensureHerbEurPrices()
+
+const { sales_channels } = await sdk.admin.salesChannel.list({ fields: "id", limit: 50 })
+for (const service of SERVICES) {
+  const categoryId = categoryIds.get(service.category)
+  if (!categoryId) throw new Error(`Unknown category ${service.category} for ${service.handle}`)
+  await ensureService(service, categoryId, sales_channels.map((channel) => channel.id))
+}
