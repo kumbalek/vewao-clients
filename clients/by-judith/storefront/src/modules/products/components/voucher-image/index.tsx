@@ -9,14 +9,15 @@ const CARD_RATIO = "2480 / 1748"
 const TEXT_AREA: React.CSSProperties = { left: "37%", right: "8%", top: "29%", bottom: "15%" }
 
 // After the owner's A4 mockup (bbclinic mockup-a4.jpg, 2026-11-22): the card
-// lies on a warm beige table, seen from above at an angle.
-const TABLE = "radial-gradient(120% 100% at 78% 18%, #E4D9C8 0%, #D9CBB6 55%, #CDBDA6 100%)"
+// lies on a table, seen from above at an angle. The table is the site's light
+// sand (tokens sand.light), lighter than the mockup's beige (owner).
+const TABLE = "radial-gradient(120% 100% at 78% 18%, #FDFAF5 0%, #F7F0E4 55%, #EFE5D3 100%)"
 // The card turned in its plane, then the table tipped away from the viewer (its
 // far edge shorter). The perspective is in card widths (container units), so
 // the depth looks the same from the cart thumbnail to the product page.
 const TILT = "perspective(350cqw) rotateX(40deg) rotateY(-6deg) rotateZ(-18deg)"
 // Around the card's own outline, after the tilt: a contact shadow and a soft one.
-const SHADOW = "drop-shadow(0 3px 4px rgb(70 50 30 / 0.16)) drop-shadow(0 22px 28px rgb(70 50 30 / 0.2))"
+const SHADOW = "drop-shadow(0 3px 4px rgb(90 70 40 / 0.13)) drop-shadow(0 22px 28px rgb(90 70 40 / 0.15))"
 // Light falling from the top right across the paper.
 const LIGHT = "linear-gradient(120deg, rgb(255 255 255 / 0) 35%, rgb(60 40 20 / 0.07) 100%)"
 
