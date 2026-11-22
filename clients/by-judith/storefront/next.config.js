@@ -24,6 +24,14 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: false,
   },
+  // The herb lines were collections until 2026-11-22; they are Herbs'
+  // subcategories now (vewao-clients#67). Old links keep working.
+  async redirects() {
+    return [
+      { source: "/:countryCode/collections/gold", destination: "/:countryCode/categories/gold-edition", permanent: true },
+      { source: "/:countryCode/collections/acute", destination: "/:countryCode/categories/acute", permanent: true },
+    ]
+  },
   images: {
     // Next 16 allows only quality 75 by default; thumbnails use 50.
     qualities: [50, 75],

@@ -4,7 +4,7 @@ import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-g
 // import RefinementList from "@modules/store/components/refinement-list"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import Breadcrumbs from "@modules/common/components/breadcrumbs"
-import { HttpTypes } from "@medusajs/types"
+import type { MenuCategory } from "@lib/util/menu-categories"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 import PaginatedProducts from "./paginated-products"
@@ -14,13 +14,14 @@ const StoreTemplate = ({
   page,
   query,
   countryCode,
-  collections,
+  categories,
 }: {
   sortBy?: SortOptions
   page?: string
   query?: string
   countryCode: string
-  collections: HttpTypes.StoreCollection[]
+  /** The top-level categories, linked above the product list. */
+  categories: MenuCategory[]
 }) => {
   const pageNumber = page ? parseInt(page) : 1
   const sort = sortBy || "created_at"
@@ -48,15 +49,15 @@ const StoreTemplate = ({
           <h1 data-testid="store-page-title">
             {query ? tSearch("title", { query }) : t("allProducts")}
           </h1>
-          {collections.length > 0 && (
-            <div className="flex gap-1 small:gap-2 text-xl">
-              {`${t("collection")}: `}
-              {collections.map((c, index) => (
+          {categories.length > 0 && (
+            <div className="flex flex-wrap gap-1 small:gap-2 text-xl" data-testid="store-categories">
+              {`${t("category")}: `}
+              {categories.map((c, index) => (
                 <span className="text-[#85977b]" key={c.handle}>
-                  <LocalizedClientLink href={`/collections/${c.handle}`}>
+                  <LocalizedClientLink href={`/categories/${c.handle}`}>
                     {c.title}
                   </LocalizedClientLink>
-                  {index !== collections.length - 1 && (
+                  {index !== categories.length - 1 && (
                     <span className="ml-1 small:ml-2">{"|"}</span>
                   )}
                 </span>

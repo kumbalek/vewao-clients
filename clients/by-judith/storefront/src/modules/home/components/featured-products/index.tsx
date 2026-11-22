@@ -1,16 +1,15 @@
 import { HttpTypes } from "@medusajs/types"
+
+import type { MenuCategory } from "@lib/util/menu-categories"
 import ProductRail from "@modules/home/components/featured-products/product-rail"
 
+/** A rail per top-level category, its subcategories' products included; empty ones render nothing. */
 export default async function FeaturedProducts({
-  collections,
+  categories,
   region,
 }: {
-  collections: HttpTypes.StoreCollection[]
+  categories: MenuCategory[]
   region: HttpTypes.StoreRegion
 }) {
-  return collections.map((collection) => (
-    <li key={collection.id}>
-      <ProductRail collection={collection} region={region} />
-    </li>
-  ))
+  return categories.map((category) => <ProductRail key={category.id} category={category} region={region} />)
 }

@@ -27,8 +27,11 @@ export default async function RelatedProducts({
   if (region?.id) {
     queryParams.region_id = region.id
   }
-  if (product.collection_id) {
-    queryParams.collection_id = [product.collection_id]
+  // The same categories (the product page reads them), not a collection: the
+  // shop has none since vewao-clients#67.
+  const categoryIds = (product.categories ?? []).flatMap((category) => (category?.id ? [category.id] : []))
+  if (categoryIds.length) {
+    queryParams.category_id = categoryIds
   }
   if (product.tags) {
     queryParams.tag_id = product.tags

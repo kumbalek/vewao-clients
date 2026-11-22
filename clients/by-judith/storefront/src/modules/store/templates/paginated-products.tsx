@@ -12,7 +12,6 @@ const PRODUCT_LIMIT = 12
 
 type PaginatedProductsParams = {
   limit: number
-  collection_id?: string[]
   category_id?: string[]
   id?: string[]
   order?: string
@@ -23,8 +22,7 @@ export default async function PaginatedProducts({
   sortBy,
   page,
   query,
-  collectionId,
-  categoryId,
+  categoryIds,
   productsIds,
   countryCode,
 }: {
@@ -32,8 +30,8 @@ export default async function PaginatedProducts({
   page: number
   /** Full-text product search, passed to Medusa as `q`. */
   query?: string
-  collectionId?: string
-  categoryId?: string
+  /** A category and its subcategories: products in any of them. */
+  categoryIds?: string[]
   productsIds?: string[]
   countryCode: string
 }) {
@@ -45,12 +43,8 @@ export default async function PaginatedProducts({
     queryParams["q"] = query
   }
 
-  if (collectionId) {
-    queryParams["collection_id"] = [collectionId]
-  }
-
-  if (categoryId) {
-    queryParams["category_id"] = [categoryId]
+  if (categoryIds?.length) {
+    queryParams["category_id"] = categoryIds
   }
 
   if (productsIds) {

@@ -7,6 +7,9 @@ import { SortOptions } from "@modules/store/components/refinement-list/sort-prod
 import { getAuthHeaders, getCacheOptions } from "./cookies"
 import { getRegion, retrieveRegion } from "./regions"
 
+/** What product listings read; a caller's `fields` replaces it, so extend this rather than restate it. */
+export const PRODUCT_LIST_FIELDS = "*variants.calculated_price,+variants.inventory_quantity,+metadata,+tags"
+
 export const listProducts = async ({
   pageParam = 1,
   queryParams,
@@ -62,8 +65,7 @@ export const listProducts = async ({
           limit,
           offset,
           region_id: region?.id,
-          fields:
-            "*variants.calculated_price,+variants.inventory_quantity,+metadata,+tags",
+          fields: PRODUCT_LIST_FIELDS,
           ...queryParams,
         },
         headers,

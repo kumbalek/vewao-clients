@@ -36,6 +36,10 @@ export default function CategoryTemplate({
 
   getParents(category)
 
+  // Subcategories in admin order; the page lists their products too (vewao-clients#67).
+  const children = [...(category.category_children ?? [])].sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0))
+  const categoryIds = [category.id, ...children.map((child) => child.id)]
+
   return (
     <div
       className="flex flex-col small:flex-row small:items-start py-6 content-container"
@@ -64,10 +68,10 @@ export default function CategoryTemplate({
             <p>{category.description}</p>
           </div>
         )}
-        {category.category_children && (
+        {children.length > 0 && (
           <div className="mb-8 text-base-large">
             <ul className="grid grid-cols-1 gap-2">
-              {category.category_children?.map((c) => (
+              {children.map((c) => (
                 <li key={c.id}>
                   <InteractiveLink href={`/categories/${c.handle}`}>
                     {c.name}
@@ -87,7 +91,7 @@ export default function CategoryTemplate({
           <PaginatedProducts
             sortBy={sort}
             page={pageNumber}
-            categoryId={category.id}
+            categoryIds={categoryIds}
             countryCode={countryCode}
           />
         </Suspense>
