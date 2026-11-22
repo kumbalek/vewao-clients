@@ -89,7 +89,7 @@ test("the desktop header offers the wireframe navigation", async ({ page, isMobi
   await expect(shop).toHaveAttribute("aria-expanded", "false")
 })
 
-test("the desktop Shop menu shows the categories as boxes; hovering one shows its subcategories", async ({
+test("the desktop Shop menu shows the categories as boxes; hovering one shows its subcategories in a row", async ({
   page,
   isMobile,
 }) => {
@@ -118,6 +118,18 @@ test("the desktop Shop menu shows the categories as boxes; hovering one shows it
   // Smaller boxes without subtitles, in admin order (rank), not the API's order.
   await expect(dp.getByRole("link")).toHaveText(["Čištění a exfoliace", "DP Masky"])
   await expect(dp.getByRole("link", { name: "DP Masky" })).toHaveAttribute("href", "/cz/categories/dp-masky")
+  // Side by side under the categories, not in a column.
+  const [first, second] = await Promise.all([
+    dp.getByRole("link").nth(0).boundingBox(),
+    dp.getByRole("link").nth(1).boundingBox(),
+  ])
+  expect(Math.abs(first!.y - second!.y)).toBeLessThan(2)
+  expect(second!.x).toBeGreaterThan(first!.x + first!.width)
+
+  // Without a mouse: ArrowDown on a category moves into its subcategories.
+  await header.getByRole("link", { name: /^DP Dermaceuticals/ }).focus()
+  await page.keyboard.press("ArrowDown")
+  await expect(dp.getByRole("link", { name: "Čištění a exfoliace" })).toBeFocused()
 })
 
 test("the mobile Shop menu shows the category boxes; an arrow opens a category's subcategories", async ({

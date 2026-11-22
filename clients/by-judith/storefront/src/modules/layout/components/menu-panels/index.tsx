@@ -1,9 +1,7 @@
 import { useTranslations } from "next-intl"
 
 import type { ProcedureCategory } from "content/site"
-import type { MenuCategory } from "@lib/util/menu-categories"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import CategoryBox from "@modules/layout/components/category-box"
 import { CopyText, Placeholder } from "@modules/common/components/placeholder"
 import { ArrowLink, Container, Text } from "@modules/design-system"
 
@@ -89,44 +87,4 @@ export function ProceduresPanel({ categories }: { categories: ProcedureCategory[
   )
 }
 
-/**
- * The shop's categories as boxes (vewao-clients#70). A category's subcategories
- * appear under it as small boxes while it is hovered or holds focus; they come
- * right after its box, so Tab reaches them. The logo leads to the e-shop's
- * front page, the footer to the full product list.
- */
-export function ShopPanel({ categories }: { categories: MenuCategory[] }) {
-  return (
-    <Container width="page" className="py-8">
-      <ul className="grid grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] items-start gap-4">
-        {categories.map((category) => (
-          <li key={category.id} className="group/category flex flex-col gap-2">
-            <CategoryBox
-              href={`/categories/${category.handle}`}
-              title={category.title}
-              subtitle={category.subtitle}
-              image={category.image}
-            />
-            {category.children.length > 0 && (
-              <ul
-                aria-label={category.title}
-                className="hidden flex-col gap-1.5 group-focus-within/category:flex group-hover/category:flex"
-              >
-                {category.children.map((child) => (
-                  <li key={child.id}>
-                    <CategoryBox
-                      href={`/categories/${child.handle}`}
-                      title={child.title}
-                      image={child.image}
-                      size="small"
-                    />
-                  </li>
-                ))}
-              </ul>
-            )}
-          </li>
-        ))}
-      </ul>
-    </Container>
-  )
-}
+export { default as ShopPanel } from "./shop-panel"
