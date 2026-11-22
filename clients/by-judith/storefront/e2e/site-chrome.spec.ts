@@ -223,7 +223,7 @@ test("header search lists matching products", async ({ page, isMobile, request }
   ).toBe(true)
 })
 
-test("the footer shows the real contact details and marks missing content", async ({
+test("the footer shows the real contact details and no placeholders", async ({
   page,
 }) => {
   await page.goto("/cz")
@@ -255,6 +255,7 @@ test("the footer shows the real contact details and marks missing content", asyn
     "alt",
     "Podporované platební metody: Comgate, Visa, Mastercard, Google Pay a Apple Pay"
   )
-  // Content the merchant has not supplied yet is visibly marked, never invented.
-  await expect(footer.locator("[data-placeholder]")).toHaveCount(3)
+  // No placeholders: the brand text, social links and newsletter are not in this version (owner, 2026-11-22).
+  await expect(footer.locator("[data-placeholder]")).toHaveCount(0)
+  await expect(footer.getByText("Newsletter", { exact: false })).toHaveCount(0)
 })
