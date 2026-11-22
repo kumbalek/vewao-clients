@@ -6,7 +6,7 @@ import { contact, footer, isFullSitePath } from "content/site"
 import { consentCategories } from "@lib/consent"
 import { CookieSettingsButton } from "@modules/common/components/cookie-consent"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
-import { CopyText, Placeholder } from "@modules/common/components/placeholder"
+import { Placeholder } from "@modules/common/components/placeholder"
 import { Container, Heading, Text } from "@modules/design-system"
 import type { MenuCategory } from "@lib/util/menu-categories"
 
@@ -63,7 +63,7 @@ export default function SiteFooter({
     <footer className="border-t border-line bg-surface" data-testid="site-footer">
       <Container
         width="page"
-        className="grid gap-10 py-12 xsmall:grid-cols-2 small:grid-cols-4 small:py-16"
+        className="grid gap-10 py-12 xsmall:grid-cols-2 small:grid-cols-3 small:py-16"
       >
         <div className="flex flex-col items-start gap-4">
           <LocalizedClientLink href="/" className={linkClasses}>
@@ -76,12 +76,6 @@ export default function SiteFooter({
               className="mix-blend-multiply"
             />
           </LocalizedClientLink>
-          <Text size="sm" tone="subtle">
-            <CopyText value={footer.about} />
-          </Text>
-          <Text size="sm" tone="subtle">
-            <CopyText value={footer.social} />
-          </Text>
         </div>
 
         <Column id="footer-links" title={t("quickLinks")}>
@@ -113,11 +107,6 @@ export default function SiteFooter({
           </Text>
         </Column>
 
-        <Column id="footer-newsletter" title={t("newsletter")}>
-          <Text size="sm" tone="subtle">
-            <CopyText value={footer.newsletter} />
-          </Text>
-        </Column>
       </Container>
 
       <div className="border-t border-line bg-white">

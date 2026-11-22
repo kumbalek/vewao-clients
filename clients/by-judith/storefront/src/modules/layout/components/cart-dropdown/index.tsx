@@ -109,7 +109,7 @@ const CartDropdown = ({
         leaveTo="opacity-0 translate-y-1"
       >
         <div
-          className="absolute right-0 top-[calc(100%+1px)] hidden w-[420px] border-x border-b border-line bg-white text-ink small:block"
+          className="absolute right-0 top-[calc(100%+1px)] hidden w-[480px] border-x border-b border-line bg-white text-ink small:block"
           data-testid="nav-cart-dropdown"
         >
           <div className="p-4 flex items-center justify-center">
@@ -155,8 +155,8 @@ const CartDropdown = ({
                         )}
                         <div className="flex flex-col justify-between flex-1">
                           <div className="flex flex-col flex-1">
-                            <div className="flex items-start justify-between">
-                              <div className="flex flex-col overflow-ellipsis whitespace-nowrap mr-4 w-[180px]">
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex min-w-0 flex-1 flex-col overflow-ellipsis whitespace-nowrap">
                                 <h3 className="text-base-regular overflow-hidden text-ellipsis">
                                   {isGiftPackaging ? (
                                     item.title
@@ -181,7 +181,7 @@ const CartDropdown = ({
                                   {`${t("quantity")}: ${item.quantity}`}
                                 </span>
                               </div>
-                              <div className="flex justify-end">
+                              <div className="flex shrink-0 justify-end">
                                 <LineItemPrice
                                   item={item}
                                   style="tight"

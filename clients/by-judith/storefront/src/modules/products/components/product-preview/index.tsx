@@ -48,11 +48,11 @@ export default async function ProductPreview({
           isFeatured={isFeatured}
           voucherTitle={productVoucherTitle(product)}
         />
-        <div className="flex txt-compact-medium mt-4 justify-between px-8">
-          <Text className="text-ui-fg-subtle" data-testid="product-title">
+        <div className="flex txt-compact-medium mt-4 items-start justify-between gap-4 px-8">
+          <Text className="min-w-0 text-ui-fg-subtle" data-testid="product-title">
             {product.title}
           </Text>
-          <div className="flex items-center gap-x-2">
+          <div className="flex shrink-0">
             {cheapestPrice && (
               <PreviewPrice price={cheapestPrice} claim={claim} />
             )}
