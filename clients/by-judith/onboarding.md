@@ -46,6 +46,12 @@ The owner confirmed the old instance's setup for launch:
 - Shipping: clinic pickup at Beauty Body Clinic (free) and PPL courier
   (150 Kč, free from 5 000 Kč), both fulfilled manually; PPL labels in the PPL
   portal. Packeta stays off.
+- PPL routine (decided 2026-11-22, vewao-platform#42): "Export pro PPL" on the
+  admin order list → import the CSV in klient.ppl.cz → print labels → "Odeslat
+  e-mail zákazníkům" → order collection → create the PPL fulfillment in Medusa.
+  PPL e-mails the recipient the tracking; our "Objednávka odeslána" says so.
+  Open: the merchant sets up the portal's import template and checks PPL's
+  e-mail with a test parcel.
 - Payment: Comgate for every order; pay on site only with clinic pickup. Free
   PPL delivery is still paid online. No cash on delivery.
 - Comgate connections, one per currency (owner, 2026-11-22; vewao-platform#39):
