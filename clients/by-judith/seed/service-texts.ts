@@ -12,7 +12,8 @@ import { htmlToLexical } from "./payload/html-lexical.ts"
  *
  * Edits to the owner's text: the product name above it is the page title;
  * "[Jméno]" is Lucia, as the text names her; "hormonální disbalanci"; headings
- * without colons; the capitalised price note in bold, for both (owner).
+ * without colons; the capitalised price note in bold, for both (owner). The
+ * other vouchers' texts are short; their edits are noted beside them.
  */
 
 const included = (items: [string, string][]) =>
@@ -82,6 +83,32 @@ ${steps("zašleme")}
 ${priceNote}
 <p>Dopřejte svému tělu péči, která respektuje jeho přirozený rytmus.</p>`,
 }
+
+// Short voucher descriptions, owner's texts of 2026-11-22. One Ultherapy text
+// for all three Ultherapy products.
+const ultherapy =
+  "<p>Neinvazivní lifting Ultherapy® Prime cílí přesně do hlubokých vrstev pokožky (SMAS), kde probouzí tvorbu vlastního kolagenu. Žádná rekonvalescence, žádné jizvy – pouze postupné, přirozené zpevnění kontur s efektem přetrvávajícím 1 až 2 roky.</p>"
+Object.assign(html, {
+  "ultherapy-aplikace-na-jednotlive-partie": ultherapy,
+  "ultherapy-facelift": ultherapy,
+  "ultherapy-full-facelift": ultherapy,
+  "modelace-a-hydratace-rtu-lips-by-boris-jegorov":
+    "<p>Přirozená plnost, dokonalé kontury a hloubková hydratace. To jsou oblíbené Jegorovky, neboli rty od MUDr. Borise Jegorova. Letos je můžete darovat za cenu, která potěší každého Ježíška.</p>",
+  "vyhlazeni-mimickych-vrasek-baby-botox":
+    "<p>Prémiový botulotoxin pro uvolnění vrásek na čele, mezi obočím (glabela) a v okolí očí. Výsledkem je odpočatý, mladistvý výraz při zachování přirozené mimiky, který potěší nejen pod stromečkem.</p>",
+  blefaroplastika:
+    "<p>Plastická operace horních očních víček. Precizní chirurgický zákrok pod vedením zkušeného plastického chirurga, který odstraní nadbytečnou kůži víček, otevře pohled a zbaví obličej unaveného výrazu na mnoho let, nejen na Vánoce.</p>",
+  "vstupni-osobni-diagnostika-judity-halvove":
+    "<p>Komplexní 45minutové vyšetření podle principů tradiční čínské medicíny (diagnostika z jazyka, pulzu a celkové konstituce), na jehož základě stanovíme přesný plán terapie a úpravy životosprávy na míru.</p>",
+  "balicek-5x-akupunktura-u-senior-terapeuta":
+    "<p>Ucelená terapeutická kúra zaměřená na odstranění chronických bolestí, harmonizaci nervového systému, podporu spánku a hlubokou regeneraci organismu pod vedením našich senior terapeutů.</p>",
+  // "Zvažujete", "k MUDr. Jegorovovi" (dative), a closing full stop.
+  "osobni-konzultace-s-mudr-jegorovem": `<p>Zvažujete estetický zákrok a nejste si jistí, co je pro vás to pravé?</p>
+<p>Objednejte se na konzultaci k MUDr. Jegorovovi, atestovanému plastickému chirurgovi, který s vámi vše detailně probere a vysvětlí. V případě, že se rozhodnete pro zákrok u nás na klinice, bude vám cena konzultace od zákroku odečtena. Konzultace trvá 30 minut.</p>`,
+  // "vám" in lower case, as in the other texts.
+  "osobni-konzultace-s-pletovou-terapeutkou": `<p>Nevíte, která procedura je pro vás ta pravá? Expertka na léčbu pleti, včetně injekčních aplikací, vám doporučí nejvhodnější ošetření pro řešení těžkých forem akné, pigmentací, vrásek, ale i kruhů pod očima či rozšířených žilek nebo znamének.</p>
+<p>Délka konzultace je 30 minut. V případě, že absolvujete ošetření u nás, vám bude částka za konzultaci odečtena z výsledné ceny.</p>`,
+})
 
 const products: ProductTextsFile["products"] = {}
 for (const [handle, text] of Object.entries(html)) {
