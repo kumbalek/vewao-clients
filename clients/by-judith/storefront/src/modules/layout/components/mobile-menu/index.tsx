@@ -166,29 +166,28 @@ export default function MobileMenu({
                         const listId = `menu-subcategories-${category.id}`
                         return (
                           <li key={category.id}>
-                            <div className="flex items-center gap-2">
-                              <CategoryBox
-                                href={`/categories/${category.handle}`}
-                                title={category.title}
-                                subtitle={category.subtitle}
-                                image={category.image}
-                                className="min-w-0 flex-1"
-                              />
-                              {category.children.length > 0 && (
-                                <button
-                                  type="button"
-                                  aria-expanded={expanded}
-                                  aria-controls={listId}
-                                  aria-label={t("showSubcategories", { category: category.title })}
-                                  onClick={() => setOpenCategory(expanded ? null : category.id)}
-                                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-ink hover:bg-surface-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-ink"
-                                >
-                                  <ChevronIcon
-                                    className={`transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
-                                  />
-                                </button>
-                              )}
-                            </div>
+                            <CategoryBox
+                              href={`/categories/${category.handle}`}
+                              title={category.title}
+                              subtitle={category.subtitle}
+                              image={category.image}
+                              action={
+                                category.children.length > 0 && (
+                                  <button
+                                    type="button"
+                                    aria-expanded={expanded}
+                                    aria-controls={listId}
+                                    aria-label={t("showSubcategories", { category: category.title })}
+                                    onClick={() => setOpenCategory(expanded ? null : category.id)}
+                                    className="flex h-10 w-10 items-center justify-center rounded-full text-ink hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-ink"
+                                  >
+                                    <ChevronIcon
+                                      className={`transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
+                                    />
+                                  </button>
+                                )
+                              }
+                            />
                             {category.children.length > 0 && (
                               <ul
                                 id={listId}
