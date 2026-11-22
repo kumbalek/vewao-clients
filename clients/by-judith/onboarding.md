@@ -82,7 +82,13 @@ The owner confirmed the old instance's setup for launch:
   they were sold at the regular prices before the sale is recorded in the
   ledger as `source: manual` periods from 2026-10-01. This covers the five
   sale vouchers and Ultherapy's six areas, whose −10 % box strikes the
-  regular price only when the ledger confirms it. Keep that statement on
+  regular price only when the ledger confirms it.
+  The same was done later for both online phytotherapy consultations:
+  - Judita's is 2 000 Kč, on sale for 1 000 Kč.
+  - Lucie's is 1 000 Kč, on sale for 500 Kč.
+  The owner states Judita's 1 500 Kč was a mistake in the new catalogue, never
+  offered publicly. Its two ledger rows (CZK, EUR) were soft-deleted on
+  2026-11-22, so they remain in the table with `deleted_at` set. Keep that statement on
   file; correct the start date in the ledger if it is wrong.
 - Admin changes to products, prices, stock, categories, regions and payment or
   shipping options appear in the shop within about a minute (#65). The shop
