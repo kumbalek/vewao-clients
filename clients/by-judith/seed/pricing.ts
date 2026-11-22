@@ -6,6 +6,9 @@
 /** Owner's EUR prices for the herb lines, by collection handle (2026-11-22). */
 export const HERB_EUR_PRICES: Record<string, number> = { gold: 75, acute: 24 }
 
+/** The owner's rule for the other ranges (2026-11-22): EUR = Kč ÷ 25, to the cent (760 Kč → 30,40 €). */
+export const eurFromCzk = (czk: number) => Math.round(czk * 4) / 100
+
 /** Placeholder EUR price: CZK at 25 Kč/€, up to a whole euro, minus 10 cents (1 890 Kč → 75,90 €). */
 export const devEurPrice = (czk: number) => Math.ceil(czk / 25) - 0.1
 

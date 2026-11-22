@@ -1,0 +1,861 @@
+{
+  "source": "https://shop.bbclinic.cz/dp-dermaceuticals",
+  "extracted_at": "2026-11-22",
+  "categories": [
+    {
+      "title": "Čištění a exfoliace",
+      "handle": "cisteni-a-exfoliace",
+      "source_url": "https://shop.bbclinic.cz/cisteni-a-exfoliace",
+      "products": [
+        "tri-phase-cleanser-60-ml",
+        "tri-phase-cleanser-150-ml",
+        "micro-derm-exfoliant-150ml",
+        "clr-foam-cleanser-150-ml",
+        "oscisonic-cleanser-head",
+        "cliniprep"
+      ]
+    },
+    {
+      "title": "Podkladová séra",
+      "handle": "podkladova-sera",
+      "source_url": "https://shop.bbclinic.cz/podkladova-sera",
+      "products": [
+        "exo-skin-serum-30ml",
+        "antioxidant-coctail-50ml",
+        "antioxidant-coctail-30ml",
+        "hyla-active-50ml",
+        "hyla-active-30ml",
+        "cbd-elixir-500mg-30ml"
+      ]
+    },
+    {
+      "title": "Korektivní péče",
+      "handle": "korektivni-pece",
+      "source_url": "https://shop.bbclinic.cz/korektivni-pece",
+      "products": [
+        "r-e-r-eye-serum",
+        "retinal-active",
+        "vitamin-rich-repair-50ml",
+        "vitamin-rich-repair-30ml",
+        "brite-lite-50ml",
+        "brite-lite-30ml"
+      ]
+    },
+    {
+      "title": "Pleťové krémy a hydratace",
+      "handle": "pletove-kremy-a-hydratace",
+      "source_url": "https://shop.bbclinic.cz/pletove-kremy-a-hydratace",
+      "products": [
+        "clr-lotion-15-ml",
+        "cbd-uber-calm-balm-30-ml",
+        "vitamin-rich-repair-50ml",
+        "vitamin-rich-repair-30ml",
+        "skin-veneer-50ml",
+        "clr-lotion-50-ml",
+        "cbd-visssage-50-ml"
+      ]
+    },
+    {
+      "title": "SPF",
+      "handle": "spf",
+      "source_url": "https://shop.bbclinic.cz/spf-ochrana-cover-recover",
+      "products": [
+        "barrier-body-butter-spf-50-pa-60ml",
+        "cover-recover-spf-30-pa"
+      ]
+    },
+    {
+      "title": "DP Masky",
+      "handle": "dp-masky",
+      "source_url": "https://shop.bbclinic.cz/dp-masky",
+      "products": [
+        "clr-clarifying-mask-60-ml",
+        "radiant-c-mask-60ml",
+        "hyla-active-3d-sculptured-mask-5-ks-baleni",
+        "brite-lite-3d-sculptured-mask-5-ks-baleni",
+        "r-e-r-eye-mask-5-ks-baleni"
+      ]
+    },
+    {
+      "title": "CBD Kolekce",
+      "handle": "cbd-kolekce",
+      "source_url": "https://shop.bbclinic.cz/cbd-kolekce",
+      "products": [
+        "cbd-uber-calm-balm-30-ml",
+        "cbd-elixir-500mg-30ml",
+        "cbd-visssage-50-ml",
+        "cbd-r-e-r-eye-cream-15-ml"
+      ]
+    },
+    {
+      "title": "DP Home",
+      "handle": "dp-home",
+      "source_url": "https://shop.bbclinic.cz/dp-home",
+      "products": [
+        "dermapen-home",
+        "dermapen-treatment-homecare-set",
+        "dermapem-home-jehlickove-naplne"
+      ]
+    },
+    {
+      "title": "Vlasová péče",
+      "handle": "vlasova-pece",
+      "source_url": "https://shop.bbclinic.cz/exo-grow-hair",
+      "products": [
+        "exo-grow-sampon-300-ml",
+        "exo-grow-kondicioner-300-ml",
+        "exo-grow-scalp-mask-150-ml"
+      ]
+    },
+    {
+      "title": "Výhodné balíčky",
+      "handle": "vyhodne-balicky",
+      "source_url": "https://shop.bbclinic.cz/vyhodne-balicky",
+      "products": [
+        "cleanse-hydrate",
+        "exfoliate-brighten",
+        "cleanse-clear",
+        "hydrate-repair"
+      ]
+    }
+  ],
+  "products": [
+    {
+      "handle": "tri-phase-cleanser-60-ml",
+      "title": "TRI-PHASE CLEANSER™ 60 ml",
+      "source_url": "https://shop.bbclinic.cz/p/tri-phase-cleansertm-60-ml",
+      "sku": "P00049",
+      "price_czk": 760,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/e/e/eef2527ff6bbeefb27f3e7bd649e112b-270161-710640e90c624a32a76c989ba5708778-mv2.jpg",
+      "option": null,
+      "variants": [
+        {
+          "title": "TRI-PHASE CLEANSER™ 60 ml",
+          "sku": "P00049",
+          "price_czk": 760
+        }
+      ]
+    },
+    {
+      "handle": "tri-phase-cleanser-150-ml",
+      "title": "TRI-PHASE CLEANSER™ 150 ml",
+      "source_url": "https://shop.bbclinic.cz/p/tri-phase-cleanser",
+      "sku": "P00003",
+      "price_czk": 1522,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/f/2/f2510a11b976ec7255de250fe45bc59e-dpd-tpc-150-bf.png",
+      "option": null,
+      "variants": [
+        {
+          "title": "TRI-PHASE CLEANSER™ 150 ml",
+          "sku": "P00003",
+          "price_czk": 1522
+        }
+      ]
+    },
+    {
+      "handle": "micro-derm-exfoliant-150ml",
+      "title": "MICRO DERM EXFOLIANT™ 150ML",
+      "source_url": "https://shop.bbclinic.cz/p/micro-derm-exfoliant-150ml",
+      "sku": "P00009",
+      "price_czk": 1522,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/9/7/97db79c826b57e933c18d328fca13262-dpd-md-150-bf.png",
+      "option": null,
+      "variants": [
+        {
+          "title": "MICRO DERM EXFOLIANT™ 150ML",
+          "sku": "P00009",
+          "price_czk": 1522
+        }
+      ]
+    },
+    {
+      "handle": "clr-foam-cleanser-150-ml",
+      "title": "CLR FOAM CLEANSER™ 150 ml",
+      "source_url": "https://shop.bbclinic.cz/p/clr-foam-cleanser",
+      "sku": "P00008",
+      "price_czk": 1522,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/0/1/01bf2f82ce4a28ea4aa118b2cd0381c1-dpd-clrfc-150-bf.png",
+      "option": null,
+      "variants": [
+        {
+          "title": "CLR FOAM CLEANSER™ 150 ml",
+          "sku": "P00008",
+          "price_czk": 1522
+        }
+      ]
+    },
+    {
+      "handle": "oscisonic-cleanser-head",
+      "title": "OSCISONIC CLEANSER HEAD™",
+      "source_url": "https://shop.bbclinic.cz/p/oscisonic-cleanser-head",
+      "sku": "P00002",
+      "price_czk": 1249,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/b/4/b4305c1566fc6551d82b71c093f3c885-oscisonic-03.jpg",
+      "option": null,
+      "variants": [
+        {
+          "title": "OSCISONIC CLEANSER HEAD™",
+          "sku": "P00002",
+          "price_czk": 1249
+        }
+      ]
+    },
+    {
+      "handle": "cliniprep",
+      "title": "CLINIPREP+™",
+      "source_url": "https://shop.bbclinic.cz/p/clini-prep",
+      "sku": "P00004",
+      "price_czk": 890,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/e/e/ee5c9f2c85e2edcd125e4ff701b87ab7-cprep-88-front-render-edit-1.png",
+      "option": null,
+      "variants": [
+        {
+          "title": "CLINIPREP+™",
+          "sku": "P00004",
+          "price_czk": 890
+        }
+      ]
+    },
+    {
+      "handle": "exo-skin-serum-30ml",
+      "title": "EXO-SKIN SÉRUM 30ML",
+      "source_url": "https://shop.bbclinic.cz/p/exo-skin-serum-30ml",
+      "sku": "P00027",
+      "price_czk": 8990,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/b/1/b1ef74c532a51e3658a78084e8a77ffc-screenshot-2024-08-09-at-13-01-10.png",
+      "option": null,
+      "variants": [
+        {
+          "title": "EXO-SKIN SÉRUM 30ML",
+          "sku": "P00027",
+          "price_czk": 8990
+        }
+      ]
+    },
+    {
+      "handle": "antioxidant-coctail-50ml",
+      "title": "ANTIOXIDANT COCTAIL™ 50ML",
+      "source_url": "https://shop.bbclinic.cz/p/antioxidant-coctailtm-50ml",
+      "sku": "P00020",
+      "price_czk": 3099,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/7/8/78a75db85423afa3859ae90128f37c2e-dpd-ac-50.png",
+      "option": null,
+      "variants": [
+        {
+          "title": "ANTIOXIDANT COCTAIL™ 50ML",
+          "sku": "P00020",
+          "price_czk": 3099
+        }
+      ]
+    },
+    {
+      "handle": "antioxidant-coctail-30ml",
+      "title": "ANTIOXIDANT COCTAIL™ 30ML",
+      "source_url": "https://shop.bbclinic.cz/p/antioxidant-coctail-30ml",
+      "sku": "P00019",
+      "price_czk": 2499,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/a/6/a6f1b26f6b75c2c1a422cbf6e6b281d1-dpd-ac-30-bf.png",
+      "option": null,
+      "variants": [
+        {
+          "title": "ANTIOXIDANT COCTAIL™ 30ML",
+          "sku": "P00019",
+          "price_czk": 2499
+        }
+      ]
+    },
+    {
+      "handle": "hyla-active-50ml",
+      "title": "HYLA ACTIVE™ 50ML",
+      "source_url": "https://shop.bbclinic.cz/p/hyla-activetm-50ml",
+      "sku": "P00025",
+      "price_czk": 3099,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/b/7/b7d4d391a4d5b53c091f3fe581c9d963-dpd-ha-50.png",
+      "option": null,
+      "variants": [
+        {
+          "title": "HYLA ACTIVE™ 50ML",
+          "sku": "P00025",
+          "price_czk": 3099
+        }
+      ]
+    },
+    {
+      "handle": "hyla-active-30ml",
+      "title": "HYLA ACTIVE™ 30ML",
+      "source_url": "https://shop.bbclinic.cz/p/hyla-active-30ml",
+      "sku": "P00024",
+      "price_czk": 2499,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/7/d/7d9a9d229ce70649fe47d3e9f735caec-dpd-ha-30.png",
+      "option": null,
+      "variants": [
+        {
+          "title": "HYLA ACTIVE™ 30ML",
+          "sku": "P00024",
+          "price_czk": 2499
+        }
+      ]
+    },
+    {
+      "handle": "cbd-elixir-500mg-30ml",
+      "title": "CBD ELIXIR 500MG / 30ML",
+      "source_url": "https://shop.bbclinic.cz/p/cbd-elixir-500mg-30ml",
+      "sku": "P00012",
+      "price_czk": 2362,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/b/2/b2cd028edbf279729a3e559de3620003-dpd-cbd-elixir-500.png",
+      "option": null,
+      "variants": [
+        {
+          "title": "CBD ELIXIR 500MG / 30ML",
+          "sku": "P00012",
+          "price_czk": 2362
+        }
+      ]
+    },
+    {
+      "handle": "r-e-r-eye-serum",
+      "title": "R.E.R EYE SERUM™",
+      "source_url": "https://shop.bbclinic.cz/p/r-e-r-eye-serum",
+      "sku": "P00014",
+      "price_czk": 2362,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/4/f/4f848d0cb28fa5928dffc9c4b1f719cd-dpd-rer-eye-15.png",
+      "option": "Množství",
+      "variants": [
+        {
+          "title": "15 ml",
+          "sku": "P00014-1",
+          "price_czk": 2362
+        },
+        {
+          "title": "50 ml",
+          "sku": "P00014-2",
+          "price_czk": 5990
+        }
+      ]
+    },
+    {
+      "handle": "retinal-active",
+      "title": "RETINAL ACTIVE™",
+      "source_url": "https://shop.bbclinic.cz/p/retinal-active",
+      "sku": "P00017",
+      "price_czk": 3024,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/f/c/fcf943fc8db211de9e45f6682115afdd-dpd-ra-50-bf.png",
+      "option": null,
+      "variants": [
+        {
+          "title": "RETINAL ACTIVE™",
+          "sku": "P00017",
+          "price_czk": 3024
+        }
+      ]
+    },
+    {
+      "handle": "vitamin-rich-repair-50ml",
+      "title": "VITAMIN RICH REPAIR™ 50ML",
+      "source_url": "https://shop.bbclinic.cz/p/vitamin-rich-repairtm-50ml",
+      "sku": "P00023",
+      "price_czk": 3099,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/f/e/feca494b83fff1ad0cfe68e47b3fa800-dpd-vrr-50.png",
+      "option": null,
+      "variants": [
+        {
+          "title": "VITAMIN RICH REPAIR™ 50ML",
+          "sku": "P00023",
+          "price_czk": 3099
+        }
+      ]
+    },
+    {
+      "handle": "vitamin-rich-repair-30ml",
+      "title": "VITAMIN RICH REPAIR™ 30ML",
+      "source_url": "https://shop.bbclinic.cz/p/vitamin-rich-repair-30ml",
+      "sku": "P00022",
+      "price_czk": 2499,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/9/6/96cb539d891812c3c84a7abd377ab656-dpd-vrr-30-bf.png",
+      "option": null,
+      "variants": [
+        {
+          "title": "VITAMIN RICH REPAIR™ 30ML",
+          "sku": "P00022",
+          "price_czk": 2499
+        }
+      ]
+    },
+    {
+      "handle": "brite-lite-50ml",
+      "title": "BRITE LITE™ 50ML",
+      "source_url": "https://shop.bbclinic.cz/p/brite-lite-50ml",
+      "sku": "P00011",
+      "price_czk": 3099,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/7/d/7db555835def6589af9da41efb941b0c-dpd-bl-50.png",
+      "option": null,
+      "variants": [
+        {
+          "title": "BRITE LITE™ 50ML",
+          "sku": "P00011",
+          "price_czk": 3099
+        }
+      ]
+    },
+    {
+      "handle": "brite-lite-30ml",
+      "title": "BRITE LITE™ 30ML",
+      "source_url": "https://shop.bbclinic.cz/p/brite-lite-30ml",
+      "sku": "P00021",
+      "price_czk": 2499,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/a/4/a459e894fd518832ecc3609e75f6576f-dpd-bl-30-bf.png",
+      "option": null,
+      "variants": [
+        {
+          "title": "BRITE LITE™ 30ML",
+          "sku": "P00021",
+          "price_czk": 2499
+        }
+      ]
+    },
+    {
+      "handle": "clr-lotion-15-ml",
+      "title": "CLR LOTION™ 15 ml",
+      "source_url": "https://shop.bbclinic.cz/p/clr-lotiontm-15-ml",
+      "sku": "P00050",
+      "price_czk": 1450,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/9/c/9cf53aca12d1565c266ae1386eebf0b8-270161-dec888e110e4441d9683fdace22a6cfb-mv2.jpg",
+      "option": null,
+      "variants": [
+        {
+          "title": "CLR LOTION™ 15 ml",
+          "sku": "P00050",
+          "price_czk": 1450
+        }
+      ]
+    },
+    {
+      "handle": "cbd-uber-calm-balm-30-ml",
+      "title": "CBD ÜBER CALM BALM 30 ml",
+      "source_url": "https://shop.bbclinic.cz/p/cbd-uber-calm-balm",
+      "sku": "P00007",
+      "price_czk": 1260,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/6/2/622a4f286da0f2c34f9727beec6581d3-dpd-cbd-uberbalm-30.png",
+      "option": null,
+      "variants": [
+        {
+          "title": "CBD ÜBER CALM BALM 30 ml",
+          "sku": "P00007",
+          "price_czk": 1260
+        }
+      ]
+    },
+    {
+      "handle": "skin-veneer-50ml",
+      "title": "SKIN VENEER™ 50ML",
+      "source_url": "https://shop.bbclinic.cz/p/skin-veneer-50ml",
+      "sku": "P00016",
+      "price_czk": 3099,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/5/5/55b83a5825a61dccf66bc1eaef2114e9-dpd-sv-50.png",
+      "option": null,
+      "variants": [
+        {
+          "title": "SKIN VENEER™ 50ML",
+          "sku": "P00016",
+          "price_czk": 3099
+        }
+      ]
+    },
+    {
+      "handle": "clr-lotion-50-ml",
+      "title": "CLR LOTION™ 50 ml",
+      "source_url": "https://shop.bbclinic.cz/p/clr-lotion-50-ml",
+      "sku": "P00001",
+      "price_czk": 3099,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/6/b/6b64c94d940a5eeb2ead9fe354635ffe-getimagenoresize-2-3.png",
+      "option": null,
+      "variants": [
+        {
+          "title": "CLR LOTION™ 50 ml",
+          "sku": "P00001",
+          "price_czk": 3099
+        }
+      ]
+    },
+    {
+      "handle": "cbd-visssage-50-ml",
+      "title": "CBD VISSSAGE 50 ML",
+      "source_url": "https://shop.bbclinic.cz/p/cbd-vissage-50ml",
+      "sku": "P00018",
+      "price_czk": 3024,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/7/5/75d6173a9c1e0b4874bbfb1c1356027e-dpd-cbd-vissage-50.png",
+      "option": null,
+      "variants": [
+        {
+          "title": "CBD VISSSAGE 50 ML",
+          "sku": "P00018",
+          "price_czk": 3024
+        }
+      ]
+    },
+    {
+      "handle": "barrier-body-butter-spf-50-pa-60ml",
+      "title": "BARRIER BODY BUTTER™ SPF 50, PA++++ 60ML",
+      "source_url": "https://shop.bbclinic.cz/p/barrier-body-butter-spf-50-pa-60ml",
+      "sku": "P00028",
+      "price_czk": 1360,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/d/7/d76fdf8dfc882dced018f2dd52ff481c-bbbshop-02-1.png",
+      "option": null,
+      "variants": [
+        {
+          "title": "BARRIER BODY BUTTER™ SPF 50, PA++++ 60ML",
+          "sku": "P00028",
+          "price_czk": 1360
+        }
+      ]
+    },
+    {
+      "handle": "cover-recover-spf-30-pa",
+      "title": "COVER RECOVER™ SPF 30/PA +++",
+      "source_url": "https://shop.bbclinic.cz/p/upravit-cover-recover-spf-30-pa",
+      "sku": "P00010",
+      "price_czk": 1890,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/9/f/9fe9c816eac3c839e9eed92b6146e446-untitled-2.png",
+      "option": "Odstín",
+      "variants": [
+        {
+          "title": "Clear",
+          "sku": "P00010-1",
+          "price_czk": 1890
+        },
+        {
+          "title": "Sheer",
+          "sku": "P00010-2",
+          "price_czk": 1890
+        },
+        {
+          "title": "Creme",
+          "sku": "P00010-3",
+          "price_czk": 1890
+        },
+        {
+          "title": "Ivory",
+          "sku": "P00010-4",
+          "price_czk": 1890
+        },
+        {
+          "title": "Taupe",
+          "sku": "P00010-5",
+          "price_czk": 1890
+        },
+        {
+          "title": "Beige",
+          "sku": "P00010-6",
+          "price_czk": 1890
+        },
+        {
+          "title": "Sand",
+          "sku": "P00010-7",
+          "price_czk": 1890
+        },
+        {
+          "title": "Tawny",
+          "sku": "P00010-8",
+          "price_czk": 1890
+        }
+      ]
+    },
+    {
+      "handle": "clr-clarifying-mask-60-ml",
+      "title": "CLR CLARIFYING MASK™ 60 ml",
+      "source_url": "https://shop.bbclinic.cz/p/clr-clarifying-mask-30ml",
+      "sku": "P00030",
+      "price_czk": 977,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/e/8/e808a498a49a4879151089f458446b9d-clrcm150-front-600x493-5e39adc-1.png",
+      "option": null,
+      "variants": [
+        {
+          "title": "CLR CLARIFYING MASK™ 60 ml",
+          "sku": "P00030",
+          "price_czk": 977
+        }
+      ]
+    },
+    {
+      "handle": "radiant-c-mask-60ml",
+      "title": "RADIANT-C MASK™ 60ML",
+      "source_url": "https://shop.bbclinic.cz/p/radiant-c-mask-60ml",
+      "sku": "P00029",
+      "price_czk": 977,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/e/7/e7ac9b4aa5c6e6a63e3202e3fd4794da-radc60-front-600x493-5e39adc-1.png",
+      "option": null,
+      "variants": [
+        {
+          "title": "RADIANT-C MASK™ 60ML",
+          "sku": "P00029",
+          "price_czk": 977
+        }
+      ]
+    },
+    {
+      "handle": "hyla-active-3d-sculptured-mask-5-ks-baleni",
+      "title": "HYLA ACTIVE 3D SCULPTURED MASK – 5 KS / BALENÍ",
+      "source_url": "https://shop.bbclinic.cz/p/hyla-active-3d-sculptured-mask-5ks-baleni",
+      "sku": "P00006",
+      "price_czk": 2380,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/3/f/3fa5288091f19f0e95f7b0b8b49c9539-dpd-ha-mask-5-bf.png",
+      "option": null,
+      "variants": [
+        {
+          "title": "HYLA ACTIVE 3D SCULPTURED MASK – 5 KS / BALENÍ",
+          "sku": "P00006",
+          "price_czk": 2380
+        }
+      ]
+    },
+    {
+      "handle": "brite-lite-3d-sculptured-mask-5-ks-baleni",
+      "title": "BRITE LITE 3D SCULPTURED MASK — 5 KS / BALENÍ",
+      "source_url": "https://shop.bbclinic.cz/p/brite-lite-3d-sculptured-mask-5-ks-baleni",
+      "sku": "P00015",
+      "price_czk": 2380,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/d/2/d2b5a42fc38ee8516c94885170bae049-dpd-bl-mask-5-bf.png",
+      "option": null,
+      "variants": [
+        {
+          "title": "BRITE LITE 3D SCULPTURED MASK — 5 KS / BALENÍ",
+          "sku": "P00015",
+          "price_czk": 2380
+        }
+      ]
+    },
+    {
+      "handle": "r-e-r-eye-mask-5-ks-baleni",
+      "title": "R.E.R. EYE MASK™ — 5 KS / BALENÍ",
+      "source_url": "https://shop.bbclinic.cz/p/r-e-r-eye-mask-5-ks-baleni",
+      "sku": "P00005",
+      "price_czk": 1200,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/6/4/64c8b4c4240053ddc29f8ad044f075ae-dpd-rer-mask-5.png",
+      "option": null,
+      "variants": [
+        {
+          "title": "R.E.R. EYE MASK™ — 5 KS / BALENÍ",
+          "sku": "P00005",
+          "price_czk": 1200
+        }
+      ]
+    },
+    {
+      "handle": "cbd-r-e-r-eye-cream-15-ml",
+      "title": "CBD R.E.R. EYE CREAM 15 ml",
+      "source_url": "https://shop.bbclinic.cz/p/cbd-r-e-r-eye-cream",
+      "sku": "P00013",
+      "price_czk": 2362,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/2/5/2595bb5ae5c96640bc5eeb7781730772-dpd-cbd-rer-eye-15.png",
+      "option": null,
+      "variants": [
+        {
+          "title": "CBD R.E.R. EYE CREAM 15 ml",
+          "sku": "P00013",
+          "price_czk": 2362
+        }
+      ]
+    },
+    {
+      "handle": "dermapen-home",
+      "title": "Dermapen HOME™",
+      "source_url": "https://shop.bbclinic.cz/p/dermapen-hometm",
+      "sku": "P00040",
+      "price_czk": 14990,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/f/7/f7141bd86ccf2551b41272a821e64bdb-objekt.png",
+      "option": null,
+      "variants": [
+        {
+          "title": "Dermapen HOME™",
+          "sku": "P00040",
+          "price_czk": 14990
+        }
+      ]
+    },
+    {
+      "handle": "dermapen-treatment-homecare-set",
+      "title": "Dermapen Treatment™ HOMECARE SET",
+      "source_url": "https://shop.bbclinic.cz/p/dermapen-treatmenttm-homecare-set",
+      "sku": "P00041",
+      "price_czk": 6520,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/6/1/61b0782b1acd29370eea811b4dce6b84-704-dp-home-set.jpg",
+      "option": null,
+      "variants": [
+        {
+          "title": "Dermapen Treatment™ HOMECARE SET",
+          "sku": "P00041",
+          "price_czk": 6520
+        }
+      ]
+    },
+    {
+      "handle": "dermapem-home-jehlickove-naplne",
+      "title": "Dermapem HOME™ jehličkové náplně",
+      "source_url": "https://shop.bbclinic.cz/p/dermapem-hometm-jehlickove-naplne",
+      "sku": "P00042",
+      "price_czk": 2250,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/7/c/7c8af850b4bee1c8fa6da6e4a9ee8e65-701-dp-home-cartrige.jpg",
+      "option": null,
+      "variants": [
+        {
+          "title": "Dermapem HOME™ jehličkové náplně",
+          "sku": "P00042",
+          "price_czk": 2250
+        }
+      ]
+    },
+    {
+      "handle": "exo-grow-sampon-300-ml",
+      "title": "Exo Grow Šampon 300 ml",
+      "source_url": "https://shop.bbclinic.cz/p/exo-grow-sampon",
+      "sku": "P00052",
+      "price_czk": 1390,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/6/3/6316f58b06d57af02f9edcab5c286bc5-exo-grow-sham-fr-render.png",
+      "option": null,
+      "variants": [
+        {
+          "title": "Exo Grow Šampon 300 ml",
+          "sku": "P00052",
+          "price_czk": 1390
+        }
+      ]
+    },
+    {
+      "handle": "exo-grow-kondicioner-300-ml",
+      "title": "Exo Grow Kondicionér 300 ml",
+      "source_url": "https://shop.bbclinic.cz/p/exo-grow-kondicioner-300-ml",
+      "sku": "P00053",
+      "price_czk": 1390,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/b/c/bc30bc908bcaa356461254c898628116-exo-grow-cond-fr-render.png",
+      "option": null,
+      "variants": [
+        {
+          "title": "Exo Grow Kondicionér 300 ml",
+          "sku": "P00053",
+          "price_czk": 1390
+        }
+      ]
+    },
+    {
+      "handle": "exo-grow-scalp-mask-150-ml",
+      "title": "Exo Grow Scalp Mask 150 ml",
+      "source_url": "https://shop.bbclinic.cz/p/exo-grow-scalp-mask-150-ml",
+      "sku": "P00054",
+      "price_czk": 1390,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/1/c/1c62b2f77fddc114baf5726f5317492a-exo-grow-scalpmk-fr-render.png",
+      "option": null,
+      "variants": [
+        {
+          "title": "Exo Grow Scalp Mask 150 ml",
+          "sku": "P00054",
+          "price_czk": 1390
+        }
+      ]
+    },
+    {
+      "handle": "cleanse-hydrate",
+      "title": "CLEANSE & HYDRATE",
+      "source_url": "https://shop.bbclinic.cz/p/cleanse-hydrate",
+      "sku": "P00055",
+      "price_czk": 3259,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/1/7/17b2d080dbe6d04d24385158fbf251b5-838-box-blue-01.webp",
+      "option": null,
+      "variants": [
+        {
+          "title": "CLEANSE & HYDRATE",
+          "sku": "P00055",
+          "price_czk": 3259
+        }
+      ]
+    },
+    {
+      "handle": "exfoliate-brighten",
+      "title": "EXFOLIATE & BRIGHTEN",
+      "source_url": "https://shop.bbclinic.cz/p/exfoliate-brighten",
+      "sku": "P00056",
+      "price_czk": 3476,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/9/a/9af8d89361bf837c75f87dcc2cff550b-841-box-orange-01.webp",
+      "option": null,
+      "variants": [
+        {
+          "title": "EXFOLIATE & BRIGHTEN",
+          "sku": "P00056",
+          "price_czk": 3476
+        }
+      ]
+    },
+    {
+      "handle": "cleanse-clear",
+      "title": "CLEANSE & CLEAR",
+      "source_url": "https://shop.bbclinic.cz/p/cleanse-clear",
+      "sku": "P00057",
+      "price_czk": 3859,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/f/1/f165dfe45fdf1e87f0b437f0f92c04b6-847-box-tyrkys-01.webp",
+      "option": null,
+      "variants": [
+        {
+          "title": "CLEANSE & CLEAR",
+          "sku": "P00057",
+          "price_czk": 3859
+        }
+      ]
+    },
+    {
+      "handle": "hydrate-repair",
+      "title": "HYDRATE & REPAIR",
+      "source_url": "https://shop.bbclinic.cz/p/hydrate-repair",
+      "sku": "P00058",
+      "price_czk": 4998,
+      "vat_rate": 21,
+      "image": "https://bbclinic.s22.cdn-upgates.com/_cache/6/1/61569a4d24d220f6fe77727f7604c955-844-box-purple-01.webp",
+      "option": null,
+      "variants": [
+        {
+          "title": "HYDRATE & REPAIR",
+          "sku": "P00058",
+          "price_czk": 4998
+        }
+      ]
+    }
+  ]
+}

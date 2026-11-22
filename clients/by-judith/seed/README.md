@@ -53,21 +53,32 @@ Launch methods were agreed with the owner on 2026-09-24. The PPL thresholds use
 ## Catalogue setup
 
 `setup-catalogue.ts` (`pnpm catalogue:setup`, same environment variables) sets
-up the new shop's catalogue structure on any backend (vewao-clients#64):
+up the new shop's catalogue on any backend (vewao-clients#64):
 
 - product categories Herbs, TCM, Estetika, Ultherapy®, DP Dermaceuticals, in
   that order, with every Acute and Gold Edition product under Herbs;
 - the owner's EUR prices for the herbs (Gold Edition 75 €, Acute 24 €). They
-  replace only a missing or dev-placeholder EUR price; a price set in admin stays.
-- the services, as drafts in their category with one variant and the owner's
-  CZK and EUR prices: TCM's diagnostics, acupuncture package and two online
-  phytotherapy consultations; Estetika's lips, Baby Botox, blepharoplasty and two
-  consultations; Ultherapy® by area (six variants under "Partie", in the owner's
-  order), facelift and full facelift. Like the gift vouchers they have no shipping
-  profile and no inventory, so a cart of services skips delivery.
+  replace only a missing or dev-placeholder EUR price; a price set in admin stays;
+- the clinic's procedures and consultations (TCM, Estetika, Ultherapy®) as
+  **vouchers**: product type "Dárkový poukaz", so vewao-platform's voucher
+  plugin issues, e-mails and redeems one per unit. No shipping profile and no
+  inventory, so a cart of vouchers skips delivery. Ultherapy® by area is one
+  product with six variants under "Partie";
+- **DP Dermaceuticals** from `dp-catalogue.json`: the old shop's ten
+  subcategories under DP Dermaceuticals in its order, and its 41 products with
+  their codes as SKUs, variants (R.E.R EYE SERUM™ by Množství, COVER RECOVER™ by
+  Odstín), Kč prices, EUR at Kč ÷ 25 and main image (uploaded to the backend's
+  file storage; the source URL stays in the product's metadata). They are
+  shipped goods with managed stock, 0 at Beauty Body Clinic until counted.
 
-It is additive and idempotent. Production gets the catalogue prepared on
+Everything new is a **draft** until its texts are written in Payload. EUR prices
+other than the herbs' follow the owner's rule Kč ÷ 25 (`pricing.ts`). The
+script is additive and idempotent. Production gets the catalogue prepared on
 localhost and dev (D23), so it isn't seeded from this script.
+
+`extract-dp.ts` (`pnpm dp:extract`) refreshes `dp-catalogue.json` from
+shop.bbclinic.cz (Upgates): titles, codes and prices come from the
+`var upgates = {…}` data on each product page. Descriptions are not copied.
 
 ## Magazine (Content plugin, superseded)
 

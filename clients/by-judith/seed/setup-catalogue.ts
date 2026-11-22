@@ -1,17 +1,21 @@
 import Medusa from "@medusajs/js-sdk"
+import { readFileSync } from "node:fs"
 
-import { HERB_EUR_PRICES, ownerEurPriceUpdate } from "./pricing.ts"
+import type { DpCatalogue, DpProduct } from "./extract-dp.ts"
+import { eurFromCzk, HERB_EUR_PRICES, ownerEurPriceUpdate } from "./pricing.ts"
 
 /**
- * The new shop's catalogue structure (vewao-clients#64): product categories,
- * the owner's EUR prices for the herbs, then placeholder products as the owner
- * lists them. Production gets the
+ * The new shop's catalogue (vewao-clients#64): product categories, the owner's
+ * EUR prices for the herbs, the clinic's procedures sold as vouchers, and the
+ * DP Dermaceuticals range from the clinic's old shop (dp-catalogue.json, made
+ * by extract-dp.ts) under its subcategories. Production gets the
  * catalogue prepared on localhost and dev, without a legacy migration (D23);
  * this script sets up the same structure on any other backend.
  *
  * Additive and idempotent: it creates what is missing and never deletes. The
- * only change to existing records is the owner's EUR price replacing a missing
- * or dev-placeholder one; a price set in admin stays.
+ * only changes to existing records: the owner's EUR price replaces a missing or
+ * dev-placeholder one (a price set in admin stays), an untyped procedure gets
+ * the voucher type, and a product joins a category it is listed in.
  *
  *   MEDUSA_BACKEND_URL=https://… MEDUSA_ADMIN_API_KEY=sk_… pnpm catalogue:setup
  */
@@ -36,7 +40,7 @@ export const CATEGORIES: CategoryDef[] = [
 type Price = { czk: number; eur: number }
 
 /** One price, or variants under one option (e.g. Ultherapy's treated areas). */
-type ServiceDef = {
+type VoucherProductDef = {
   title: string
   handle: string
   /** Category handle. */
@@ -44,11 +48,13 @@ type ServiceDef = {
 } & (Price | { option: string; variants: (Price & { title: string })[] })
 
 /**
- * Services sold in the shop (owner, 2026-11-22). No shipping profile and no
- * inventory, like the gift vouchers: a cart of services skips delivery and pays
- * through Comgate. Created as drafts until their texts are written in Payload.
+ * The clinic's procedures and consultations, sold as vouchers (owner,
+ * 2026-11-22): the voucher type makes vewao-platform's voucher plugin issue,
+ * e-mail and redeem a voucher per unit, titled after the product (and variant).
+ * No shipping profile and no inventory, so a cart of vouchers skips delivery
+ * and pays through Comgate. Drafts until their texts are written in Payload.
  */
-export const SERVICES: ServiceDef[] = [
+export const VOUCHER_PRODUCTS: VoucherProductDef[] = [
   {
     title: "Vstupní osobní diagnostika Judity Halvové",
     handle: "vstupni-osobni-diagnostika-judity-halvove",
@@ -145,6 +151,14 @@ export const SERVICES: ServiceDef[] = [
 
 const DEFAULT_OPTION = { title: "Default option", value: "Default option value" }
 
+/** vewao-platform's voucher product type (its VOUCHER_PRODUCT_TYPE, "Dárkový poukaz" by default). */
+const VOUCHER_TYPE = "Dárkový poukaz"
+/** Physical goods ship from the clinic; stock starts at 0 until the merchant counts it. */
+const STOCK_LOCATION = "Beauty Body Clinic"
+const DP_PARENT = "dp-dermaceuticals"
+
+const dp = JSON.parse(readFileSync(new URL("./dp-catalogue.json", import.meta.url), "utf8")) as DpCatalogue
+
 function createClient() {
   const baseUrl = process.env.MEDUSA_BACKEND_URL
   const apiKey = process.env.MEDUSA_ADMIN_API_KEY
@@ -160,7 +174,7 @@ function log(action: "created" | "exists" | "updated" | "warning", what: string)
   console.log(`${action.padEnd(7)} ${what}`)
 }
 
-async function ensureCategory(def: CategoryDef, rank: number) {
+async function ensureCategory(def: CategoryDef, rank: number, parentId?: string) {
   const { product_categories } = await sdk.admin.productCategory.list({
     handle: def.handle,
     fields: "id,name,handle",
@@ -176,6 +190,7 @@ async function ensureCategory(def: CategoryDef, rank: number) {
     is_active: true,
     is_internal: false,
     rank,
+    ...(parentId ? { parent_category_id: parentId } : {}),
   })
   log("created", `category ${def.name} (${def.handle})`)
   return product_category
@@ -257,11 +272,36 @@ async function ensureHerbEurPrices() {
   }
 }
 
-/** Creates a missing service as a draft; an existing product is left as it is. */
-async function ensureService(def: ServiceDef, categoryId: string, salesChannelIds: string[]) {
-  const { products } = await sdk.admin.product.list({ handle: def.handle, fields: "id,title,status" })
-  if (products[0]) {
-    log("exists", `product ${products[0].title} (${products[0].status})`)
+/** The voucher product type, created if the backend has none yet. */
+async function ensureVoucherType() {
+  const { product_types } = await sdk.admin.productType.list({ value: VOUCHER_TYPE, fields: "id,value" })
+  if (product_types[0]) return product_types[0].id
+  const { product_type } = await sdk.admin.productType.create({ value: VOUCHER_TYPE })
+  log("created", `product type ${VOUCHER_TYPE}`)
+  return product_type.id
+}
+
+/**
+ * Creates a missing voucher product as a draft. An existing one keeps
+ * everything, except that it gets the voucher type if it has no type.
+ */
+async function ensureVoucherProduct(
+  def: VoucherProductDef,
+  categoryId: string,
+  salesChannelIds: string[],
+  voucherTypeId: string
+) {
+  const { products } = await sdk.admin.product.list({ handle: def.handle, fields: "id,title,status,type_id" })
+  const existing = products[0]
+  if (existing) {
+    if (!existing.type_id) {
+      await sdk.admin.product.update(existing.id, { type_id: voucherTypeId })
+      log("updated", `product ${existing.title}: sold as a voucher`)
+    } else if (existing.type_id !== voucherTypeId) {
+      log("warning", `product ${existing.title} has another type; it is not sold as a voucher`)
+    } else {
+      log("exists", `product ${existing.title} (${existing.status}, voucher)`)
+    }
     return
   }
   // A single price is one variant under Medusa's default option.
@@ -274,6 +314,7 @@ async function ensureService(def: ServiceDef, categoryId: string, salesChannelId
     title: def.title,
     handle: def.handle,
     status: "draft",
+    type_id: voucherTypeId,
     categories: [{ id: categoryId }],
     sales_channels: salesChannelIds.map((id) => ({ id })),
     options: [{ title: option, values: variants.map((v) => v.value) }],
@@ -291,7 +332,121 @@ async function ensureService(def: ServiceDef, categoryId: string, salesChannelId
     })),
   })
   const prices = variants.map((v) => `${v.czk} Kč / ${v.eur} €`).join(", ")
-  log("created", `product ${def.title} (draft, ${prices})`)
+  log("created", `product ${def.title} (draft voucher, ${prices})`)
+}
+
+/** Uploads the product's image from the old shop to this backend's file storage. */
+async function uploadImage(url: string, handle: string): Promise<string | undefined> {
+  try {
+    const response = await fetch(url, { headers: { "user-agent": "Mozilla/5.0 (vewao catalogue import)" } })
+    if (!response.ok) throw new Error(`HTTP ${response.status}`)
+    const type = response.headers.get("content-type") ?? "image/jpeg"
+    const extension = new URL(url).pathname.split(".").pop() ?? "jpg"
+    const form = new FormData()
+    form.append("files", new File([await response.arrayBuffer()], `${handle}.${extension}`, { type }))
+    // sdk.admin.upload.create checks `instanceof FileList`, which Node lacks: send its request directly.
+    const { files } = await sdk.client.fetch<{ files: { url: string }[] }>("/admin/uploads", {
+      method: "POST",
+      headers: { "content-type": null },
+      body: form,
+    })
+    return files[0]?.url
+  } catch (error) {
+    log("warning", `${handle}: image not uploaded (${error instanceof Error ? error.message : error})`)
+    return undefined
+  }
+}
+
+/**
+ * Creates a missing DP Dermaceuticals product as a draft: shipped goods with a
+ * shipping profile and managed stock, the old shop's codes as SKUs, EUR at
+ * Kč ÷ 25. An existing product is left as it is, except that it gets the old
+ * shop's image if it has none.
+ */
+async function ensureDpProduct(
+  p: DpProduct,
+  categoryIds: string[],
+  salesChannelIds: string[],
+  shippingProfileId: string
+): Promise<string> {
+  const { products } = await sdk.admin.product.list({ handle: p.handle, fields: "id,title,status,thumbnail" })
+  const existing = products[0]
+  if (existing) {
+    const image = !existing.thumbnail && p.image ? await uploadImage(p.image, p.handle) : undefined
+    if (image) {
+      await sdk.admin.product.update(existing.id, { thumbnail: image, images: [{ url: image }] })
+      log("updated", `product ${existing.title}: image from the old shop`)
+    } else {
+      log("exists", `product ${existing.title} (${existing.status})`)
+    }
+    return existing.id
+  }
+  const option = p.option ?? DEFAULT_OPTION.title
+  const image = p.image ? await uploadImage(p.image, p.handle) : undefined
+  const { product } = await sdk.admin.product.create({
+    title: p.title,
+    handle: p.handle,
+    status: "draft",
+    categories: categoryIds.map((id) => ({ id })),
+    sales_channels: salesChannelIds.map((id) => ({ id })),
+    shipping_profile_id: shippingProfileId,
+    ...(image ? { thumbnail: image, images: [{ url: image }] } : {}),
+    metadata: { source_url: p.source_url, ...(p.image ? { source_image: p.image } : {}) },
+    options: [{ title: option, values: p.option ? p.variants.map((v) => v.title) : [DEFAULT_OPTION.value] }],
+    variants: p.variants.map((v, rank) => ({
+      title: v.title,
+      sku: v.sku,
+      variant_rank: rank,
+      manage_inventory: true,
+      allow_backorder: false,
+      options: { [option]: p.option ? v.title : DEFAULT_OPTION.value },
+      prices: [
+        { currency_code: "czk", amount: v.price_czk },
+        { currency_code: "eur", amount: eurFromCzk(v.price_czk) },
+      ],
+    })),
+  })
+  const prices = p.variants.map((v) => `${v.price_czk} Kč / ${eurFromCzk(v.price_czk)} €`).join(", ")
+  log("created", `product ${p.title} (draft, ${prices}${image ? "" : ", no image"})`)
+  return product.id
+}
+
+/** Adds listed products missing from the category; products already in it stay. */
+async function addProducts(category: { id: string; name: string }, productIds: string[]) {
+  const { products } = await sdk.admin.product.list({
+    id: productIds,
+    fields: "id,handle,*categories",
+    limit: productIds.length,
+  })
+  const missing = products.filter((p) => !p.categories?.some((c) => c?.id === category.id))
+  if (!missing.length) return
+  await sdk.admin.productCategory.updateProducts(category.id, { add: missing.map((p) => p.id) })
+  log("updated", `${category.name}: added ${missing.map((p) => p.handle).join(", ")}`)
+}
+
+/** A stock level of 0 at the clinic for every SKU that has none there. */
+async function ensureStockLevels(skus: string[]) {
+  const { stock_locations } = await sdk.admin.stockLocation.list({ name: STOCK_LOCATION, fields: "id,name" })
+  const location = stock_locations[0]
+  if (!location) {
+    log("warning", `stock location ${STOCK_LOCATION} not found; DP stock levels not created`)
+    return
+  }
+  let created = 0
+  for (const sku of skus) {
+    const { inventory_items } = await sdk.admin.inventoryItem.list({ sku, fields: "id,sku,*location_levels" })
+    const item = inventory_items[0]
+    if (!item) {
+      log("warning", `no inventory item for SKU ${sku}`)
+      continue
+    }
+    if (item.location_levels?.some((level) => level.location_id === location.id)) continue
+    await sdk.admin.inventoryItem.batchInventoryItemLocationLevels(item.id, {
+      create: [{ location_id: location.id, stocked_quantity: 0 }],
+    })
+    created++
+  }
+  log(created ? "created" : "exists", `stock levels at ${STOCK_LOCATION}: ${created} new (0 in stock)`)
 }
 
 const categoryIds = new Map<string, string>()
@@ -304,8 +459,33 @@ for (let rank = 0; rank < CATEGORIES.length; rank++) {
 await ensureHerbEurPrices()
 
 const { sales_channels } = await sdk.admin.salesChannel.list({ fields: "id", limit: 50 })
-for (const service of SERVICES) {
-  const categoryId = categoryIds.get(service.category)
-  if (!categoryId) throw new Error(`Unknown category ${service.category} for ${service.handle}`)
-  await ensureService(service, categoryId, sales_channels.map((channel) => channel.id))
+const salesChannelIds = sales_channels.map((channel) => channel.id)
+
+const voucherTypeId = await ensureVoucherType()
+for (const def of VOUCHER_PRODUCTS) {
+  const categoryId = categoryIds.get(def.category)
+  if (!categoryId) throw new Error(`Unknown category ${def.category} for ${def.handle}`)
+  await ensureVoucherProduct(def, categoryId, salesChannelIds, voucherTypeId)
 }
+
+// DP Dermaceuticals: the old shop's subcategories under DP_PARENT, then its products.
+const dpParent = categoryIds.get(DP_PARENT)
+if (!dpParent) throw new Error(`Category ${DP_PARENT} missing`)
+const dpCategories: { id: string; name: string; products: string[] }[] = []
+for (let rank = 0; rank < dp.categories.length; rank++) {
+  const c = dp.categories[rank]!
+  const category = await ensureCategory({ name: c.title, handle: c.handle }, rank, dpParent)
+  dpCategories.push({ id: category.id, name: c.title, products: c.products })
+}
+const { shipping_profiles } = await sdk.admin.shippingProfile.list({ type: "default", fields: "id" })
+const shippingProfileId = shipping_profiles[0]?.id
+if (!shippingProfileId) throw new Error("No default shipping profile; run the dev seed or create one in admin")
+const dpProductIds = new Map<string, string>()
+for (const p of dp.products) {
+  const inCategories = dpCategories.filter((c) => c.products.includes(p.handle)).map((c) => c.id)
+  dpProductIds.set(p.handle, await ensureDpProduct(p, inCategories, salesChannelIds, shippingProfileId))
+}
+for (const c of dpCategories) {
+  await addProducts(c, c.products.map((handle) => dpProductIds.get(handle)!))
+}
+await ensureStockLevels(dp.products.flatMap((p) => p.variants.map((v) => v.sku)))
