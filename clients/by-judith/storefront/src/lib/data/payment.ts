@@ -3,6 +3,7 @@
 import { sdk } from "@lib/config"
 import { getAuthHeaders, getCacheOptions } from "./cookies"
 import { HttpTypes } from "@medusajs/types"
+import { catalogueRevalidate } from "@lib/util/catalogue-cache"
 
 export const listCartPaymentMethods = async (regionId: string) => {
   const headers = {
@@ -20,8 +21,7 @@ export const listCartPaymentMethods = async (regionId: string) => {
         method: "GET",
         query: { region_id: regionId },
         headers,
-        next,
-        cache: "force-cache",
+        next: { ...next, revalidate: catalogueRevalidate() },
       }
     )
     .then(({ payment_providers }) =>

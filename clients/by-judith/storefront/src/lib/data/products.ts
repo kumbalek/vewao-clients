@@ -7,6 +7,7 @@ import { SortOptions } from "@modules/store/components/refinement-list/sort-prod
 import { getAuthHeaders, getCacheOptions } from "./cookies"
 import { getRegion, retrieveRegion } from "./regions"
 import { PRODUCT_LIST_FIELDS } from "@lib/util/product-fields"
+import { catalogueRevalidate } from "@lib/util/catalogue-cache"
 
 export const listProducts = async ({
   pageParam = 1,
@@ -67,8 +68,7 @@ export const listProducts = async ({
           ...queryParams,
         },
         headers,
-        next,
-        cache: "force-cache",
+        next: { ...next, revalidate: catalogueRevalidate() },
       }
     )
     .then(({ products, count }) => {

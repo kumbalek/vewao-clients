@@ -18,7 +18,9 @@ const shippingOptions = [
 // PPL to Slovakia: 8 €, free from 200 € (the dev seed's placeholders).
 const shippingOptionSk = { id: "so_ppl_sk", name: "Přepravce PPL – Slovensko", price_type: "flat", amount: 8, service_zone: { fulfillment_set: { type: "shipping" } }, prices: [] }
 // The same variants in EUR: [calculated, original] per variant.
-const eurPrices = { variant_test: [19.9, 19.9], variant_sale: [59.9, 75.9], variant_gift: [7.9, 7.9] }
+const EUR_PRICES = { variant_test: [19.9, 19.9], variant_sale: [59.9, 75.9], variant_gift: [7.9, 7.9] }
+// Mutable through /__catalogue/price, like a price changed in admin (#65).
+const eurPrices = structuredClone(EUR_PRICES)
 const isSk = (current) => current?.region_id === regionSk.id
 /** A product as the Slovak region prices it. */
 function pricedFor(product, regionId) {
@@ -260,7 +262,11 @@ const server = createServer(async (req, res) => {
   const data = body ? JSON.parse(body) : {}
   if (url.pathname === "/health") return send({ ok: true })
   if (url.pathname === "/__requests") return send(requests)
-  if (url.pathname === "/__reset") { carts.clear(); orders.clear(); requests.length = 0; gatewayOutcome = "PAID"; Object.assign(cartControls, { delayMs: 0, status: 200, message: "Košík se nepodařilo aktualizovat." }); promotionTiers = []; priceHistory = { current_amount: 1490, reference_price: 1690, history_complete: true }; customers.clear(); tokens.clear(); lastResetToken = null; return send({ ok: true }) }
+  if (url.pathname === "/__catalogue/price" && req.method === "POST") {
+    eurPrices[data.variant] = [data.amount, data.original ?? data.amount]
+    return send({ ok: true })
+  }
+  if (url.pathname === "/__reset") { Object.assign(eurPrices, structuredClone(EUR_PRICES)); carts.clear(); orders.clear(); requests.length = 0; gatewayOutcome = "PAID"; Object.assign(cartControls, { delayMs: 0, status: 200, message: "Košík se nepodařilo aktualizovat." }); promotionTiers = []; priceHistory = { current_amount: 1490, reference_price: 1690, history_complete: true }; customers.clear(); tokens.clear(); lastResetToken = null; return send({ ok: true }) }
   if (url.pathname === "/__cart/seed") {
     const current = cart(data.cartId)
     if (data.quantity > 1) {
