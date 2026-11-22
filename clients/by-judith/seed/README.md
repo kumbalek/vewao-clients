@@ -84,7 +84,22 @@ localhost and dev (D23), so it isn't seeded from this script.
 
 `extract-dp.ts` (`pnpm dp:extract`) refreshes `dp-catalogue.json` from
 shop.bbclinic.cz (Upgates): titles, codes and prices come from the
-`var upgates = {…}` data on each product page. Descriptions are not copied.
+`var upgates = {…}` data on each product page, the summary and the "Popis"
+tab's HTML from the page. The owner's title fixes and placements are in
+`dp-decisions.ts`.
+
+**Texts.** `dp-texts.ts` (`pnpm dp:texts`) turns the snapshot into
+`dp-texts.json`: per product, keyed by its new handle, the summary as Payload's
+`subtitle` and the description as Lexical (`payload/html-lexical.ts`: headings,
+paragraphs, lists, bold/italic; the old shop's colours dropped and its links
+reduced to text). The storefront writes them into Payload through the Local
+API, since texts are editor-only fields. It fills empty fields only and leaves
+a pending editor draft alone:
+
+```sh
+cd ../storefront
+pnpm cms:import-product-texts ../seed/dp-texts.json   # PAYLOAD_DATABASE_URL, PAYLOAD_SECRET
+```
 
 ## Magazine (Content plugin, superseded)
 

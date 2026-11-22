@@ -15,6 +15,7 @@
     "clinic:extract": "node --experimental-strip-types extract-clinic.ts",
     "clinic:import": "node --experimental-strip-types import-clinic.ts",
     "dp:extract": "node --experimental-strip-types extract-dp.ts",
+    "dp:texts": "node --experimental-strip-types dp-texts.ts",
     "novinky:setup": "node --experimental-strip-types setup-novinky.ts",
     "catalogue:setup": "node --experimental-strip-types setup-catalogue.ts",
     "test": "node --experimental-strip-types --test pricing.test.ts extract-dp.test.ts magazin/*.test.ts content/*.test.ts payload/*.test.ts",

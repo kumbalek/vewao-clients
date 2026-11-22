@@ -1,6 +1,7 @@
 import Medusa from "@medusajs/js-sdk"
 import { readFileSync } from "node:fs"
 
+import { DP_ONLY_IN, DP_TITLE_FIXES } from "./dp-decisions.ts"
 import type { DpCatalogue, DpProduct } from "./extract-dp.ts"
 import { eurFromCzk, HERB_EUR_PRICES, ownerEurPriceUpdate, roundedEurUpdate } from "./pricing.ts"
 
@@ -156,22 +157,6 @@ const VOUCHER_TYPE = "Dárkový poukaz"
 /** Physical goods ship from the clinic; stock starts at 0 until the merchant counts it. */
 const STOCK_LOCATION = "Beauty Body Clinic"
 const DP_PARENT = "dp-dermaceuticals"
-
-/**
- * The owner's corrections to the old shop's DP titles (2026-11-22), by the
- * snapshot's handle. "CBD VISSSAGE" is DP Dermaceuticals' own spelling and stays.
- */
-const DP_TITLE_FIXES: Record<string, { title: string; handle: string }> = {
-  "antioxidant-coctail-50ml": { title: "ANTIOXIDANT COCKTAIL™ 50ML", handle: "antioxidant-cocktail-50ml" },
-  "antioxidant-coctail-30ml": { title: "ANTIOXIDANT COCKTAIL™ 30ML", handle: "antioxidant-cocktail-30ml" },
-  "dermapem-home-jehlickove-naplne": {
-    title: "Dermapen HOME™ jehličkové náplně",
-    handle: "dermapen-home-jehlickove-naplne",
-  },
-}
-
-/** Products the owner files in fewer DP subcategories than the old shop did (2026-11-22). */
-const DP_ONLY_IN: Record<string, string[]> = { "cbd-uber-calm-balm-30-ml": ["cbd-kolekce"] }
 
 /** VAT on everything, in Czechia and Slovakia alike (owner, 2026-11-22); prices include it. */
 const VAT = { rate: 21, name: "DPH 21 %", code: "DPH21" }

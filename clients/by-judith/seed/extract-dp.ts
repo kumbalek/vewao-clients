@@ -28,6 +28,10 @@ export type DpProduct = {
   /** The variant option's name (Množství, Odstín), or null for a single variant. */
   option: string | null
   variants: DpVariant[]
+  /** The one-line summary under the title. */
+  summary: string | null
+  /** The "Popis" tab's HTML as the shop serves it; dp-texts.ts converts it for Payload. */
+  description_html: string | null
 }
 export type DpCategory = { title: string; handle: string; source_url: string; products: string[] }
 export type DpCatalogue = {
@@ -114,6 +118,40 @@ export function variantChoices(html: string): { option: string; values: string[]
   return { option: label ? text(label[1]!) : "Varianta", values }
 }
 
+/** The inner HTML of the element that `start` opens, by counting nested `<div>`s. */
+function innerDiv(html: string, start: number): string {
+  const open = html.indexOf(">", start) + 1
+  let depth = 1
+  let at = open
+  while (depth > 0) {
+    const nextOpen = html.indexOf("<div", at)
+    const nextClose = html.indexOf("</div>", at)
+    if (nextClose < 0) throw new Error("Unclosed <div>")
+    if (nextOpen >= 0 && nextOpen < nextClose) {
+      depth++
+      at = nextOpen + 4
+    } else {
+      depth--
+      at = nextClose + 6
+    }
+  }
+  return html.slice(open, at - 6)
+}
+
+/** The "Popis" tab's HTML, or null when the page has none. */
+export function descriptionHtml(html: string): string | null {
+  const start = html.indexOf('<div id="description" class="')
+  if (start < 0) return null
+  const inner = innerDiv(html, start).trim()
+  return inner || null
+}
+
+/** The summary paragraph without its "Více" link. */
+export function summary(html: string): string | null {
+  const match = html.match(/<p itemprop="description">(.*?)(?:<a [^>]*data-scroll-id[^>]*>.*?<\/a>)?\s*<\/p>/s)
+  return match ? text(match[1]!) || null : null
+}
+
 export function productFromPage(html: string, path: string): DpProduct {
   const data = upgatesData(html).product
   if (!data) throw new Error(`${path}: no product data`)
@@ -138,6 +176,8 @@ export function productFromPage(html: string, path: string): DpProduct {
     image,
     option: choices && options.length ? choices.option : null,
     variants,
+    summary: summary(html),
+    description_html: descriptionHtml(html),
   }
 }
 

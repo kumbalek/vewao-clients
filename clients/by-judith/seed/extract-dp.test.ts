@@ -1,7 +1,7 @@
 import assert from "node:assert/strict"
 import test from "node:test"
 
-import { productFromPage, productLinks, subcategoryLinks, text, upgatesData } from "./extract-dp.ts"
+import { descriptionHtml, productFromPage, productLinks, subcategoryLinks, summary, text, upgatesData } from "./extract-dp.ts"
 
 // Fragments shaped like shop.bbclinic.cz (Upgates), 2026-11-22.
 const product = (data: object, extra = "") =>
@@ -45,6 +45,8 @@ test("a product without a variant select is one variant", () => {
     image: "https://cdn.example/p.png",
     option: null,
     variants: [{ title: "TRI-PHASE CLEANSER™ 60 ml", sku: "P00001", price_czk: 760 }],
+    summary: null,
+    description_html: null,
   })
 })
 
@@ -78,4 +80,14 @@ test("a select that does not match the priced options is refused", () => {
     `<select name="options[1]"><option value="--">-</option><option value="1">A</option><option value="2">B</option></select>`
   )
   assert.throws(() => productFromPage(html, "/p/x"), /2 choices but 1 priced options/)
+})
+
+test("the summary drops its Více link, the description keeps its nested markup", () => {
+  const html = `<p itemprop="description">Revoluční kombinace antioxidantů. <a href="#" data-scroll-id="description" rel="nofollow">Více <i class="fa"></i></a></p>
+    <div id="description" class="b bg-white tab-pane">
+      <h2>AKTIVNÍ LÁTKY</h2><div class="x"><p>Vitamín C</p></div>
+    </div><div id="after">nope</div>`
+  assert.equal(summary(html), "Revoluční kombinace antioxidantů.")
+  assert.equal(descriptionHtml(html), '<h2>AKTIVNÍ LÁTKY</h2><div class="x"><p>Vitamín C</p></div>')
+  assert.equal(descriptionHtml("<p>none</p>"), null)
 })

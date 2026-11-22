@@ -16,7 +16,8 @@
     "typecheck": "tsc --noEmit",
     "test": "node --experimental-strip-types --test test/*.test.mjs",
     "test:e2e": "playwright test",
-    "payload": "PAYLOAD_CONFIG_PATH=src/payload.config.ts NODE_OPTIONS=--no-deprecation payload"
+    "payload": "PAYLOAD_CONFIG_PATH=src/payload.config.ts NODE_OPTIONS=--no-deprecation payload",
+    "cms:import-product-texts": "pnpm payload run src/cms/scripts/import-product-texts.ts"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
