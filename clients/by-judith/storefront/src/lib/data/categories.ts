@@ -50,4 +50,6 @@ export const getCategoryByHandle = async (categoryHandle: string[]) => {
 
 /** The shop's categories for the header and footer menus: top level with their subcategories. */
 export const listMenuCategories = async (): Promise<MenuCategory[]> =>
-  menuCategories(await listCategories({ fields: "id,handle,name,rank,parent_category_id", limit: 200 }))
+  menuCategories(
+    await listCategories({ fields: "id,handle,name,rank,parent_category_id,description,metadata", limit: 200 })
+  )
