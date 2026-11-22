@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test"
 
+const MOCK = "http://127.0.0.1:9101"
+
 // Categories replace the collections (vewao-clients#67). The mock backend's
 // sale product is a herb in Herbs › Gold Edition; TCM and DP have no products.
 
@@ -57,4 +59,24 @@ test("the old collection addresses redirect to the herb subcategories", async ({
     expect(response.status(), from).toBe(308)
     expect(response.headers().location, from).toBe(to)
   }
+})
+
+test("a price changed in admin reaches the product page within the cache window", async ({ page, request }) => {
+  await request.post(`${MOCK}/__reset`)
+  await page.goto("/sk/products/akcni-produkt")
+  await expect(page.getByTestId("product-price").first()).toContainText("59,90 €")
+
+  await request.post(`${MOCK}/__catalogue/price`, { data: { variant: "variant_sale", amount: 49.9, original: 75.9 } })
+  // The test server keeps catalogue data 1 s (CATALOGUE_REVALIDATE_SECONDS); a
+  // request after that serves the old copy once and refreshes it.
+  await expect
+    .poll(
+      async () => {
+        await page.reload()
+        return page.getByTestId("product-price").first().textContent()
+      },
+      { timeout: 20_000, intervals: [1_500] }
+    )
+    .toContain("49,90 €")
+  await request.post(`${MOCK}/__reset`)
 })

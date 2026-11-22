@@ -4,6 +4,7 @@ import { sdk } from "@lib/config"
 import medusaError from "@lib/util/medusa-error"
 import { HttpTypes } from "@medusajs/types"
 import { getCacheOptions } from "./cookies"
+import { catalogueRevalidate } from "@lib/util/catalogue-cache"
 
 export const listRegions = async () => {
   const next = {
@@ -13,8 +14,7 @@ export const listRegions = async () => {
   return sdk.client
     .fetch<{ regions: HttpTypes.StoreRegion[] }>(`/store/regions`, {
       method: "GET",
-      next,
-      cache: "force-cache",
+      next: { ...next, revalidate: catalogueRevalidate() },
     })
     .then(({ regions }) => regions)
     .catch(medusaError)
@@ -28,38 +28,26 @@ export const retrieveRegion = async (id: string) => {
   return sdk.client
     .fetch<{ region: HttpTypes.StoreRegion }>(`/store/regions/${id}`, {
       method: "GET",
-      next,
-      cache: "force-cache",
+      next: { ...next, revalidate: catalogueRevalidate() },
     })
     .then(({ region }) => region)
     .catch(medusaError)
 }
 
-const regionMap = new Map<string, HttpTypes.StoreRegion>()
-
+/**
+ * The country's region. Read through listRegions' cache, not a module-level map:
+ * a map would keep a region's settings until the server restarts (#65).
+ */
 export const getRegion = async (countryCode: string) => {
   try {
-    if (regionMap.has(countryCode)) {
-      return regionMap.get(countryCode)
-    }
-
     const regions = await listRegions()
 
     if (!regions) {
       return null
     }
 
-    regions.forEach((region) => {
-      region.countries?.forEach((c) => {
-        regionMap.set(c?.iso_2 ?? "", region)
-      })
-    })
-
-    const region = countryCode
-      ? regionMap.get(countryCode)
-      : regionMap.get("cz")
-
-    return region
+    const code = countryCode || "cz"
+    return regions.find((region) => region.countries?.some((c) => c?.iso_2 === code))
   } catch (e: any) {
     return null
   }

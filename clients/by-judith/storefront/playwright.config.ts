@@ -69,6 +69,8 @@ export default defineConfig({
         NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY: "pk_test_fixture",
         NEXT_PUBLIC_BASE_URL: "http://127.0.0.1:8101",
         NEXT_TELEMETRY_DISABLED: "1",
+        // Catalogue data may be a second old here, a minute in production (#65).
+        CATALOGUE_REVALIDATE_SECONDS: "1",
         NEXT_PUBLIC_GA_MEASUREMENT_ID: TEST_GA_ID,
         ...(E2E_SHOP_ONLY ? { SITE_MODE: "shop" } : {}),
         // e2e/cms.spec.ts runs only when a Payload database is configured.
