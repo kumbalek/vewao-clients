@@ -91,8 +91,15 @@ const partieProduct = {
     calculated_price: { ...giftProduct.variants[0].calculated_price, calculated_amount: amount, original_amount: amount },
   })),
 }
+// Facelift: static variants, two of the areas (owner, 2026-11-22).
+const faceliftProduct = {
+  ...voucherProduct,
+  id: "prod_facelift", handle: "ultherapy-facelift", title: "Facelift",
+  metadata: { static_variants_from: partieProduct.handle, static_variants: "Lower face, Horní část krku/podbradek" },
+  variants: [{ ...giftProduct.variants[0], id: "variant_facelift", title: "Facelift", sku: "ULTHERAPY-FACELIFT" }],
+}
 // Products served by handle or id only, so listings stay as they are.
-const byHandleOrIdOnly = [voucherProduct, partieProduct]
+const byHandleOrIdOnly = [voucherProduct, partieProduct, faceliftProduct]
 // Active quantity-tier promotions as vewao-platform's GET /store/promotion-tiers returns them.
 let promotionTiers = []
 // Volume discounts on one product (vewao-platform#45), empty unless a test sets them.

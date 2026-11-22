@@ -120,8 +120,11 @@ test.describe("Ultherapy's single areas", () => {
       const whole = await button.evaluate((el) => getComputedStyle(el).whiteSpace === "nowrap" && el.scrollWidth <= el.clientWidth)
       expect(whole, (await button.textContent()) ?? "").toBe(true)
     }
-    // Nothing chosen yet: the button asks for a choice instead of "sold out".
+    // Nothing chosen yet: the button asks for a choice instead of "sold out",
+    // and the cheapest area is a "from" price.
     await expect(product.getByTestId("add-product-button")).toHaveText("Vyberte variantu")
+    await expect(product.getByTestId("price-from").filter({ visible: true })).toHaveText("Od")
+    await expect(product.getByTestId("product-price").filter({ visible: true }).first()).toContainText("6.000")
 
     const price = product.getByTestId("product-price").filter({ visible: true }).first()
     const [title, group, priceBox] = await Promise.all([
@@ -209,4 +212,18 @@ test.describe("Ultherapy's single areas", () => {
     // Each line says which area it is.
     await expect(rows.getByTestId("product-variant")).toHaveText(["Krk", "Dekolt"])
   })
+})
+
+// Static variants (owner, 2026-11-22): Facelift shows the areas' pills, its
+// two lit and the rest greyed, nothing to press.
+test("Facelift shows the areas it covers as pills", async ({ page }) => {
+  await page.goto("/cz/products/ultherapy-facelift")
+  const pills = page.getByTestId("product-container").getByTestId("static-variants")
+  await expect(pills).toContainText("Zahrnuté partie")
+  await expect(pills.getByTestId("static-variant")).toHaveText([
+    /^Brow lift/, /^Brow lift a oční okolí/, /^Lower face/, /^Horní část krku\/podbradek/, /^Krk/, /^Dekolt/,
+  ])
+  const included = await pills.getByTestId("static-variant").evaluateAll((els) => els.map((e) => e.getAttribute("data-included")))
+  expect(included).toEqual(["false", "false", "true", "true", "false", "false"])
+  await expect(pills.getByRole("button")).toHaveCount(0)
 })

@@ -4,6 +4,7 @@ import { listProducts } from "@lib/data/products"
 import { claimForPrice } from "@lib/util/discount-claim"
 import { getProductPrice } from "@lib/util/get-product-price"
 import { productVoucherTitle } from "@lib/util/voucher"
+import { hasPriceRange } from "@lib/util/price-range"
 import { HttpTypes } from "@medusajs/types"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import Thumbnail from "../thumbnail"
@@ -54,7 +55,7 @@ export default async function ProductPreview({
           </Text>
           <div className="flex shrink-0">
             {cheapestPrice && (
-              <PreviewPrice price={cheapestPrice} claim={claim} />
+              <PreviewPrice price={cheapestPrice} claim={claim} from={hasPriceRange(product)} />
             )}
           </div>
         </div>

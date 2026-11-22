@@ -15,6 +15,8 @@ import { HttpTypes } from "@medusajs/types"
 import { useTranslations } from "next-intl"
 import type { ProductTexts } from "@lib/cms/product-texts"
 import type { ProductTier } from "@lib/util/product-tiers"
+import type { StaticVariants as StaticVariantsData } from "@lib/util/static-variants"
+import StaticVariants from "@modules/products/components/static-variants"
 import { productCategoryPath } from "@lib/util/category-path"
 
 type ProductTemplateProps = {
@@ -25,6 +27,8 @@ type ProductTemplateProps = {
   texts: ProductTexts
   /** Volume discounts on this product (vewao-platform#45). */
   productTiers?: ProductTier[]
+  /** Another product's option pills this product bundles (static variants). */
+  staticVariants?: StaticVariantsData | null
 }
 
 const ProductTemplate: React.FC<ProductTemplateProps> = ({
@@ -33,6 +37,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
   countryCode,
   texts,
   productTiers = [],
+  staticVariants,
 }) => {
   const t = useTranslations("product")
 
@@ -79,6 +84,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
         </div>
         <div className="flex flex-col items-center gap-4 block w-full small:max-w-[500px] small:pl-8 relative">
           <ProductInfo product={product} texts={texts} />
+          {staticVariants && <StaticVariants variants={staticVariants} />}
           {/* Right under the description, with room for whole words (vewao-clients#70). */}
           <VariantOptions product={product} className="hidden small:flex" />
           <ProductTabs texts={texts} />

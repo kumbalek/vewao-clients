@@ -239,7 +239,11 @@
     "tierFrom": "od {count} ks",
     "tierApplies": "(sleva platí)",
     "priceInfo": "Informace o ceně",
-    "discountOf": "Sleva"
+    "discountOf": "Sleva",
+    "includedOption": "Zahrnuté {option}",
+    "included": "zahrnuto",
+    "notIncluded": "nezahrnuto",
+    "priceFrom": "Od"
   },
   "payment": {
     "title": "Zpracováváme vaši platbu. Vyčkejte prosím."

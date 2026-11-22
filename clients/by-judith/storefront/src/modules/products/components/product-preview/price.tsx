@@ -8,9 +8,12 @@ import { VariantPrice } from "types/global"
 export default async function PreviewPrice({
   price,
   claim,
+  from = false,
 }: {
   price: VariantPrice
   claim: DiscountClaim | null
+  /** The cheapest of variants that differ in price: "Od …". */
+  from?: boolean
 }) {
   if (!price) {
     return null
@@ -28,6 +31,7 @@ export default async function PreviewPrice({
         })}
         data-testid="price"
       >
+        {from && `${t("priceFrom")} `}
         {price.calculated_price}
       </Text>
       {claim && (

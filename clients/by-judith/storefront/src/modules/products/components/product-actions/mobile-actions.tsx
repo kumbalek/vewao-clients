@@ -13,6 +13,7 @@ import { convertToLocale } from "@lib/util/money"
 import { VariantOptions } from "./variant-options"
 import { HttpTypes } from "@medusajs/types"
 import { isSimpleProduct } from "@lib/util/product"
+import { hasPriceRange } from "@lib/util/price-range"
 
 type MobileActionsProps = {
   product: HttpTypes.StoreProduct
@@ -44,6 +45,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
   priceReferences,
 }) => {
   const t = useTranslations("cart")
+  const tProduct = useTranslations("product")
   const { state, open, close } = useToggleState()
 
   const price = getProductPrice({
@@ -105,6 +107,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
                       "text-ui-fg-interactive": !!claim,
                     })}
                   >
+                    {!variant && !priceOverride && hasPriceRange(product) && `${tProduct("priceFrom")} `}
                     {priceOverride ?? selectedPrice.calculated_price}
                   </span>
                 </div>

@@ -5,6 +5,7 @@ import { PRODUCT_LIST_FIELDS } from "@lib/util/product-fields"
 import { getRegion, listRegions } from "@lib/data/regions"
 import ProductTemplate from "@modules/products/templates"
 import { listProductTiers } from "@lib/data/promotion-tiers"
+import { staticVariants, staticVariantsConfig } from "@lib/util/static-variants"
 import { GIFT_PACKAGING_HANDLE } from "@lib/util/gift-packaging"
 import { getProductPageTexts } from "@lib/data/product-texts"
 import PreviewBar from "@modules/cms/components/preview-bar"
@@ -70,6 +71,13 @@ export default async function ProductPage(props: Props) {
   const { texts, docId, grant } = await getProductPageTexts(pricedProduct, path)
   // Volume discounts on this product, e.g. the Christmas sale on Ultherapy's areas (vewao-clients#70).
   const productTiers = await listProductTiers(pricedProduct.id)
+  // Static variants: another product's option pills, the bundled ones lit (owner, 2026-11-22).
+  const staticConfig = staticVariantsConfig(pricedProduct.metadata)
+  const staticPills = staticConfig
+    ? await listProducts({ countryCode: params.countryCode, queryParams: { handle: staticConfig.from } })
+        .then(({ response }) => staticVariants(response.products[0], staticConfig.included))
+        .catch(() => null)
+    : null
   const edit = grant?.mode === "edit"
 
   return (
@@ -80,6 +88,7 @@ export default async function ProductPage(props: Props) {
         countryCode={params.countryCode}
         texts={texts}
         productTiers={productTiers}
+        staticVariants={staticPills}
       />
       {grant && docId && (
         <PreviewBar path={path} editHref={`/admin/collections/products/${docId}`} edit={edit} />

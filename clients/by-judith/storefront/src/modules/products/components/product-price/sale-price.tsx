@@ -15,7 +15,10 @@ export default function SalePrice({
   reference,
   percentage,
   currencyCode,
+  prefix,
 }: {
+  /** e.g. "Od" for the cheapest of several variants. */
+  prefix?: string
   amount: number
   reference: number
   percentage: number
@@ -27,6 +30,7 @@ export default function SalePrice({
   return (
     <div className="flex flex-col items-center text-ui-fg-base">
       <span className="text-2xl text-ui-fg-interactive">
+        {prefix && <span data-testid="price-from">{prefix} </span>}
         <span data-testid="product-price" data-value={amount}>
           {money(amount)}
         </span>
