@@ -1,13 +1,17 @@
 import Medusa from "@medusajs/js-sdk"
 
+import { HERB_EUR_PRICES, ownerEurPriceUpdate } from "./pricing.ts"
+
 /**
  * The new shop's catalogue structure (vewao-clients#64): product categories,
- * then placeholder products as the owner lists them. Production gets the
+ * the owner's EUR prices for the herbs, then placeholder products as the owner
+ * lists them. Production gets the
  * catalogue prepared on localhost and dev, without a legacy migration (D23);
  * this script sets up the same structure on any other backend.
  *
- * Additive and idempotent: it creates what is missing and never changes or
- * deletes existing records, so admin edits survive a re-run.
+ * Additive and idempotent: it creates what is missing and never deletes. The
+ * only change to existing records is the owner's EUR price replacing a missing
+ * or dev-placeholder one; a price set in admin stays.
  *
  *   MEDUSA_BACKEND_URL=https://… MEDUSA_ADMIN_API_KEY=sk_… pnpm catalogue:setup
  */
@@ -99,8 +103,51 @@ async function addCollectionProducts(category: { id: string; name: string }, han
   log("updated", `${category.name}: added ${missing.map((p) => p.handle).join(", ")}`)
 }
 
+/** The owner's EUR price on every variant of the herb lines (Gold 75 €, Acute 24 €). */
+async function ensureHerbEurPrices() {
+  const lines = Object.keys(HERB_EUR_PRICES)
+  const { collections } = await sdk.admin.productCollection.list({ handle: lines, fields: "id,handle" })
+  for (const collection of collections) {
+    const ownerEur = HERB_EUR_PRICES[collection.handle]!
+    const { products, count } = await sdk.admin.product.list({
+      collection_id: [collection.id],
+      fields: "id,handle,variants.id,*variants.prices",
+      limit: 200,
+    })
+    if (count > products.length) throw new Error(`More than ${products.length} products in ${collection.handle}`)
+    for (const product of products) {
+      for (const variant of product.variants ?? []) {
+        const prices = variant.prices ?? []
+        const eur = prices.find((price) => price.currency_code === "eur")
+        const czk = prices.find((price) => price.currency_code === "czk")?.amount
+        if (czk == null) {
+          log("warning", `${product.handle}: no CZK price, EUR left as it is`)
+          continue
+        }
+        const amount = ownerEurPriceUpdate(eur?.amount, czk, ownerEur)
+        if (amount === undefined) {
+          if (eur?.amount === ownerEur) log("exists", `${product.handle}: ${ownerEur} €`)
+          else log("warning", `${product.handle}: keeps ${eur?.amount} € set in admin (owner's price ${ownerEur} €)`)
+          continue
+        }
+        // A variant's prices are replaced as a set: keep the others as they are.
+        await sdk.admin.product.updateVariant(product.id, variant.id, {
+          prices: [
+            ...prices
+              .filter((price) => price.currency_code !== "eur")
+              .map((price) => ({ id: price.id, currency_code: price.currency_code, amount: price.amount })),
+            { ...(eur ? { id: eur.id } : {}), currency_code: "eur", amount },
+          ],
+        })
+        log("updated", `${product.handle}: ${eur?.amount ?? "no"} € → ${amount} €`)
+      }
+    }
+  }
+}
+
 for (let rank = 0; rank < CATEGORIES.length; rank++) {
   const def = CATEGORIES[rank]!
   const category = await ensureCategory(def, rank)
   if (def.collections) await addCollectionProducts(category, def.collections)
 }
+await ensureHerbEurPrices()

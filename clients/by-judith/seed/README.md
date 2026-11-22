@@ -34,7 +34,7 @@ channel. Keep the secret key out of shell history and git; revoke it when done.
 | Gift packaging | Product `darkove-baleni` (the legacy handle), 199 Kč, _Discountable_ off: promotions neither discount nor count it |
 | Quantity tiers | Automatic promotions `TIER_10`/`TIER_20`/`TIER_30` (10/20/30 % from 1/2/3+ discountable items), created as **draft** with the legacy progress-bar texts; activate them in admin once the merchant confirms values (vewao-platform#14) |
 | Tax | Prices are VAT-inclusive; **no tax rates** until verified with the accountant |
-| Slovakia (EUR) | Region `Slovensko` (EUR, `sk`), EUR among the store's currencies, Comgate's EUR connection `pp_comgate_eur` when the backend has it, otherwise the Czech region's Comgate (no pay-on-site: Slovakia has no pickup); `Přepravce PPL – Slovensko` (8 €, free from 200 €); an EUR price on every variant (CZK ÷ 25, up to a whole euro, minus 10 cents). All EUR amounts are **dev placeholders** until the merchant sets them (vewao-clients#45) |
+| Slovakia (EUR) | Region `Slovensko` (EUR, `sk`), EUR among the store's currencies, Comgate's EUR connection `pp_comgate_eur` when the backend has it, otherwise the Czech region's Comgate (no pay-on-site: Slovakia has no pickup); `Přepravce PPL – Slovensko` (8 €, free from 200 €); an EUR price on every variant: the owner's for the herbs (Gold Edition 75 €, Acute 24 €; `pricing.ts`), otherwise CZK ÷ 25, up to a whole euro, minus 10 cents. Delivery amounts and non-herb EUR prices are **dev placeholders** until the merchant sets them (vewao-clients#45) |
 
 A new Slovak region gets Comgate's EUR connection (vewao-platform#39) or, on a
 backend without one, the Czech region's online payment providers. An existing
@@ -49,6 +49,19 @@ rule, `FEATURE_PROMOTION_TIERS`). The seed saves their texts through
 Launch methods were agreed with the owner on 2026-09-24. The PPL thresholds use
 `lt 5000`/`gt 4999.99` because of a Medusa 2.20.1 pricing bug; see
 `docs/MEDUSA-V2-NOTES.md` in the workspace.
+
+## Catalogue setup
+
+`setup-catalogue.ts` (`pnpm catalogue:setup`, same environment variables) sets
+up the new shop's catalogue structure on any backend (vewao-clients#64):
+
+- product categories Herbs, TCM, Estetika, Ultherapy®, DP Dermaceuticals, in
+  that order, with every Acute and Gold Edition product under Herbs;
+- the owner's EUR prices for the herbs (Gold Edition 75 €, Acute 24 €). They
+  replace only a missing or dev-placeholder EUR price; a price set in admin stays.
+
+It is additive and idempotent. Production gets the catalogue prepared on
+localhost and dev (D23), so it isn't seeded from this script.
 
 ## Magazine (Content plugin, superseded)
 

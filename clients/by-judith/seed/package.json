@@ -16,7 +16,7 @@
     "clinic:import": "node --experimental-strip-types import-clinic.ts",
     "novinky:setup": "node --experimental-strip-types setup-novinky.ts",
     "catalogue:setup": "node --experimental-strip-types setup-catalogue.ts",
-    "test": "node --experimental-strip-types --test magazin/*.test.ts content/*.test.ts payload/*.test.ts",
+    "test": "node --experimental-strip-types --test pricing.test.ts magazin/*.test.ts content/*.test.ts payload/*.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
