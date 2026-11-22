@@ -3,8 +3,17 @@
  * catalogue setup and the unit tests share it.
  */
 
-/** Owner's EUR prices for the herb lines, by collection handle (2026-11-22). */
-export const HERB_EUR_PRICES: Record<string, number> = { gold: 75, acute: 24 }
+/**
+ * The herb lines (owner, 2026-11-22): the line as catalogue.json names it (the
+ * legacy collection), its subcategory under Herbs, and its EUR price.
+ */
+export const HERB_LINES = [
+  { line: "gold", title: "Gold Edition", handle: "gold-edition", eur: 75 },
+  { line: "acute", title: "Acute", handle: "acute", eur: 24 },
+] as const
+
+/** The owner's EUR prices for the herb lines, by catalogue.json line. */
+export const HERB_EUR_PRICES: Record<string, number> = Object.fromEntries(HERB_LINES.map((l) => [l.line, l.eur]))
 
 /** The owner's rule for the other ranges (2026-11-22): EUR = Kč ÷ 25, rounded up to a whole euro (2 362 Kč → 95 €). */
 export const eurFromCzk = (czk: number) => Math.ceil(czk / 25)
@@ -28,8 +37,8 @@ export function roundedEurUpdate(currentEur: number | null | undefined, czk: num
 export const devEurPrice = (czk: number) => Math.ceil(czk / 25) - 0.1
 
 /** The EUR price a new product gets: the owner's for a herb line, otherwise a placeholder. */
-export const eurPriceFor = (collection: string | null | undefined, czk: number) =>
-  (collection ? HERB_EUR_PRICES[collection] : undefined) ?? devEurPrice(czk)
+export const eurPriceFor = (line: string | null | undefined, czk: number) =>
+  (line ? HERB_EUR_PRICES[line] : undefined) ?? devEurPrice(czk)
 
 /**
  * The owner's EUR price to set on a variant, or undefined to leave it: only a

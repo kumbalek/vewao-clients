@@ -373,26 +373,8 @@ async function ensureShipping(locationId: string, shippingProfileId: string) {
   }
 }
 
-async function ensureCollections(catalogue: Catalogue) {
-  const ids = new Map<string, string>()
-  for (const { handle, title } of catalogue.collections) {
-    const { collections } = await sdk.admin.productCollection.list({ handle })
-    let id = collections[0]?.id
-    if (!id) {
-      const { collection } = await sdk.admin.productCollection.create({ handle, title })
-      id = collection.id
-      log("created", `collection ${title}`)
-    } else {
-      log("exists", `collection ${title}`)
-    }
-    ids.set(handle, id)
-  }
-  return ids
-}
-
 async function ensureProducts(
   catalogue: Catalogue,
-  collections: Map<string, string>,
   salesChannelId: string,
   shippingProfileId: string
 ) {
@@ -410,7 +392,6 @@ async function ensureProducts(
       status: "published",
       thumbnail: p.thumbnail,
       images: p.images.map((url) => ({ url })),
-      collection_id: p.collection ? collections.get(p.collection) : undefined,
       metadata: p.metadata,
       discountable: p.discountable ?? true,
       sales_channels: [{ id: salesChannelId }],
@@ -533,8 +514,8 @@ async function main() {
   const locationId = await ensureLocation(salesChannel.id)
   const shippingProfileId = await ensureShippingProfile()
   await ensureShipping(locationId, shippingProfileId)
-  const collections = await ensureCollections(catalogue)
-  await ensureProducts(catalogue, collections, salesChannel.id, shippingProfileId)
+  // Herb lines are categories now (setup-catalogue.ts), not collections (2026-11-22).
+  await ensureProducts(catalogue, salesChannel.id, shippingProfileId)
   await ensureEurPrices(catalogue)
   await ensureStock(catalogue, locationId)
   await ensureTierPromotions()

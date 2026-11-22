@@ -2,7 +2,7 @@
 
 Creates the shop setup a checkout needs on a local or dev backend, through the
 Admin API: tax-inclusive CZK prices, the Beauty Body Clinic stock location,
-clinic pickup and PPL delivery, two collections, seven products and dev stock.
+clinic pickup and PPL delivery, seven products and dev stock.
 It is additive and idempotent: existing records are left alone, so re-running
 it never overwrites admin edits. It refuses `by-judith.com` hosts; production
 data comes from the migration.
@@ -56,7 +56,10 @@ Launch methods were agreed with the owner on 2026-09-24. The PPL thresholds use
 up the new shop's catalogue on any backend (vewao-clients#64):
 
 - product categories Herbs, TCM, Estetika, Ultherapy®, DP Dermaceuticals, in
-  that order, with every Acute and Gold Edition product under Herbs;
+  that order. Herbs has subcategories Gold Edition and Acute, the herb lines,
+  which replace the legacy collections: their products move there (by the
+  `collection` field of `catalogue.json` and any collection membership) and the
+  emptied collections are deleted (owner, 2026-11-22);
 - the owner's EUR prices for the herbs (Gold Edition 75 €, Acute 24 €). They
   replace only a missing or dev-placeholder EUR price; a price set in admin stays;
 - the clinic's procedures and consultations (TCM, Estetika, Ultherapy®) as
