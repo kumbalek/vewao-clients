@@ -1,3 +1,4 @@
+import type { ReactNode } from "react"
 import { HttpTypes } from "@medusajs/types"
 import { Heading } from "@medusajs/ui"
 import { lexicalHasContent } from "@lib/cms/lexical"
@@ -7,10 +8,12 @@ import type { ProductTexts } from "@lib/cms/product-texts"
 type ProductInfoProps = {
   product: HttpTypes.StoreProduct
   texts: Pick<ProductTexts, "subtitle" | "description">
+  /** Shown right under the title: the sale labels and the variant choice. */
+  afterTitle?: ReactNode
 }
 
 /** The product's name from Medusa; its subtitle and description from the CMS. */
-const ProductInfo = ({ product, texts }: ProductInfoProps) => {
+const ProductInfo = ({ product, texts, afterTitle }: ProductInfoProps) => {
   return (
     <div id="product-info">
       <div className="flex flex-col gap-y-4 mx-auto">
@@ -23,6 +26,7 @@ const ProductInfo = ({ product, texts }: ProductInfoProps) => {
             {product.title}
           </Heading>
         </div>
+        {afterTitle}
         {texts.subtitle && (
           <p
             className="text-ui-fg-base whitespace-pre-line"

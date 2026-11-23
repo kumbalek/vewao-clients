@@ -89,6 +89,26 @@ export async function getCmsPage(slug: string, draft: boolean): Promise<CmsPage 
   })()
 }
 
+export type CmsSale = {
+  id: number
+  code: string
+  label: string
+  description?: string | null
+  categories?: string[] | null
+  showInCart?: boolean | null
+}
+
+async function findSales(): Promise<CmsSale[]> {
+  const payload = await getPayload({ config })
+  const result = await payload.find({ collection: "sales", depth: 0, limit: 200, pagination: false })
+  return result.docs as unknown as CmsSale[]
+}
+
+/** The sale labels ("Akce"); whether a sale runs is Medusa's to say (lib/data/sale-labels). */
+export async function listCmsSales(): Promise<CmsSale[]> {
+  return unstable_cache(findSales, ["cms-sales"], { tags: ["cms:sales"], revalidate: MAX_AGE_SECONDS })()
+}
+
 export async function listCmsNews(limit: number, draft: boolean): Promise<CmsNews[]> {
   if (draft) return findNews(limit, true)
   return unstable_cache(() => findNews(limit, false), ["cms-news", String(limit)], {

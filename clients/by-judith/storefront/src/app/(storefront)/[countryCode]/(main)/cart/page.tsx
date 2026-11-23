@@ -4,6 +4,8 @@ import { retrieveCart } from "@lib/data/cart"
 import { retrieveCustomer } from "@lib/data/customer"
 import { retrieveGiftPackaging } from "@lib/data/gift-packaging"
 import { listPromotionTiers } from "@lib/data/promotion-tiers"
+import { listRunningSaleLabels } from "@lib/data/sale-labels"
+import { saleLabelsForCart } from "@lib/util/sale-labels"
 import CartTemplate from "@modules/cart/templates"
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
@@ -27,10 +29,11 @@ export default async function Cart(props: {
     return notFound()
   })
 
-  const [customer, promotionTiers, giftPackaging] = await Promise.all([
+  const [customer, promotionTiers, giftPackaging, sales] = await Promise.all([
     retrieveCustomer(),
     listPromotionTiers(),
     retrieveGiftPackaging(countryCode),
+    listRunningSaleLabels(),
   ])
 
   return (
@@ -39,6 +42,7 @@ export default async function Cart(props: {
       customer={customer}
       promotionTiers={promotionTiers}
       giftPackaging={giftPackaging}
+      activeSales={saleLabelsForCart(sales.labels, sales.active, cart)}
     />
   )
 }

@@ -12,12 +12,15 @@ import Breadcrumbs from "@modules/common/components/breadcrumbs"
 import { notFound } from "next/navigation"
 import ProductActionsWrapper from "./product-actions-wrapper"
 import { HttpTypes } from "@medusajs/types"
+import { clx } from "@medusajs/ui"
 import { useTranslations } from "next-intl"
 import type { ProductTexts } from "@lib/cms/product-texts"
 import type { ProductTier } from "@lib/util/product-tiers"
 import type { StaticVariants as StaticVariantsData } from "@lib/util/static-variants"
 import StaticVariants from "@modules/products/components/static-variants"
 import { productCategoryPath } from "@lib/util/category-path"
+import type { SaleLabel } from "@lib/util/sale-labels"
+import SaleLabels from "@modules/common/components/sale-labels"
 
 type ProductTemplateProps = {
   product: HttpTypes.StoreProduct
@@ -29,6 +32,8 @@ type ProductTemplateProps = {
   productTiers?: ProductTier[]
   /** Another product's option pills this product bundles (static variants). */
   staticVariants?: StaticVariantsData | null
+  /** Labels of the running sales on the product's categories. */
+  saleLabels?: SaleLabel[]
 }
 
 const ProductTemplate: React.FC<ProductTemplateProps> = ({
@@ -38,6 +43,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
   texts,
   productTiers = [],
   staticVariants,
+  saleLabels = [],
 }) => {
   const t = useTranslations("product")
 
@@ -83,10 +89,23 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
           </Suspense>
         </div>
         <div className="flex flex-col items-center gap-4 block w-full small:max-w-[500px] small:pl-8 relative">
-          <ProductInfo product={product} texts={texts} />
-          {staticVariants && <StaticVariants variants={staticVariants} />}
-          {/* Right under the description, with room for whole words (vewao-clients#70). */}
-          <VariantOptions product={product} className="hidden small:flex" />
+          {/* Under the title, before a long description can push them out of
+              sight (owner, 2026-11-22): the running sales, then the choice. On a
+              phone the choice sits with the price (ProductActions). */}
+          <ProductInfo
+            product={product}
+            texts={texts}
+            afterTitle={
+              (saleLabels.length > 0 || staticVariants || (product.variants?.length ?? 0) > 1) && (
+                // Only the variant choice: hidden on a phone, where it sits with the price.
+                <div className={clx("w-full flex-col gap-4", saleLabels.length > 0 || staticVariants ? "flex" : "hidden small:flex")}>
+                  <SaleLabels labels={saleLabels} />
+                  {staticVariants && <StaticVariants variants={staticVariants} />}
+                  <VariantOptions product={product} className="hidden small:flex" />
+                </div>
+              )
+            }
+          />
           <ProductTabs texts={texts} />
         </div>
       </div>

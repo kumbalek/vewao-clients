@@ -5,6 +5,8 @@ import { getCategoryByHandle, listCategories } from "@lib/data/categories"
 import { listRegions } from "@lib/data/regions"
 import { StoreRegion } from "@medusajs/types"
 import CategoryTemplate from "@modules/categories/templates"
+import { listRunningSaleLabels } from "@lib/data/sale-labels"
+import { saleLabelsForCategories } from "@lib/util/sale-labels"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 
 type Props = {
@@ -42,7 +44,7 @@ export default async function CategoryPage(props: Props) {
   const params = await props.params
   const { sortBy, page } = searchParams
 
-  const productCategory = await getCategoryByHandle(params.category)
+  const [productCategory, sales] = await Promise.all([getCategoryByHandle(params.category), listRunningSaleLabels()])
 
   if (!productCategory) {
     notFound()
@@ -54,6 +56,7 @@ export default async function CategoryPage(props: Props) {
       sortBy={sortBy}
       page={page}
       countryCode={params.countryCode}
+      saleLabels={saleLabelsForCategories(sales.labels, [productCategory])}
     />
   )
 }

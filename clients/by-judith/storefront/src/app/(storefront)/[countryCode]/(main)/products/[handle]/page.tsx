@@ -5,6 +5,8 @@ import { PRODUCT_LIST_FIELDS } from "@lib/util/product-fields"
 import { getRegion, listRegions } from "@lib/data/regions"
 import ProductTemplate from "@modules/products/templates"
 import { listProductTiers } from "@lib/data/promotion-tiers"
+import { listRunningSaleLabels } from "@lib/data/sale-labels"
+import { saleLabelsForCategories } from "@lib/util/sale-labels"
 import { staticVariants, staticVariantsConfig } from "@lib/util/static-variants"
 import { GIFT_PACKAGING_HANDLE } from "@lib/util/gift-packaging"
 import { getProductPageTexts } from "@lib/data/product-texts"
@@ -70,7 +72,9 @@ export default async function ProductPage(props: Props) {
   const path = `/${params.countryCode}/products/${params.handle}`
   const { texts, docId, grant } = await getProductPageTexts(pricedProduct, path)
   // Volume discounts on this product, e.g. the Christmas sale on Ultherapy's areas (vewao-clients#70).
-  const productTiers = await listProductTiers(pricedProduct.id)
+  const [productTiers, sales] = await Promise.all([listProductTiers(pricedProduct.id), listRunningSaleLabels()])
+  // Labels of the running sales on this product's categories (owner, 2026-11-22).
+  const saleLabels = saleLabelsForCategories(sales.labels, pricedProduct.categories ?? [])
   // Static variants: another product's option pills, the bundled ones lit (owner, 2026-11-22).
   const staticConfig = staticVariantsConfig(pricedProduct.metadata)
   const staticPills = staticConfig
@@ -89,6 +93,7 @@ export default async function ProductPage(props: Props) {
         texts={texts}
         productTiers={productTiers}
         staticVariants={staticPills}
+        saleLabels={saleLabels}
       />
       {grant && docId && (
         <PreviewBar path={path} editHref={`/admin/collections/products/${docId}`} edit={edit} />
