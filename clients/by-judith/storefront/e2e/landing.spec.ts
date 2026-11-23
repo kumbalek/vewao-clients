@@ -159,32 +159,15 @@ test.describe("with reduced motion", () => {
 test("the header logo is the diamond and leads home", async ({ page }) => {
   await page.goto("/cz/shop")
   const logo = page.getByRole("banner").getByRole("link", { name: "JuditH – úvodní stránka" })
-  await expect(logo.getByRole("img")).toHaveAttribute("src", "/logo_gold.svg")
+  await expect(logo.getByRole("img")).toHaveAttribute("src", "/logo.svg")
   await logo.click()
   await expect(page).toHaveURL(/\/cz$/)
   await expect(page.getByTestId("landing-hero")).toBeVisible()
 })
 
-test("the former home page is the e-shop's front page", async ({ page, isMobile }) => {
-  await page.goto("/cz")
-
-  if (isMobile) {
-    const open = page.getByRole("button", { name: "Otevřít menu" })
-    await waitForHydration(page, open)
-    await open.click()
-    const menu = page.getByRole("dialog", { name: "Menu" })
-    await menu.getByText("Shop", { exact: true }).click()
-    await menu.getByRole("link", { name: "Úvod e-shopu" }).click()
-    // Following a link closes the menu rather than leaving it over the new page.
-    await expect(menu).toBeHidden()
-  } else {
-    const shop = page.getByRole("navigation", { name: "Hlavní navigace" }).getByRole("button", {
-      name: "Shop",
-    })
-    await waitForHydration(page, shop)
-    await shop.hover()
-    await page.getByRole("link", { name: "Úvod e-shopu" }).click()
-  }
+test("the former home page is the e-shop's front page", async ({ page }) => {
+  // No menu link leads there (#70): in the e-shop-only site the logo does.
+  await page.goto("/cz/shop")
 
   await expect(page).toHaveURL(/\/cz\/shop$/)
   await expect(page).toHaveTitle("Shop")

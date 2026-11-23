@@ -30,6 +30,14 @@ const nextConfig = {
     return [
       { source: "/:countryCode/collections/gold", destination: "/:countryCode/categories/gold-edition", permanent: true },
       { source: "/:countryCode/collections/acute", destination: "/:countryCode/categories/acute", permanent: true },
+      // The list of all products is gone (vewao-clients#70); /store?q= still
+      // serves the header search.
+      {
+        source: "/:countryCode/store",
+        missing: [{ type: "query", key: "q" }],
+        destination: "/:countryCode/shop",
+        permanent: true,
+      },
     ]
   },
   images: {

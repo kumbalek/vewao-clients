@@ -19,7 +19,8 @@
     "novinky:setup": "node --experimental-strip-types setup-novinky.ts",
     "catalogue:setup": "node --experimental-strip-types setup-catalogue.ts",
     "test": "node --experimental-strip-types --test pricing.test.ts extract-dp.test.ts magazin/*.test.ts content/*.test.ts payload/*.test.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "service:texts": "node --experimental-strip-types service-texts.ts"
   },
   "dependencies": {
     "@medusajs/js-sdk": "2.20.1"

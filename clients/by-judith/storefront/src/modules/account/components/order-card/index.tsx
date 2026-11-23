@@ -1,3 +1,4 @@
+import { itemVoucherTitle } from "@lib/util/voucher"
 import { HttpTypes } from "@medusajs/types"
 import { useTranslations } from "next-intl"
 
@@ -39,7 +40,7 @@ const OrderCard = ({ order }: { order: HttpTypes.StoreOrder }) => {
         {items.slice(0, 3).map((item) => (
           <li key={item.id} className="flex items-center gap-3" data-testid="order-item">
             <div className="w-14 flex-none">
-              <Thumbnail thumbnail={item.thumbnail} images={[]} size="square" />
+              <Thumbnail thumbnail={item.thumbnail} images={[]} size="square" voucherTitle={itemVoucherTitle(item)} />
             </div>
             <Text as="span" size="sm">
               <span data-testid="item-title">{item.product_title ?? item.title}</span>{" "}

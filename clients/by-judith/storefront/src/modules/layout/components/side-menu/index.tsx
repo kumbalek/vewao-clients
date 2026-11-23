@@ -13,7 +13,7 @@ const SideMenu = () => {
   const SideMenuItems = [
     {
       name: t("store"),
-      href: "/store",
+      href: "/shop",
     },
     // {
     //   name: t("account"),

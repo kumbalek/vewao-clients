@@ -26,12 +26,15 @@ import { eurFromCzk, HERB_LINES, ownerEurPriceUpdate, roundedEurUpdate } from ".
 
 type CategoryDef = { name: string; handle: string }
 
-/** Owner's order, 2026-11-22. */
+/**
+ * Owner's order, 2026-11-22. The owner renamed TCM to Východní medicína (new
+ * handle) and Estetika to Západní medicína (handle kept) in admin.
+ */
 export const CATEGORIES: CategoryDef[] = [
   // Subcategories Gold Edition and Acute, the herb lines (HERB_LINES in pricing.ts).
   { name: "Herbs", handle: "herbs" },
-  { name: "TCM", handle: "tcm" },
-  { name: "Estetika", handle: "estetika" },
+  { name: "Východní medicína", handle: "vychodni-medicina" },
+  { name: "Západní medicína", handle: "estetika" },
   { name: "Ultherapy®", handle: "ultherapy" },
   { name: "DP Dermaceuticals", handle: "dp-dermaceuticals" },
 ]
@@ -57,28 +60,28 @@ export const VOUCHER_PRODUCTS: VoucherProductDef[] = [
   {
     title: "Vstupní osobní diagnostika Judity Halvové",
     handle: "vstupni-osobni-diagnostika-judity-halvove",
-    category: "tcm",
+    category: "vychodni-medicina",
     czk: 3000,
     eur: 120,
   },
   {
     title: "Balíček 5× akupunktura u senior terapeuta",
     handle: "balicek-5x-akupunktura-u-senior-terapeuta",
-    category: "tcm",
+    category: "vychodni-medicina",
     czk: 15000,
     eur: 600,
   },
   {
     title: "Online konzultace fytoterapie s Juditou Halvovou",
     handle: "online-konzultace-fytoterapie-s-juditou-halvovou",
-    category: "tcm",
+    category: "vychodni-medicina",
     czk: 1500,
     eur: 60,
   },
   {
     title: "Online konzultace fytoterapie s naší specialistkou Lucií",
     handle: "online-konzultace-fytoterapie-s-nasi-specialistkou-lucii",
-    category: "tcm",
+    category: "vychodni-medicina",
     czk: 1000,
     eur: 40,
   },

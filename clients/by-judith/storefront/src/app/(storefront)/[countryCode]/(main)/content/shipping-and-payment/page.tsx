@@ -47,7 +47,8 @@ const shippingOptions: Option[] = [
         >
           PPL
         </a>
-        , cena za odeslání je 150 Kč.
+        . Doprava po Česku stojí 150 Kč, od 5.000 Kč je zdarma. Doprava na
+        Slovensko stojí 10 €, od 220 € je zdarma.
       </>
     ),
   },

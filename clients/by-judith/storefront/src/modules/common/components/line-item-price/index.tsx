@@ -22,13 +22,14 @@ const LineItemPrice = ({
   const hasReducedPrice = currentPrice < originalPrice
 
   return (
-    <div className="flex flex-col gap-x-2 text-ui-fg-subtle items-end">
-      <div className="text-left">
+    // One size for the struck and the current price, each on one line (owner, 2026-11-22).
+    <div className="flex flex-col items-end text-base-regular text-ui-fg-subtle">
+      <div className="flex flex-col items-end">
         {hasReducedPrice && (
           <>
-            <p>
+            <span className="whitespace-nowrap">
               {style === "default" && (
-                <span className="text-ui-fg-subtle">Original: </span>
+                <span className="text-ui-fg-subtle">Původně: </span>
               )}
               <span
                 className="line-through text-ui-fg-muted"
@@ -39,7 +40,7 @@ const LineItemPrice = ({
                   currency_code: currencyCode,
                 })}
               </span>
-            </p>
+            </span>
             {style === "default" && (
               <span className="text-ui-fg-interactive">
                 -{getPercentageDiff(originalPrice, currentPrice || 0)}%

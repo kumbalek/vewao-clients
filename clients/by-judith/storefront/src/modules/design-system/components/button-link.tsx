@@ -5,7 +5,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import { buttonClasses, type ButtonStyleProps } from "./button"
 
 export type ButtonLinkProps = ButtonStyleProps & {
-  /** A shop path without the country code, e.g. "/store". */
+  /** A shop path without the country code, e.g. "/shop". */
   href: string
   className?: string
   children: React.ReactNode

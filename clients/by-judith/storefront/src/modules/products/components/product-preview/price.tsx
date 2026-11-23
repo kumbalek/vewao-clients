@@ -8,9 +8,12 @@ import { VariantPrice } from "types/global"
 export default async function PreviewPrice({
   price,
   claim,
+  from = false,
 }: {
   price: VariantPrice
   claim: DiscountClaim | null
+  /** The cheapest of variants that differ in price: "Od …". */
+  from?: boolean
 }) {
   if (!price) {
     return null
@@ -18,11 +21,22 @@ export default async function PreviewPrice({
 
   const t = await getTranslations("product")
 
+  // Each price on one line; on sale the new price above the struck one, as
+  // on the product page (owner, 2026-11-22).
   return (
-    <>
+    <div className="flex flex-col items-end">
+      <Text
+        className={clx("whitespace-nowrap text-ui-fg-muted", {
+          "text-ui-fg-interactive": !!claim,
+        })}
+        data-testid="price"
+      >
+        {from && `${t("priceFrom")} `}
+        {price.calculated_price}
+      </Text>
       {claim && (
         <Text
-          className="line-through text-ui-fg-muted"
+          className="whitespace-nowrap line-through text-ui-fg-muted"
           data-testid="original-price"
           title={t("referencePrice")}
         >
@@ -32,14 +46,6 @@ export default async function PreviewPrice({
           })}
         </Text>
       )}
-      <Text
-        className={clx("text-ui-fg-muted", {
-          "text-ui-fg-interactive": !!claim,
-        })}
-        data-testid="price"
-      >
-        {price.calculated_price}
-      </Text>
-    </>
+    </div>
   )
 }

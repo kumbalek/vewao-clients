@@ -1,10 +1,12 @@
-import { clx } from "@medusajs/ui"
-import { useTranslations } from "next-intl"
 
 import { claimForPrice, type PriceReference } from "@lib/util/discount-claim"
 import { getProductPrice } from "@lib/util/get-product-price"
-import { convertToLocale } from "@lib/util/money"
 import { HttpTypes } from "@medusajs/types"
+import { useTranslations } from "next-intl"
+
+import { hasPriceRange } from "@lib/util/price-range"
+
+import SalePrice from "./sale-price"
 
 export default function ProductPrice({
   product,
@@ -16,6 +18,8 @@ export default function ProductPrice({
   priceReferences?: PriceReference[]
 }) {
   const t = useTranslations("product")
+  // No variant chosen and the variants differ in price: the cheapest is a "from" price.
+  const from = !variant && hasPriceRange(product)
   const { cheapestPrice, variantPrice } = getProductPrice({
     product,
     variantId: variant?.id,
@@ -30,13 +34,22 @@ export default function ProductPrice({
   // A reduction is announced only against the Omnibus 30-day lowest price.
   const claim = claimForPrice(selectedPrice, priceReferences)
 
+  if (claim) {
+    return (
+      <SalePrice
+        amount={selectedPrice.calculated_price_number}
+        reference={claim.referenceAmount}
+        percentage={claim.percentage}
+        currencyCode={selectedPrice.currency_code}
+        prefix={from ? t("priceFrom") : undefined}
+      />
+    )
+  }
+
   return (
     <div className="flex flex-col text-ui-fg-base">
-      <span
-        className={clx("text-2xl", {
-          "text-ui-fg-interactive": !!claim,
-        })}
-      >
+      <span className="text-2xl">
+        {from && <span data-testid="price-from">{t("priceFrom")} </span>}
         <span
           data-testid="product-price"
           data-value={selectedPrice.calculated_price_number}
@@ -44,29 +57,6 @@ export default function ProductPrice({
           {selectedPrice.calculated_price}
         </span>
       </span>
-      {claim && (
-        <>
-          <p>
-            <span className="text-ui-fg-subtle">{t("referencePrice")} </span>
-            <span
-              className="line-through"
-              data-testid="reference-product-price"
-              data-value={claim.referenceAmount}
-            >
-              {convertToLocale({
-                amount: claim.referenceAmount,
-                currency_code: selectedPrice.currency_code,
-              })}
-            </span>
-          </p>
-          <span
-            className="text-ui-fg-interactive"
-            data-testid="product-price-discount"
-          >
-            -{claim.percentage} %
-          </span>
-        </>
-      )}
     </div>
   )
 }

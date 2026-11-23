@@ -1,7 +1,6 @@
 import { useTranslations } from "next-intl"
 
 import type { ProcedureCategory } from "content/site"
-import type { MenuCategory } from "@lib/util/menu-categories"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 import { CopyText, Placeholder } from "@modules/common/components/placeholder"
 import { ArrowLink, Container, Text } from "@modules/design-system"
@@ -88,62 +87,4 @@ export function ProceduresPanel({ categories }: { categories: ProcedureCategory[
   )
 }
 
-/** The e-shop's front page, its categories with their subcategories, and the full product list. */
-export function ShopPanel({ categories }: { categories: MenuCategory[] }) {
-  const t = useTranslations("layout")
-
-  return (
-    <Container width="page" className="flex flex-col gap-4 py-8">
-      <ArrowLink href="/shop" className={`text-sm ${overlayArrow}`}>
-        {t("shopHome")}
-      </ArrowLink>
-      {categories.length > 0 && (
-        <>
-          <Text
-            as="span"
-            size="xs"
-            tone="subtle"
-            className={`uppercase tracking-widest ${overlayLabel}`}
-          >
-            {t("categories")}
-          </Text>
-          <ul className="flex flex-wrap gap-2">
-            {categories.map((category) => (
-              <li key={category.id}>
-                <LocalizedClientLink href={`/categories/${category.handle}`} className={pillClasses}>
-                  {category.title}
-                </LocalizedClientLink>
-              </li>
-            ))}
-          </ul>
-          {categories
-            .filter((category) => category.children.length > 0)
-            .map((category) => (
-              <div key={category.id} className="flex flex-col gap-1">
-                <Text
-                  as="span"
-                  size="xs"
-                  tone="subtle"
-                  className={`uppercase tracking-widest ${overlayLabel}`}
-                >
-                  {category.title}
-                </Text>
-                <ul aria-label={category.title} className="flex flex-wrap gap-x-4">
-                  {category.children.map((child) => (
-                    <li key={child.id}>
-                      <LocalizedClientLink href={`/categories/${child.handle}`} className={subLinkClasses}>
-                        {child.title}
-                      </LocalizedClientLink>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-        </>
-      )}
-      <ArrowLink href="/store" className={`text-sm ${overlayArrow}`}>
-        {t("allProducts")}
-      </ArrowLink>
-    </Container>
-  )
-}
+export { default as ShopPanel } from "./shop-panel"

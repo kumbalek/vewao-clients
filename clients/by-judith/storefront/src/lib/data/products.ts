@@ -134,3 +134,41 @@ export const listProductsWithSort = async ({
     queryParams,
   }
 }
+
+/**
+ * The header search (vewao-clients#70): products whose own texts match
+ * (Medusa's `q`) and the products of the categories whose names match,
+ * without duplicates, sorted and paged like the product list.
+ */
+export const searchProducts = async ({
+  query,
+  categoryIds,
+  page = 1,
+  sortBy = "created_at",
+  countryCode,
+  limit = 12,
+}: {
+  query: string
+  categoryIds: string[]
+  page?: number
+  sortBy?: SortOptions
+  countryCode: string
+  limit?: number
+}): Promise<{ response: { products: HttpTypes.StoreProduct[]; count: number } }> => {
+  const [byText, byCategory] = await Promise.all([
+    listProducts({ pageParam: 0, queryParams: { q: query, limit: 100 }, countryCode }),
+    categoryIds.length
+      ? listProducts({ pageParam: 0, queryParams: { category_id: categoryIds, limit: 100 }, countryCode })
+      : Promise.resolve({ response: { products: [] as HttpTypes.StoreProduct[], count: 0 } }),
+  ])
+  const seen = new Set<string>()
+  const merged = byText.response.products.concat(byCategory.response.products).filter((product) => {
+    if (seen.has(product.id)) return false
+    seen.add(product.id)
+    return true
+  })
+  const start = (page - 1) * limit
+  return {
+    response: { products: sortProducts(merged, sortBy).slice(start, start + limit), count: merged.length },
+  }
+}

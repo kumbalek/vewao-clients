@@ -69,7 +69,7 @@ test("keeps the Czech homepage and the brand's logos", async ({
   await page.goto("/cz")
   await expect(page.locator("html")).toHaveAttribute("lang", "cs")
   // The diamond in the header; the footer keeps the JuditH wordmark.
-  await expect(page.getByRole("banner").locator('img[src="/logo_gold.svg"]')).toBeVisible()
+  await expect(page.getByRole("banner").locator('img[src="/logo.svg"]')).toBeVisible()
   await expect(page.getByRole("contentinfo").locator('img[src*="logo.webp"]')).toBeVisible()
   await expect(page.locator("main")).toBeVisible()
   await page.screenshot({
@@ -84,7 +84,7 @@ test("checkout shows the diamond logo, leading home", async ({ page }) => {
   await expect(logo).toHaveAttribute("href", "/cz")
   await expect(logo.getByRole("img", { name: "JuditH – úvodní stránka" })).toHaveAttribute(
     "src",
-    "/logo_gold.svg"
+    "/logo.svg"
   )
 })
 
@@ -294,6 +294,11 @@ test("announces a sale only against the 30-day lowest price", async ({
   // The reference is the ledger's 30-day lowest (1 690), not Medusa's list price (1 890).
   await expect(page.getByTestId("reference-product-price").first()).toHaveAttribute("data-value", "1690")
   await expect(page.getByTestId("product-price-discount").first()).toHaveText("-11 %")
+  // The struck price explains itself in a tooltip (owner, 2026-11-22).
+  const info = page.getByTestId("product-container").getByRole("button", { name: "Informace o ceně" })
+  await expect(info).toHaveAccessibleDescription(/Nejnižší cena za 30 dní před slevou: 1\.690 Kč\. Sleva -11 %/)
+  await info.click()
+  await expect(page.getByRole("tooltip").filter({ visible: true }).first()).toContainText("Nejnižší cena za 30 dní před slevou")
 
   await request.post(`${MOCK}/__price-history`, { data: { history_complete: false } })
   await page.goto("/cz/products/akcni-produkt?incomplete")
@@ -308,7 +313,7 @@ test("product photos are named after the product; product thumbnails are decorat
   await expect(page.getByRole("img", { name: "Akční produkt – foto 2" })).toBeAttached()
   await expect(page.locator('img[alt="Thumbnail"], img[alt^="Product image"]')).toHaveCount(0)
 
-  await page.goto("/cz/store")
+  await page.goto("/cz/shop")
   const card = page.getByTestId("product-wrapper").filter({ hasText: "Akční produkt" })
   // The name is right below the photo, so the photo itself is not announced again.
   await expect(card.locator("img").first()).toHaveAttribute("alt", "")

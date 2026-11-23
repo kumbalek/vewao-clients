@@ -21,7 +21,7 @@ const EmptyCartMessage = () => {
         {t("emptyText")}
       </Text>
       <div>
-        <InteractiveLink href="/store">{t("exploreProducts")}</InteractiveLink>
+        <InteractiveLink href="/shop">{t("exploreProducts")}</InteractiveLink>
       </div>
     </div>
   )
