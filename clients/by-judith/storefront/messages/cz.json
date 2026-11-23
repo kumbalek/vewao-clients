@@ -35,16 +35,14 @@
     "privacyTitle": "Zásady ochrany osobních údajů",
     "termsTitle": "Obchodní podmínky",
     "customerServiceTitle": "Zákaznická podpora",
-    "customerServiceDescription": "Informace pro zákazníky, způsoby dopravy, platby a možnosti vrácení."
+    "customerServiceDescription": "Informace pro zákazníky, způsoby dopravy, platby a možnosti vrácení.",
+    "shippingPaymentTitle": "Doprava a platba",
+    "shippingPaymentDescription": "Možnosti dopravy a platby – osobní odběr, PPL, bankovní převod, platba kartou a rychlé online platby."
   },
   "hero": {
     "claim": "Objevte moudrost mistrů tradiční čínské medicíny a sílu bylin ukrytou v každé tabletě.",
     "showProduct": "Zobrazit",
     "productsTitle": "Naše produkty",
-    "iconText1": "Původní čínské byliny",
-    "iconText2": "Vyrobeno v ČR",
-    "iconText3": "Přírodní produkt",
-    "iconText4": "Receptury dávných mistrů",
     "dnTitle": "Řekla o nás",
     "dnReview1": "Čínské byliny od Judity jsou absolutní zázrak – ať už ty na nachlazení (podchytíte v začátku a nemoc se nerozjede!), ekzém (tady to chce trpělivost a trochu víc času, ale remise se dostaví!), nebo hlasivky (ráno jsem nemluvila a večer už jsem odzpívala hlavni roli v muzikálu)...",
     "dnReview2": "Pokud bych měla volit mezi chemií a bylinkami, byliny vyhrají na plné čáře!",
@@ -92,7 +90,8 @@
     "goToCheckout": "Přejít k objednávce",
     "shipping": "Doprava",
     "discount": "Sleva",
-    "backToTheShop": "Zpátky do obchodu"
+    "backToTheShop": "Zpátky do obchodu",
+    "addToCartCount": "Přidat do košíku ({count})"
   },
   "signIn": {
     "title": "Zeregistrujte se",
@@ -127,7 +126,8 @@
     "customerServiceLink": "Zákaznická podpora",
     "title": "Zákaznická podpora",
     "privacyLink": "Zásady ochrany osobních údajů",
-    "termsLink": "Obchodní podmínky"
+    "termsLink": "Obchodní podmínky",
+    "shippingPaymentLink": "Doprava a platba"
   },
   "contact": {
     "title": "Kontakt"
@@ -137,6 +137,11 @@
   },
   "privacyPolicy": {
     "title": "Zásady ochrany osobních údajů"
+  },
+  "shippingPayment": {
+    "title": "Doprava a platba",
+    "shippingOptions": "Možnosti dopravy",
+    "paymentOptions": "Možnosti platby"
   },
   "checkout": {
     "backToCart": "Zpět do košíku",
@@ -225,8 +230,20 @@
     "ingredients": "Složení",
     "info": "Důležité informace",
     "viewAll": "Zobrazit kolekci",
+    "category": "Kategorie",
     "collection": "Kolekce",
-    "referencePrice": "Nejnižší cena za 30 dní před slevou:"
+    "referencePrice": "Nejnižší cena za 30 dní před slevou:",
+    "voucher": "Dárkový poukaz",
+    "selectOption": "Vyberte {option}",
+    "severalAllowed": "lze vybrat více",
+    "tierFrom": "od {count} ks",
+    "tierApplies": "(sleva platí)",
+    "priceInfo": "Informace o ceně",
+    "discountOf": "Sleva",
+    "includedOption": "Zahrnuté {option}",
+    "included": "zahrnuto",
+    "notIncluded": "nezahrnuto",
+    "priceFrom": "Od"
   },
   "payment": {
     "title": "Zpracováváme vaši platbu. Vyčkejte prosím."
@@ -250,8 +267,7 @@
     "procedures": "Procedury",
     "shop": "Shop",
     "collections": "Kolekce",
-    "shopHome": "Úvod e-shopu",
-    "allProducts": "Všechny produkty",
+    "showSubcategories": "Zobrazit podkategorie: {category}",
     "showMore": "Zobrazit více",
     "book": "Rezervovat",
     "search": "Hledat",
@@ -269,7 +285,9 @@
     "contact": "Kontakt",
     "magazin": "Magazín",
     "about": "O nás",
-    "copyright": "© {year} Herbs by JuditH"
+    "copyright": "© {year} Herbs by JuditH",
+    "shippingPayment": "Doprava a platba",
+    "paymentMethods": "Podporované platební metody: Comgate, Visa, Mastercard, Google Pay a Apple Pay"
   },
   "magazin": {
     "title": "Magazín",
@@ -315,7 +333,9 @@
   },
   "search": {
     "title": "Výsledky hledání „{query}“",
-    "empty": "Pro „{query}“ jsme nic nenašli. Zkuste jiné slovo nebo si prohlédněte všechny produkty."
+    "empty": "Pro „{query}“ jsme nic nenašli. Zkuste jiné slovo nebo si prohlédněte všechny produkty.",
+    "browseShop": "Prohlédnout e-shop",
+    "categories": "Nalezené kategorie"
   },
   "account": {
     "title": "Můj účet",

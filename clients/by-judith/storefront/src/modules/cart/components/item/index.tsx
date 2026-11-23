@@ -1,5 +1,6 @@
 "use client"
 
+import { itemVoucherTitle, itemVoucherVariant } from "@lib/util/voucher"
 import { Table, Text, clx } from "@medusajs/ui"
 import { updateLineItem } from "@lib/data/cart"
 import { HttpTypes } from "@medusajs/types"
@@ -75,6 +76,7 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
             <Thumbnail
               thumbnail={item.thumbnail}
               images={item.variant?.product?.images}
+              voucherTitle={itemVoucherTitle(item)}
               size="square"
             />
           </LocalizedClientLink>
@@ -88,7 +90,12 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
         >
           {item.product_title}
         </Text>
-        {/* <LineItemOptions variant={item.variant} data-testid="product-variant" /> */}
+        {/* Which variant, where one voucher product is bought several times (vewao-clients#70). */}
+        {itemVoucherVariant(item) && (
+          <Text className="txt-medium text-ui-fg-subtle" data-testid="product-variant">
+            {itemVoucherVariant(item)}
+          </Text>
+        )}
       </Table.Cell>
 
       {type === "full" && (

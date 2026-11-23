@@ -10,16 +10,20 @@ import X from "@modules/common/icons/x"
 import { claimForPrice, type PriceReference } from "@lib/util/discount-claim"
 import { getProductPrice } from "@lib/util/get-product-price"
 import { convertToLocale } from "@lib/util/money"
-import OptionSelect from "./option-select"
+import { VariantOptions } from "./variant-options"
 import { HttpTypes } from "@medusajs/types"
 import { isSimpleProduct } from "@lib/util/product"
+import { hasPriceRange } from "@lib/util/price-range"
 
 type MobileActionsProps = {
   product: HttpTypes.StoreProduct
   variant?: HttpTypes.StoreProductVariant
-  options: Record<string, string | undefined>
-  updateOptions: (title: string, value: string) => void
-  inStock?: boolean
+  /** The chosen option values, or null before a choice. */
+  selectionLabel: string | null
+  /** Several variants chosen: their total instead of the variant's price. */
+  priceOverride?: string | null
+  canAdd: boolean
+  buttonLabel: string
   handleAddToCart: () => void
   isAdding?: boolean
   show: boolean
@@ -30,9 +34,10 @@ type MobileActionsProps = {
 const MobileActions: React.FC<MobileActionsProps> = ({
   product,
   variant,
-  options,
-  updateOptions,
-  inStock,
+  selectionLabel,
+  priceOverride,
+  canAdd,
+  buttonLabel,
   handleAddToCart,
   isAdding,
   show,
@@ -40,6 +45,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
   priceReferences,
 }) => {
   const t = useTranslations("cart")
+  const tProduct = useTranslations("product")
   const { state, open, close } = useToggleState()
 
   const price = getProductPrice({
@@ -56,7 +62,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
     return variantPrice || cheapestPrice || null
   }, [price])
 
-  const claim = claimForPrice(selectedPrice, priceReferences)
+  const claim = priceOverride ? null : claimForPrice(selectedPrice, priceReferences)
 
   const isSimple = isSimpleProduct(product)
 
@@ -101,7 +107,8 @@ const MobileActions: React.FC<MobileActionsProps> = ({
                       "text-ui-fg-interactive": !!claim,
                     })}
                   >
-                    {selectedPrice.calculated_price}
+                    {!variant && !priceOverride && hasPriceRange(product) && `${tProduct("priceFrom")} `}
+                    {priceOverride ?? selectedPrice.calculated_price}
                   </span>
                 </div>
               ) : (
@@ -121,27 +128,19 @@ const MobileActions: React.FC<MobileActionsProps> = ({
                   data-testid="mobile-actions-button"
                 >
                   <div className="flex items-center justify-between w-full">
-                    <span>
-                      {variant
-                        ? Object.values(options).join(" / ")
-                        : t("selectVariant")}
-                    </span>
+                    <span className="truncate">{selectionLabel ?? t("selectVariant")}</span>
                     <ChevronDown />
                   </div>
                 </Button>
               )}
               <Button
                 onClick={handleAddToCart}
-                disabled={!inStock || !variant}
+                disabled={!canAdd}
                 className="w-full rounded-[3rem]"
                 isLoading={isAdding}
                 data-testid="mobile-cart-button"
               >
-                {!variant
-                  ? t("selectVariant")
-                  : !inStock
-                  ? t("outOfStock")
-                  : t("addToCart")}
+                {buttonLabel}
               </Button>
             </div>
           </div>
@@ -186,23 +185,8 @@ const MobileActions: React.FC<MobileActionsProps> = ({
                     </button>
                   </div>
                   <div className="bg-white px-6 py-12">
-                    {(product.variants?.length ?? 0) > 1 && (
-                      <div className="flex flex-col gap-y-6">
-                        {(product.options || []).map((option) => {
-                          return (
-                            <div key={option.id}>
-                              <OptionSelect
-                                option={option}
-                                current={options[option.id]}
-                                updateOption={updateOptions}
-                                title={option.title ?? ""}
-                                disabled={optionsDisabled}
-                              />
-                            </div>
-                          )
-                        })}
-                      </div>
-                    )}
+                    {/* The page's shared choice (vewao-clients#70), several at once where allowed. */}
+                    <VariantOptions product={product} disabled={optionsDisabled} />
                   </div>
                 </Dialog.Panel>
               </Transition.Child>

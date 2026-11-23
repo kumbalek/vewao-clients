@@ -54,6 +54,46 @@ The owner confirmed the old instance's setup for launch:
   e-mail with a test parcel.
 - Payment: Comgate for every order; pay on site only with clinic pickup. Free
   PPL delivery is still paid online. No cash on delivery.
+- Catalogue (owner, 2026-11-22; #64, #67): categories Herbs (subcategories Gold
+  Edition and Acute, replacing the former collections), TCM, Estetika,
+  Ultherapy® and DP Dermaceuticals (ten subcategories from the clinic's old
+  shop). TCM, Estetika and Ultherapy® are sold as vouchers; only herbs and DP
+  are shipped. EUR prices: herbs 75 € / 24 €, everything else Kč ÷ 25 rounded
+  up; VAT 21 % in CZ and SK. The shop's menus, front-page rails and breadcrumbs
+  follow the categories. `seed/setup-catalogue.ts` holds the structure.
+- The Shop menu shows each category as a box with an image, its name and a
+  short subtitle (#70). Fill both in admin → Products → Categories → the
+  category:
+  - the subtitle is the **Description**;
+  - the image is a URL under **Metadata**, key `image` (https://… or a path
+    such as /static/…). Admin shows the URL, not the picture. Subcategories
+    show their image and name in the menu; the category page lists them as
+    boxes with their subtitles;
+  - the category page's button is **Metadata** `cta_label` (its text) and
+    `cta_url` (https://… or a shop path such as /content/shipping-and-payment,
+    without /cz). Without both there is no button.
+  The logo leads to the e-shop's front page; the menu lists only the categories.
+- **Christmas sale 2026** (set up 2026-11-22 on localhost, no end dates yet):
+  - the sale price list "Vánoční ceny" covers five vouchers;
+  - `VANOCE-ULTHERAPY-10`/`-20` give −10 %/−20 % on Ultherapy's areas (vewao-platform#45);
+  - `VANOCE-HERBS-2PLUS1` makes every third herb free.
+  The struck-through price is the price ledger's 30-day lowest. The ledger
+  first saw the vouchers' prices on 2026-11-22, so the owner's statement that
+  they were sold at the regular prices before the sale is recorded in the
+  ledger as `source: manual` periods from 2026-10-01. This covers the five
+  sale vouchers and Ultherapy's six areas, whose −10 % box strikes the
+  regular price only when the ledger confirms it.
+  The same was done later for both online phytotherapy consultations:
+  - Judita's is 2 000 Kč, on sale for 1 000 Kč.
+  - Lucie's is 1 000 Kč, on sale for 500 Kč.
+  The owner states Judita's 1 500 Kč was a mistake in the new catalogue, never
+  offered publicly. Its two ledger rows (CZK, EUR) were soft-deleted on
+  2026-11-22, so they remain in the table with `deleted_at` set. Keep that statement on
+  file; correct the start date in the ledger if it is wrong.
+- Admin changes to products, prices, stock, categories, regions and payment or
+  shipping options appear in the shop within about a minute (#65). The shop
+  keeps that data for 60 s (`CATALOGUE_REVALIDATE_SECONDS`), then refreshes it
+  on the next visit. Payload texts appear on publish.
 - Comgate connections, one per currency (owner, 2026-11-22; vewao-platform#39):
   CZK merchant 525121 for region CZ (`pp_comgate_comgate`), EUR merchant 525122
   for region Slovensko (`pp_comgate_eur`). Each connection's return URLs are

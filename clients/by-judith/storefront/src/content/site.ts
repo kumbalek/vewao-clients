@@ -28,7 +28,8 @@ export const contact = {
  * ../seed/seed-dev.ts); a unit test checks it. The EUR value is a placeholder
  * until the merchant sets it (vewao-clients#45).
  */
-export const freeDeliveryFrom: Record<string, number> = { czk: 5000, eur: 200 }
+// EUR: 10 € delivery, free from 220 € (owner, 2026-11-22).
+export const freeDeliveryFrom: Record<string, number> = { czk: 5000, eur: 220 }
 
 /** Where the shop delivers, in Czech; each country is a region with its own currency (#45). */
 export const deliveryCountries: Record<string, string> = { cz: "Česko", sk: "Slovensko" }
@@ -64,7 +65,6 @@ export const footer = {
   about: pending("krátký popis značky a kliniky") as Copy,
   social: pending("odkazy na sociální sítě") as Copy,
   newsletter: pending("poskytovatel newsletteru a souhlas GDPR") as Copy,
-  paymentMethods: pending("loga platebních metod") as Copy,
   legal: [
     { label: "Ochrana osobních údajů", href: "/content/privacy-policy" },
     { label: "Obchodní podmínky", href: "/content/terms-of-use" },

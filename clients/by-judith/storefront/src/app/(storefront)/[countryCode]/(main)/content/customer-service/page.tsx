@@ -95,6 +95,11 @@ export default function CustomerServicePage() {
           </Heading>
           <ul className="gap-y-2 flex flex-col">
             <li>
+              <UnderlineLink href="/content/shipping-and-payment">
+                {t("shippingPaymentLink")}
+              </UnderlineLink>
+            </li>
+            <li>
               <UnderlineLink href="/content/terms-of-use">
                 {t("termsLink")}
               </UnderlineLink>

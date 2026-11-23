@@ -4,7 +4,9 @@ import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-g
 // import RefinementList from "@modules/store/components/refinement-list"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import Breadcrumbs from "@modules/common/components/breadcrumbs"
-import { HttpTypes } from "@medusajs/types"
+import type { MenuCategory } from "@lib/util/menu-categories"
+import { searchCategories } from "@lib/util/category-search"
+import CategoryBox from "@modules/layout/components/category-box"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 import PaginatedProducts from "./paginated-products"
@@ -14,18 +16,21 @@ const StoreTemplate = ({
   page,
   query,
   countryCode,
-  collections,
+  categories,
 }: {
   sortBy?: SortOptions
   page?: string
   query?: string
   countryCode: string
-  collections: HttpTypes.StoreCollection[]
+  /** The top-level categories, linked above the product list. */
+  categories: MenuCategory[]
 }) => {
   const pageNumber = page ? parseInt(page) : 1
   const sort = sortBy || "created_at"
   const t = useTranslations("product")
   const tSearch = useTranslations("search")
+  // Category names are searched too (vewao-clients#70).
+  const found = query ? searchCategories(categories, query) : null
 
   return (
     <div
@@ -48,15 +53,15 @@ const StoreTemplate = ({
           <h1 data-testid="store-page-title">
             {query ? tSearch("title", { query }) : t("allProducts")}
           </h1>
-          {collections.length > 0 && (
-            <div className="flex gap-1 small:gap-2 text-xl">
-              {`${t("collection")}: `}
-              {collections.map((c, index) => (
+          {categories.length > 0 && (
+            <div className="flex flex-wrap gap-1 small:gap-2 text-xl" data-testid="store-categories">
+              {`${t("category")}: `}
+              {categories.map((c, index) => (
                 <span className="text-[#85977b]" key={c.handle}>
-                  <LocalizedClientLink href={`/collections/${c.handle}`}>
+                  <LocalizedClientLink href={`/categories/${c.handle}`}>
                     {c.title}
                   </LocalizedClientLink>
-                  {index !== collections.length - 1 && (
+                  {index !== categories.length - 1 && (
                     <span className="ml-1 small:ml-2">{"|"}</span>
                   )}
                 </span>
@@ -64,11 +69,31 @@ const StoreTemplate = ({
             </div>
           )}
         </div>
+        {!!found?.matches.length && (
+          <ul
+            data-testid="search-categories"
+            aria-label={tSearch("categories")}
+            className="mb-8 grid grid-cols-1 gap-3 small:grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] small:gap-4"
+          >
+            {found.matches.map((category) => (
+              <li key={category.id}>
+                <CategoryBox
+                  href={`/categories/${category.handle}`}
+                  title={category.title}
+                  subtitle={category.subtitle}
+                  image={category.image}
+                  className="h-full"
+                />
+              </li>
+            ))}
+          </ul>
+        )}
         <Suspense fallback={<SkeletonProductGrid />}>
           <PaginatedProducts
             sortBy={sort}
             page={pageNumber}
             query={query}
+            searchCategoryIds={found?.ids}
             countryCode={countryCode}
           />
         </Suspense>

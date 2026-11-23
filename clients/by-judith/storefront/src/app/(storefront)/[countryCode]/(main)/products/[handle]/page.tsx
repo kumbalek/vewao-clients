@@ -1,8 +1,11 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { listProducts } from "@lib/data/products"
+import { PRODUCT_LIST_FIELDS } from "@lib/util/product-fields"
 import { getRegion, listRegions } from "@lib/data/regions"
 import ProductTemplate from "@modules/products/templates"
+import { listProductTiers } from "@lib/data/promotion-tiers"
+import { staticVariants, staticVariantsConfig } from "@lib/util/static-variants"
 import { GIFT_PACKAGING_HANDLE } from "@lib/util/gift-packaging"
 import { getProductPageTexts } from "@lib/data/product-texts"
 import PreviewBar from "@modules/cms/components/preview-bar"
@@ -55,7 +58,8 @@ export default async function ProductPage(props: Props) {
 
   const pricedProduct = await listProducts({
     countryCode: params.countryCode,
-    queryParams: { handle: params.handle },
+    // The categories, with their parent, make the breadcrumb.
+    queryParams: { handle: params.handle, fields: `${PRODUCT_LIST_FIELDS},*categories,*categories.parent_category` },
   }).then(({ response }) => response.products[0])
 
   if (!pricedProduct) {
@@ -65,6 +69,15 @@ export default async function ProductPage(props: Props) {
   // Texts from the CMS; a signed CMS preview of this page shows the latest draft.
   const path = `/${params.countryCode}/products/${params.handle}`
   const { texts, docId, grant } = await getProductPageTexts(pricedProduct, path)
+  // Volume discounts on this product, e.g. the Christmas sale on Ultherapy's areas (vewao-clients#70).
+  const productTiers = await listProductTiers(pricedProduct.id)
+  // Static variants: another product's option pills, the bundled ones lit (owner, 2026-11-22).
+  const staticConfig = staticVariantsConfig(pricedProduct.metadata)
+  const staticPills = staticConfig
+    ? await listProducts({ countryCode: params.countryCode, queryParams: { handle: staticConfig.from } })
+        .then(({ response }) => staticVariants(response.products[0], staticConfig.included))
+        .catch(() => null)
+    : null
   const edit = grant?.mode === "edit"
 
   return (
@@ -74,6 +87,8 @@ export default async function ProductPage(props: Props) {
         region={region}
         countryCode={params.countryCode}
         texts={texts}
+        productTiers={productTiers}
+        staticVariants={staticPills}
       />
       {grant && docId && (
         <PreviewBar path={path} editHref={`/admin/collections/products/${docId}`} edit={edit} />

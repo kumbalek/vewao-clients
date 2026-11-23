@@ -3,6 +3,7 @@
 import { sdk } from "@lib/config"
 import { HttpTypes } from "@medusajs/types"
 import { getAuthHeaders, getCacheOptions } from "./cookies"
+import { catalogueRevalidate } from "@lib/util/catalogue-cache"
 
 export const listCartShippingMethods = async (cartId: string) => {
   const headers = {
@@ -24,8 +25,7 @@ export const listCartShippingMethods = async (cartId: string) => {
             "+service_zone.fulfillment_set.type,*service_zone.fulfillment_set.location.address",
         },
         headers,
-        next,
-        cache: "force-cache",
+        next: { ...next, revalidate: catalogueRevalidate() },
       }
     )
     .then(({ shipping_options }) => shipping_options)

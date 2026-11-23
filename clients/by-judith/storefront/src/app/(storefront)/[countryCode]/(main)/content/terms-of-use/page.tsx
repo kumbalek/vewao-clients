@@ -54,7 +54,8 @@ export default function TermsPage() {
                   </p>
                   <p>
                     fyzická osoba podnikající na základě živnostenského
-                    oprávnění
+                    oprávnění, zapsaná v obchodním rejstříku vedeném Městským
+                    soudem v Praze, sp.zn. A 60912
                   </p>
                   <p>
                     <strong>kontaktní osoba:</strong> Mgr. Judita Halvová

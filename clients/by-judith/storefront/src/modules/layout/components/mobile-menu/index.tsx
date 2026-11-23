@@ -12,8 +12,9 @@ import { ButtonLink } from "@modules/design-system"
 import type { RegionOption } from "@lib/util/region-options"
 import RegionSwitch from "@modules/layout/components/region-switch"
 import { ChevronIcon, CloseIcon, MenuIcon } from "@modules/design-system/components/icons"
-import type { MenuCollection } from "@modules/layout/components/menu-panels"
+import type { MenuCategory } from "@lib/util/menu-categories"
 import SearchForm from "@modules/layout/components/search-form"
+import CategoryBox from "@modules/layout/components/category-box"
 
 const rowClasses = "flex w-full items-center justify-between py-4 text-lg text-ink"
 const subLinkClasses = "block py-2 text-base text-ink-subtle hover:text-ink"
@@ -36,7 +37,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 export default function MobileMenu({
   countryCode,
   categories,
-  collections,
+  shopCategories,
   links,
   cartCount,
   bookingPath,
@@ -45,7 +46,8 @@ export default function MobileMenu({
 }: {
   countryCode: string
   categories: ProcedureCategory[]
-  collections: MenuCollection[]
+  /** The shop's product categories with their subcategories. */
+  shopCategories: MenuCategory[]
   links: NavLink[]
   cartCount: number
   bookingPath: string
@@ -55,6 +57,8 @@ export default function MobileMenu({
 }) {
   const t = useTranslations("layout")
   const [open, setOpen] = useState(false)
+  /** The shop category whose subcategories are open. */
+  const [openCategory, setOpenCategory] = useState<string | null>(null)
   const close = () => setOpen(false)
 
   return (
@@ -86,7 +90,7 @@ export default function MobileMenu({
           <div className="flex h-16 flex-none items-center justify-between border-b border-line px-6">
             <LocalizedClientLink href="/">
               <Image
-                src="/logo_gold.svg"
+                src="/logo.svg"
                 alt={t("logoAlt")}
                 width={160}
                 height={202}
@@ -156,27 +160,56 @@ export default function MobileMenu({
                 )}
                 <li>
                   <Section title={t("shop")}>
-                    <ul>
-                      <li>
-                        <LocalizedClientLink href="/shop" className={subLinkClasses}>
-                          {t("shopHome")}
-                        </LocalizedClientLink>
-                      </li>
-                      <li>
-                        <LocalizedClientLink href="/store" className={subLinkClasses}>
-                          {t("allProducts")}
-                        </LocalizedClientLink>
-                      </li>
-                      {collections.map((collection) => (
-                        <li key={collection.id}>
-                          <LocalizedClientLink
-                            href={`/collections/${collection.handle}`}
-                            className={subLinkClasses}
-                          >
-                            {collection.title}
-                          </LocalizedClientLink>
-                        </li>
-                      ))}
+                    <ul className="flex flex-col gap-2">
+                      {shopCategories.map((category) => {
+                        const expanded = openCategory === category.id
+                        const listId = `menu-subcategories-${category.id}`
+                        return (
+                          <li key={category.id}>
+                            <CategoryBox
+                              href={`/categories/${category.handle}`}
+                              title={category.title}
+                              subtitle={category.subtitle}
+                              image={category.image}
+                              action={
+                                category.children.length > 0 && (
+                                  <button
+                                    type="button"
+                                    aria-expanded={expanded}
+                                    aria-controls={listId}
+                                    aria-label={t("showSubcategories", { category: category.title })}
+                                    onClick={() => setOpenCategory(expanded ? null : category.id)}
+                                    className="flex h-10 w-10 items-center justify-center rounded-full text-ink hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-ink"
+                                  >
+                                    <ChevronIcon
+                                      className={`transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}
+                                    />
+                                  </button>
+                                )
+                              }
+                            />
+                            {category.children.length > 0 && (
+                              <ul
+                                id={listId}
+                                aria-label={category.title}
+                                hidden={!expanded}
+                                className="ml-4 mt-2 flex-col gap-1.5 border-l border-line pl-4 [&:not([hidden])]:flex"
+                              >
+                                {category.children.map((child) => (
+                                  <li key={child.id}>
+                                    <CategoryBox
+                                      href={`/categories/${child.handle}`}
+                                      title={child.title}
+                                      image={child.image}
+                                      size="small"
+                                    />
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </li>
+                        )
+                      })}
                     </ul>
                   </Section>
                 </li>

@@ -71,3 +71,159 @@ test.describe("a voucher with goods", () => {
     await expect(page.getByTestId("delivery-not-needed")).toHaveCount(0)
   })
 })
+
+// The voucher picture (vewao-clients#70): the empty voucher with the product's
+// name on it, tilted with a shadow like a printed card.
+test("a voucher's product page shows the voucher card with its name", async ({ page }) => {
+  await page.goto("/cz/products/darkovy-poukaz")
+
+  const card = page.getByRole("img", { name: "Vstupní osobní diagnostika Judity Halvové" })
+  await expect(card).toBeVisible()
+  await expect(card.getByTestId("voucher-title")).toHaveText("Vstupní osobní diagnostika Judity Halvové")
+  await expect(card).toContainText("Dárkový poukaz")
+  const { transform, filter } = await card.locator("[style*='aspect-ratio']").evaluate((el) => ({
+    transform: getComputedStyle(el).transform,
+    filter: getComputedStyle(el.parentElement!).filter,
+  }))
+  expect(transform).not.toBe("none")
+  expect(filter).toContain("drop-shadow")
+})
+
+test.describe("the voucher line in the cart", () => {
+  test.beforeEach(useCart("cart_voucher"))
+
+  test("shows the voucher card with the product's name", async ({ page }) => {
+    await page.goto("/cz/cart")
+    const row = page.getByTestId("product-row").filter({ has: page.getByTestId("voucher-image") })
+    await expect(row.getByTestId("voucher-title")).toHaveText("Dárkový poukaz")
+  })
+})
+
+// Ultherapy's single areas (vewao-clients#70): the options sit right under the
+// description on a large screen and above the price on a phone, in Czech, each
+// button as wide as its words. Several areas may be chosen; their prices add up
+// and each one goes into the cart as its own voucher.
+test.describe("Ultherapy's single areas", () => {
+  test.beforeEach(useCart("cart_partie"))
+
+  test("are in Czech, whole words, under the description on a large screen", async ({ page, isMobile }) => {
+    await page.goto("/cz/products/ultherapy-aplikace-na-jednotlive-partie")
+    const product = page.getByTestId("product-container")
+
+    const options = product.getByTestId("product-options").filter({ visible: true })
+    await expect(options).toHaveCount(1)
+    await expect(product.getByText("Vyberte partie").filter({ visible: true })).toBeVisible()
+    await expect(product.getByText("lze vybrat více").filter({ visible: true })).toBeVisible()
+    const buttons = options.getByTestId("option-button")
+    await expect(buttons).toHaveText(["Brow lift", "Brow lift a oční okolí", "Lower face", "Horní část krku/podbradek", "Krk", "Dekolt"])
+    for (const button of await buttons.all()) {
+      const whole = await button.evaluate((el) => getComputedStyle(el).whiteSpace === "nowrap" && el.scrollWidth <= el.clientWidth)
+      expect(whole, (await button.textContent()) ?? "").toBe(true)
+    }
+    // Nothing chosen yet: the button asks for a choice instead of "sold out",
+    // and the cheapest area is a "from" price.
+    await expect(product.getByTestId("add-product-button")).toHaveText("Vyberte variantu")
+    await expect(product.getByTestId("price-from").filter({ visible: true })).toHaveText("Od")
+    await expect(product.getByTestId("product-price").filter({ visible: true }).first()).toContainText("6.000")
+
+    const price = product.getByTestId("product-price").filter({ visible: true }).first()
+    const [title, group, priceBox] = await Promise.all([
+      product.getByTestId("product-title").boundingBox(),
+      options.boundingBox(),
+      price.boundingBox(),
+    ])
+    if (isMobile) {
+      expect(group!.y + group!.height).toBeLessThanOrEqual(priceBox!.y)
+    } else {
+      expect(group!.y).toBeGreaterThan(title!.y + title!.height)
+      expect(group!.x).toBeGreaterThan(priceBox!.x + priceBox!.width)
+    }
+  })
+
+  // The Christmas sale (vewao-platform#45): −10 % for one area, −20 % for two or more.
+  test("the sale boxes light up for the tier the choice reaches, and the price follows", async ({ page, request }) => {
+    const tier = (code: string, min_count: number, value: number, teaser: string) =>
+      ({ code, min_count, type: "percentage", value, currency_code: null, message: null, teaser, product_id: "prod_partie" })
+    await request.post(`${MOCK}/__promotion-tiers`, {
+      data: { tiers: [], product_tiers: [tier("VANOCE-20", 2, 20, "při výběru 2 a více partií"), tier("VANOCE-10", 1, 10, "při výběru 1 partie")] },
+    })
+    await page.goto("/cz/products/ultherapy-aplikace-na-jednotlive-partie")
+    const product = page.getByTestId("product-container")
+    const buttons = product.getByTestId("product-options").filter({ visible: true }).getByTestId("option-button")
+    const boxes = product.getByTestId("discount-boxes").filter({ visible: true }).getByTestId("discount-box")
+    const price = product.getByTestId("product-price").filter({ visible: true }).first()
+
+    await expect(boxes).toHaveText([/−10 %\s*při výběru 1 partie/, /−20 %\s*při výběru 2 a více partií/])
+    await expect(boxes.nth(0)).toHaveAttribute("data-active", "false")
+    await expect(boxes.nth(1)).toHaveAttribute("data-active", "false")
+
+    await buttons.filter({ hasText: /^Krk$/ }).click()
+    await expect(boxes.nth(0)).toHaveAttribute("data-active", "true")
+    await expect(boxes.nth(1)).toHaveAttribute("data-active", "false")
+    await expect(price).toContainText("13.500")
+    await expect(product.getByTestId("reference-product-price").first()).toContainText("15.000")
+
+    await buttons.filter({ hasText: /^Dekolt$/ }).click()
+    await expect(boxes.nth(0)).toHaveAttribute("data-active", "false")
+    await expect(boxes.nth(1)).toHaveAttribute("data-active", "true")
+    await expect(price).toContainText("25.600")
+    await expect(product.getByTestId("reference-product-price").first()).toContainText("32.000")
+    await expect(product.getByTestId("product-price-discount").first()).toHaveText("-20 %")
+
+    // Without a confirmed 30-day history the discounted price stands alone (§ 12a).
+    await request.post(`${MOCK}/__price-history`, { data: { history_complete: false } })
+    await page.reload()
+    await product.getByTestId("product-options").filter({ visible: true }).getByTestId("option-button").filter({ hasText: /^Krk$/ }).click()
+    await expect(price).toContainText("13.500")
+    await expect(product.getByTestId("reference-product-price")).toHaveCount(0)
+  })
+
+  test("several can be chosen; their prices add up and each goes into the cart", async ({ page }) => {
+    await page.goto("/cz/products/ultherapy-aplikace-na-jednotlive-partie")
+    const product = page.getByTestId("product-container")
+    const buttons = product.getByTestId("product-options").filter({ visible: true }).getByTestId("option-button")
+    const price = product.getByTestId("product-price").filter({ visible: true }).first()
+    const add = product.getByTestId("add-product-button")
+
+    await buttons.filter({ hasText: /^Krk$/ }).click()
+    await expect(price).toContainText("15.000")
+    await expect(add).toHaveText("Přidat do košíku")
+    await buttons.filter({ hasText: /^Dekolt$/ }).click()
+    await expect(buttons.filter({ hasText: /^Krk$/ })).toHaveAttribute("aria-pressed", "true")
+    await expect(buttons.filter({ hasText: /^Dekolt$/ })).toHaveAttribute("aria-pressed", "true")
+    await expect(price).toContainText("32.000")
+    await expect(add).toHaveText("Přidat do košíku (2)")
+    // A second press takes an area out again.
+    await buttons.filter({ hasText: /^Brow lift$/ }).click()
+    await buttons.filter({ hasText: /^Brow lift$/ }).click()
+    await expect(price).toContainText("32.000")
+
+    // The button waits while both areas are added, one after the other.
+    await add.click()
+    await expect(add).toBeDisabled()
+    await expect(add).toBeEnabled({ timeout: 15_000 })
+    const rows = page.getByTestId("product-row").filter({ hasText: "Aplikace na jednotlivé partie" })
+    await expect
+      .poll(async () => {
+        await page.goto("/cz/cart")
+        return rows.count()
+      }, { timeout: 15_000 })
+      .toBe(2)
+    // Each line says which area it is.
+    await expect(rows.getByTestId("product-variant")).toHaveText(["Krk", "Dekolt"])
+  })
+})
+
+// Static variants (owner, 2026-11-22): Facelift shows the areas' pills, its
+// two lit and the rest greyed, nothing to press.
+test("Facelift shows the areas it covers as pills", async ({ page }) => {
+  await page.goto("/cz/products/ultherapy-facelift")
+  const pills = page.getByTestId("product-container").getByTestId("static-variants")
+  await expect(pills).toContainText("Zahrnuté partie")
+  await expect(pills.getByTestId("static-variant")).toHaveText([
+    /^Brow lift/, /^Brow lift a oční okolí/, /^Lower face/, /^Horní část krku\/podbradek/, /^Krk/, /^Dekolt/,
+  ])
+  const included = await pills.getByTestId("static-variant").evaluateAll((els) => els.map((e) => e.getAttribute("data-included")))
+  expect(included).toEqual(["false", "false", "true", "true", "false", "false"])
+  await expect(pills.getByRole("button")).toHaveCount(0)
+})

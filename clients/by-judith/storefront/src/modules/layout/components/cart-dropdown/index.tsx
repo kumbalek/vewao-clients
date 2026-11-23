@@ -1,5 +1,6 @@
 "use client"
 
+import { itemVoucherTitle, itemVoucherVariant } from "@lib/util/voucher"
 import { Transition } from "@headlessui/react"
 import { convertToLocale } from "@lib/util/money"
 import { HttpTypes } from "@medusajs/types"
@@ -108,7 +109,7 @@ const CartDropdown = ({
         leaveTo="opacity-0 translate-y-1"
       >
         <div
-          className="absolute right-0 top-[calc(100%+1px)] hidden w-[420px] border-x border-b border-line bg-white text-ink small:block"
+          className="absolute right-0 top-[calc(100%+1px)] hidden w-[480px] border-x border-b border-line bg-white text-ink small:block"
           data-testid="nav-cart-dropdown"
         >
           <div className="p-4 flex items-center justify-center">
@@ -147,14 +148,15 @@ const CartDropdown = ({
                             <Thumbnail
                               thumbnail={item.thumbnail}
                               images={item.variant?.product?.images}
+                              voucherTitle={itemVoucherTitle(item)}
                               size="square"
                             />
                           </LocalizedClientLink>
                         )}
                         <div className="flex flex-col justify-between flex-1">
                           <div className="flex flex-col flex-1">
-                            <div className="flex items-start justify-between">
-                              <div className="flex flex-col overflow-ellipsis whitespace-nowrap mr-4 w-[180px]">
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex min-w-0 flex-1 flex-col overflow-ellipsis whitespace-nowrap">
                                 <h3 className="text-base-regular overflow-hidden text-ellipsis">
                                   {isGiftPackaging ? (
                                     item.title
@@ -163,10 +165,15 @@ const CartDropdown = ({
                                       href={`/products/${item.product_handle}`}
                                       data-testid="product-link"
                                     >
-                                      {item.title}
+                                      {itemVoucherVariant(item) ? item.product_title : item.title}
                                     </LocalizedClientLink>
                                   )}
                                 </h3>
+                                {itemVoucherVariant(item) && (
+                                  <span className="text-ui-fg-subtle overflow-hidden text-ellipsis" data-testid="product-variant">
+                                    {itemVoucherVariant(item)}
+                                  </span>
+                                )}
                                 <span
                                   data-testid="cart-item-quantity"
                                   data-value={item.quantity}
@@ -174,7 +181,7 @@ const CartDropdown = ({
                                   {`${t("quantity")}: ${item.quantity}`}
                                 </span>
                               </div>
-                              <div className="flex justify-end">
+                              <div className="flex shrink-0 justify-end">
                                 <LineItemPrice
                                   item={item}
                                   style="tight"
@@ -222,7 +229,7 @@ const CartDropdown = ({
           ) : (
             <div className="flex py-16 flex-col gap-y-4 items-center justify-center">
               <span>{t("cartIsEmpty")}</span>
-              <ButtonLink href="/store" variant="secondary">
+              <ButtonLink href="/shop" variant="secondary">
                 {t("exploreProductsButton")}
               </ButtonLink>
             </div>

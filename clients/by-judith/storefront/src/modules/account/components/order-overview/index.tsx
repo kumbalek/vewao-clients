@@ -12,7 +12,7 @@ const OrderOverview = ({ orders }: { orders: HttpTypes.StoreOrder[] }) => {
     return (
       <Card tone="surface" className="flex flex-col items-start gap-4" data-testid="no-orders-container">
         <Text>{t("noOrders")}</Text>
-        <ButtonLink href="/store" data-testid="continue-shopping-button">
+        <ButtonLink href="/shop" data-testid="continue-shopping-button">
           {t("continueShopping")}
         </ButtonLink>
       </Card>

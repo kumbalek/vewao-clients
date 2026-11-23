@@ -51,7 +51,7 @@ jobs:
           PAYLOAD_SECRET: e2e-payload-secret-not-for-production
       - run: pnpm test:e2e
       # The temporary production site, the e-shop alone (SITE_MODE=shop, #47).
-      - run: pnpm exec playwright test e2e/shop-mode.spec.ts e2e/storefront.spec.ts e2e/cart.spec.ts e2e/account.spec.ts e2e/eur.spec.ts e2e/withdrawal.spec.ts
+      - run: pnpm exec playwright test e2e/shop-mode.spec.ts e2e/catalogue.spec.ts e2e/storefront.spec.ts e2e/cart.spec.ts e2e/account.spec.ts e2e/eur.spec.ts e2e/withdrawal.spec.ts
         env:
           E2E_SITE_MODE: shop
   image:

@@ -36,22 +36,62 @@ export default function PrivacyPolicyPage() {
           <div className="bg-zinc-50 font-sans p-4 sm:p-8">
             <div className="max-w-4xl mx-auto bg-white p-6 sm:p-10 rounded-lg shadow-lg text-gray-800 leading-relaxed">
               {/* Header */}
-              <header className="text-center mb-10 border-b pb-6">
-                <h1 className="text-3xl sm:text-4xl text-gray-900 mb-2">
-                  Ochrana osobních údajů
-                </h1>
-                <p className="text-md text-gray-600">
-                  Naše webová adresa je:{" "}
-                  <a
-                    href="https://www.by-judith.com/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[#85977b] "
-                  >
-                    https://www.by-judith.com/
-                  </a>
-                </p>
-              </header>
+              <section className="mb-10 p-6 bg-gray-50 rounded-lg border border-gray-200">
+                <h3 className="text-xl  text-gray-800 mb-4">Prodávající:</h3>
+                <div className="space-y-1 text-gray-700">
+                  <p>
+                    <strong>Mgr. Judita Halvová</strong>
+                  </p>
+                  <p>
+                    <strong>IČ:</strong> 64417441
+                  </p>
+                  <p>
+                    <strong>DIČ:</strong> CZ77661080151
+                  </p>
+                  <p>
+                    <strong>místem podnikání:</strong> Emilie Hyblerová 524/11,
+                    Praha 4 - Háje, PSČ: 149 00
+                  </p>
+                  <p>
+                    fyzická osoba podnikající na základě živnostenského
+                    oprávnění, zapsaná v obchodním rejstříku vedeném Městským
+                    soudem v Praze, sp.zn. A 60912
+                  </p>
+                  <p>
+                    <strong>kontaktní osoba:</strong> Mgr. Judita Halvová
+                  </p>
+                  <p>
+                    <strong>email:</strong>{" "}
+                    <a
+                      href="mailto:info@bbclinic.cz"
+                      className="text-[#85977b] "
+                    >
+                      info@bbclinic.cz
+                    </a>
+                  </p>
+                  <p>
+                    <strong>telefon:</strong>{" "}
+                    <a href="tel:+420720980530" className="text-[#85977b] ">
+                      + 420 720 980 530
+                    </a>
+                  </p>
+                  <p>
+                    <strong>web:</strong>{" "}
+                    <a
+                      href="https://www.by-judith.com/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#85977b] "
+                    >
+                      https://www.by-judith.com/
+                    </a>
+                  </p>
+                  <p className="mt-4">
+                    (dále jen „
+                    <strong className="font-semibold">prodávající</strong>“)
+                  </p>
+                </div>
+              </section>
 
               <div className="space-y-12">
                 {/* Úvodní sekce */}

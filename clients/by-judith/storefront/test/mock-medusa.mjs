@@ -15,10 +15,12 @@ const shippingOptions = [
   { id: "so_ppl", name: "Přepravce PPL", price_type: "flat", amount: 150, service_zone: { fulfillment_set: { type: "shipping" } }, prices: [] },
   { id: "so_pickup", name: "Pobočka Beauty Body Clinic", price_type: "flat", amount: 0, service_zone: { fulfillment_set: { type: "pickup", location: { address: { address_1: "Kosmická 19", postal_code: "149 00", city: "Praha 4 - Háje", country_code: "cz" } } } }, prices: [] },
 ]
-// PPL to Slovakia: 8 €, free from 200 € (the dev seed's placeholders).
-const shippingOptionSk = { id: "so_ppl_sk", name: "Přepravce PPL – Slovensko", price_type: "flat", amount: 8, service_zone: { fulfillment_set: { type: "shipping" } }, prices: [] }
+// PPL to Slovakia: 10 €, free from 220 € (owner, 2026-11-22).
+const shippingOptionSk = { id: "so_ppl_sk", name: "Přepravce PPL – Slovensko", price_type: "flat", amount: 10, service_zone: { fulfillment_set: { type: "shipping" } }, prices: [] }
 // The same variants in EUR: [calculated, original] per variant.
-const eurPrices = { variant_test: [19.9, 19.9], variant_sale: [59.9, 75.9], variant_gift: [7.9, 7.9] }
+const EUR_PRICES = { variant_test: [19.9, 19.9], variant_sale: [59.9, 75.9], variant_gift: [7.9, 7.9] }
+// Mutable through /__catalogue/price, like a price changed in admin (#65).
+const eurPrices = structuredClone(EUR_PRICES)
 const isSk = (current) => current?.region_id === regionSk.id
 /** A product as the Slovak region prices it. */
 function pricedFor(product, regionId) {
@@ -48,6 +50,8 @@ const cartControls = { delayMs: 0, status: 200, message: "Košík se nepodařilo
 const saleProduct = {
   id: "prod_sale", handle: "akcni-produkt", title: "Akční produkt", subtitle: "Testovací akce", description: "Popis produktu",
   thumbnail: "/logo.webp", collection: null, collection_id: null, tags: [], type: null,
+  // A herb in Herbs › Gold Edition (vewao-clients#67).
+  categories: [{ id: "pcat_gold", name: "Gold Edition", handle: "gold-edition", parent_category: { id: "pcat_herbs", name: "Herbs", handle: "herbs" } }],
   images: [{ id: "img_sale_1", url: "/logo.webp", rank: 0 }, { id: "img_sale_2", url: "/logo.webp", rank: 1 }],
   metadata: { ingredients: JSON.stringify(["Meruňka obecná (extrakt ze semene) 960 mg", "**Hořčice** setá (extrakt ze semene) 640 mg"]) },
   options: [{ id: "opt_default", title: "Default option", values: [{ id: "optval_default", value: "Default option value" }] }],
@@ -68,11 +72,51 @@ const giftProduct = {
     calculated_price: { calculated_amount: 199, original_amount: 199, currency_code: "czk", calculated_price: { price_list_type: null }, original_price: { price_list_type: null } },
   }],
 }
+// A gift voucher product (vewao-clients#70), served by handle only so listings stay as they are.
+const voucherProduct = {
+  ...giftProduct,
+  id: "prod_voucher", handle: "darkovy-poukaz", title: "Vstupní osobní diagnostika Judity Halvové", description: null,
+  thumbnail: "/logo.webp", images: [{ id: "img_voucher", url: "/logo.webp", rank: 0 }], type: { id: "ptyp_voucher", value: "Dárkový poukaz" },
+  variants: [{ ...giftProduct.variants[0], id: "variant_voucher", title: "Poukaz", sku: "POUKAZ-DIAGNOSTIKA" }],
+}
+// Ultherapy's single areas (vewao-clients#70): one voucher, a variant per area.
+const PARTIE = [["Brow lift", 6000], ["Brow lift a oční okolí", 12000], ["Lower face", 22000], ["Horní část krku/podbradek", 15000], ["Krk", 15000], ["Dekolt", 17000]]
+const partieProduct = {
+  ...voucherProduct,
+  id: "prod_partie", handle: "ultherapy-aplikace-na-jednotlive-partie", title: "Aplikace na jednotlivé partie",
+  options: [{ id: "opt_partie", title: "Partie", values: PARTIE.map(([value], i) => ({ id: `optval_partie_${i}`, value })) }],
+  variants: PARTIE.map(([value, amount], i) => ({
+    ...giftProduct.variants[0], id: `variant_partie_${i}`, title: value, sku: `ULTHERAPY-PARTIE-${i}`,
+    options: [{ id: `optval_partie_${i}`, option_id: "opt_partie", value }],
+    calculated_price: { ...giftProduct.variants[0].calculated_price, calculated_amount: amount, original_amount: amount },
+  })),
+}
+// Facelift: static variants, two of the areas (owner, 2026-11-22).
+const faceliftProduct = {
+  ...voucherProduct,
+  id: "prod_facelift", handle: "ultherapy-facelift", title: "Facelift",
+  metadata: { static_variants_from: partieProduct.handle, static_variants: "Lower face, Horní část krku/podbradek" },
+  variants: [{ ...giftProduct.variants[0], id: "variant_facelift", title: "Facelift", sku: "ULTHERAPY-FACELIFT" }],
+}
+// Products served by handle or id only, so listings stay as they are.
+const byHandleOrIdOnly = [voucherProduct, partieProduct, faceliftProduct]
 // Active quantity-tier promotions as vewao-platform's GET /store/promotion-tiers returns them.
 let promotionTiers = []
+// Volume discounts on one product (vewao-platform#45), empty unless a test sets them.
+let productTiers = []
 // Magazine articles as the Content plugin serves them: newest first, body_html
 // only on the detail route (the plugin renders and sanitises Markdown).
 const photo = { image: "http://localhost:9101/static/dn.webp", image_width: 1200, image_height: 1798, gallery: [] }
+// The shop's categories (vewao-clients#64), out of order: the menus sort by rank.
+const CATEGORIES = [
+  { id: "pcat_dp", handle: "dp-dermaceuticals", name: "DP Dermaceuticals", rank: 4, parent_category_id: null, description: "Profesionální kosmetika", metadata: { image: "/logo.webp" } },
+  { id: "pcat_dp_masky", handle: "dp-masky", name: "DP Masky", rank: 5, parent_category_id: "pcat_dp" },
+  { id: "pcat_herbs", handle: "herbs", name: "Herbs", rank: 0, parent_category_id: null, description: "Bylinné tablety", metadata: { image: "/logo.webp", cta_label: "Objednat konzultaci", cta_url: "/kontakt" } },
+  { id: "pcat_gold", handle: "gold-edition", name: "Gold Edition", rank: 0, parent_category_id: "pcat_herbs", description: "Zlatá řada", metadata: { image: "/logo.webp" } },
+  { id: "pcat_cisteni", handle: "cisteni-a-exfoliace", name: "Čištění a exfoliace", rank: 0, parent_category_id: "pcat_dp", metadata: { image: "/logo.webp" } },
+  { id: "pcat_tcm", handle: "tcm", name: "TCM", rank: 1, parent_category_id: null },
+]
+
 // Clinic collections (seed/import-clinic.ts): the team and O nás. Procedures
 // come from the CMS (#43).
 const clinic = {
@@ -112,7 +156,7 @@ function relationsDepth(field) {
 function shippingFor(id) {
   if (isSk(carts.get(id)) || (!carts.has(id) && id.startsWith("cart_sk"))) {
     const itemSubtotal = (carts.get(id)?.items ?? [{ total: eurPrices.variant_test[0] }]).reduce((sum, item) => sum + item.total, 0)
-    return { option: shippingOptionSk, amount: itemSubtotal >= 200 ? 0 : 8 }
+    return { option: shippingOptionSk, amount: itemSubtotal >= 220 ? 0 : 10 }
   }
   if (id.startsWith("cart_pickup")) return { option: shippingOptions[1], amount: 0 }
   if (id.startsWith("cart_freeppl")) return { option: shippingOptions[0], amount: 0 }
@@ -124,7 +168,8 @@ function shippingFor(id) {
 const voucherItem = () => ({
   id: "item_voucher", variant_id: "variant_voucher", title: "Dárkový poukaz", product_title: "Dárkový poukaz", product_handle: "darkovy-poukaz",
   subtitle: "1 000 Kč", quantity: 1, unit_price: 1000, total: 1000, original_total: 1000, is_discountable: true, requires_shipping: false,
-  thumbnail: null, variant: { id: "variant_voucher", title: "1 000 Kč", options: [] }, product: { id: "prod_voucher", handle: "darkovy-poukaz" }, metadata: {},
+  thumbnail: "/logo.webp", product_type: "Dárkový poukaz",
+  variant: { id: "variant_voucher", title: "1 000 Kč", options: [] }, product: { id: "prod_voucher", handle: "darkovy-poukaz" }, metadata: {},
 })
 function cart(id) {
   if (!carts.has(id) && id.startsWith("cart_voucher")) {
@@ -248,7 +293,11 @@ const server = createServer(async (req, res) => {
   const data = body ? JSON.parse(body) : {}
   if (url.pathname === "/health") return send({ ok: true })
   if (url.pathname === "/__requests") return send(requests)
-  if (url.pathname === "/__reset") { carts.clear(); orders.clear(); requests.length = 0; gatewayOutcome = "PAID"; Object.assign(cartControls, { delayMs: 0, status: 200, message: "Košík se nepodařilo aktualizovat." }); promotionTiers = []; priceHistory = { current_amount: 1490, reference_price: 1690, history_complete: true }; customers.clear(); tokens.clear(); lastResetToken = null; return send({ ok: true }) }
+  if (url.pathname === "/__catalogue/price" && req.method === "POST") {
+    eurPrices[data.variant] = [data.amount, data.original ?? data.amount]
+    return send({ ok: true })
+  }
+  if (url.pathname === "/__reset") { Object.assign(eurPrices, structuredClone(EUR_PRICES)); carts.clear(); orders.clear(); requests.length = 0; gatewayOutcome = "PAID"; Object.assign(cartControls, { delayMs: 0, status: 200, message: "Košík se nepodařilo aktualizovat." }); promotionTiers = []; productTiers = []; priceHistory = { current_amount: 1490, reference_price: 1690, history_complete: true }; customers.clear(); tokens.clear(); lastResetToken = null; return send({ ok: true }) }
   if (url.pathname === "/__cart/seed") {
     const current = cart(data.cartId)
     if (data.quantity > 1) {
@@ -258,8 +307,8 @@ const server = createServer(async (req, res) => {
     recalcCart(current)
     return send({ cart: current })
   }
-  if (url.pathname === "/__promotion-tiers") { promotionTiers = data.tiers ?? []; return send({ ok: true }) }
-  if (url.pathname === "/store/promotion-tiers") return send({ tiers: promotionTiers })
+  if (url.pathname === "/__promotion-tiers") { promotionTiers = data.tiers ?? []; productTiers = data.product_tiers ?? []; return send({ ok: true }) }
+  if (url.pathname === "/store/promotion-tiers") return send({ tiers: promotionTiers, product_tiers: productTiers })
   if (url.pathname === "/__cart/controls") {
     Object.assign(cartControls, data)
     return send({ ok: true })
@@ -324,18 +373,46 @@ const server = createServer(async (req, res) => {
   if (url.pathname === "/store/regions/reg_test") return send({ region })
   if (url.pathname === "/store/regions/reg_sk") return send({ region: regionSk })
   if (url.pathname === "/store/collections") return send({ collections: [], count: 0 })
-  if (url.pathname === "/store/product-categories") return send({ product_categories: [], count: 0 })
+  if (url.pathname === "/store/product-categories") {
+    const handle = url.searchParams.get("handle")
+    // A category page asks by handle for the category with its children and parent.
+    const categories = handle
+      ? CATEGORIES.filter((c) => c.handle === handle).map((c) => ({
+          ...c,
+          category_children: CATEGORIES.filter((child) => child.parent_category_id === c.id),
+          parent_category: CATEGORIES.find((parent) => parent.id === c.parent_category_id) ?? null,
+        }))
+      : CATEGORIES
+    return send({ product_categories: categories, count: categories.length })
+  }
   if (url.pathname === "/store/products") {
     // The SDK encodes id arrays as id[0]=…; accept any id key.
     const regionId = url.searchParams.get("region_id")
     if (url.searchParams.get("handle") === giftProduct.handle) {
       return send({ products: [pricedFor(giftProduct, regionId)], count: 1 })
     }
+    const extra = byHandleOrIdOnly.find(
+      (p) => url.searchParams.get("handle") === p.handle || [...url.searchParams].some(([key, value]) => key.startsWith("id") && value === p.id)
+    )
+    if (extra) return send({ products: [pricedFor(extra, regionId)], count: 1 })
     // An unfiltered listing (Novinky's sale section) holds the sale product.
     const unfiltered = !url.searchParams.get("handle") && !url.searchParams.get("q") && ![...url.searchParams.keys()].some((key) => key.startsWith("id") || key.startsWith("collection_id") || key.startsWith("category_id"))
     if (unfiltered) return send({ products: [pricedFor(saleProduct, regionId)], count: 1 })
-    const wanted = url.searchParams.get("handle") === saleProduct.handle || [...url.searchParams].some(([key, value]) => key.startsWith("id") && value === saleProduct.id)
+    const wanted =
+      url.searchParams.get("handle") === saleProduct.handle ||
+      [...url.searchParams].some(([key, value]) => key.startsWith("id") && value === saleProduct.id) ||
+      [...url.searchParams].some(([key, value]) => key.startsWith("category_id") && saleProduct.categories.some((c) => c.id === value))
     return send(wanted ? { products: [pricedFor(saleProduct, regionId)], count: 1 } : { products: [], count: 0 })
+  }
+  if (url.pathname === `/store/products/${partieProduct.id}/price-history`) {
+    // The areas' regular prices, confirmed unless a test switches history off.
+    return send({
+      product_id: partieProduct.id, region_id: region.id,
+      variants: partieProduct.variants.map((v) => ({
+        variant_id: v.id, currency_code: "czk", current_amount: v.calculated_price.calculated_amount,
+        reference_price: v.calculated_price.calculated_amount, history_complete: priceHistory.history_complete,
+      })),
+    })
   }
   if (url.pathname === `/store/products/${saleProduct.id}/price-history`) {
     return send({ product_id: saleProduct.id, region_id: region.id, variants: [{ variant_id: "variant_sale", currency_code: "czk", ...priceHistory }] })
@@ -483,6 +560,21 @@ const server = createServer(async (req, res) => {
           id: "item_gift", variant_id: "variant_gift", title: giftProduct.title, product_title: giftProduct.title, product_handle: giftProduct.handle,
           quantity: 1, unit_price: isSk(current) ? eurPrices.variant_gift[0] : 199, total: isSk(current) ? eurPrices.variant_gift[0] : 199, original_total: isSk(current) ? eurPrices.variant_gift[0] : 199, is_discountable: false,
           thumbnail: null, variant: giftProduct.variants[0], product: giftProduct, metadata: {},
+        })
+      }
+      recalcCart(current)
+      return send({ cart: current })
+    }
+    // An Ultherapy area: each one its own voucher line (vewao-clients#70).
+    const area = partieProduct.variants.find((v) => v.id === data.variant_id)
+    if (area) {
+      const amount = area.calculated_price.calculated_amount
+      if (!current.items.some((item) => item.variant_id === area.id)) {
+        current.items.push({
+          id: `item_${area.id}`, variant_id: area.id, title: area.title, product_title: partieProduct.title, product_handle: partieProduct.handle,
+          product_type: "Dárkový poukaz", variant_title: area.title, subtitle: area.title, quantity: 1, unit_price: amount, total: amount, original_total: amount,
+          is_discountable: true, requires_shipping: false, thumbnail: partieProduct.thumbnail,
+          variant: { id: area.id, title: area.title, options: area.options }, product: { id: partieProduct.id, handle: partieProduct.handle }, metadata: {},
         })
       }
       recalcCart(current)

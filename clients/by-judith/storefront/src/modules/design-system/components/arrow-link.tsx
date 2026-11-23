@@ -5,7 +5,7 @@ import React from "react"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
 
 export type ArrowLinkProps = {
-  /** A shop path without the country code, e.g. "/collections/gold-edition". */
+  /** A shop path without the country code, e.g. "/categories/gold-edition". */
   href: string
   className?: string
   children: React.ReactNode

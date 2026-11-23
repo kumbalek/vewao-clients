@@ -84,9 +84,82 @@ test("the desktop header offers the wireframe navigation", async ({ page, isMobi
   const shop = nav.getByRole("button", { name: "Shop" })
   await shop.hover()
   await expect(shop).toHaveAttribute("aria-expanded", "true")
-  await page.getByRole("link", { name: "Všechny produkty" }).first().click()
-  await expect(page).toHaveURL(/\/cz\/store$/, NAVIGATION)
+  await header.getByRole("link", { name: /^Herbs/ }).click()
+  await expect(page).toHaveURL(/\/cz\/categories\/herbs$/, NAVIGATION)
   await expect(shop).toHaveAttribute("aria-expanded", "false")
+})
+
+test("the desktop Shop menu shows the categories as boxes; hovering one shows its subcategories in a row", async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(isMobile, "desktop layout")
+  await page.goto("/cz")
+  const header = page.getByRole("banner")
+  const shop = header.getByRole("navigation", { name: "Hlavní navigace" }).getByRole("button", { name: "Shop" })
+  await waitForHydration(page, shop)
+  await shop.hover()
+  await expect(shop).toHaveAttribute("aria-expanded", "true")
+
+  // A box: image, title and subtitle (the category's description).
+  const herbs = header.getByRole("link", { name: /^Herbs/ })
+  await expect(herbs).toHaveAttribute("href", "/cz/categories/herbs")
+  await expect(herbs).toContainText("Bylinné tablety")
+  await expect(herbs.locator("img")).toHaveAttribute("src", "/logo.webp")
+  await expect(header.getByRole("link", { name: "TCM", exact: true })).toHaveAttribute("href", "/cz/categories/tcm")
+  // Only the categories: the logo leads to the shop front, the footer to all products.
+  await expect(header.getByRole("link", { name: "Úvod e-shopu" })).toHaveCount(0)
+  await expect(header.getByRole("link", { name: "Všechny produkty" })).toHaveCount(0)
+
+  const dp = header.getByRole("list", { name: "DP Dermaceuticals" })
+  await expect(dp).toBeHidden()
+  await header.getByRole("link", { name: /^DP Dermaceuticals/ }).hover()
+  await expect(dp).toBeVisible()
+  // Smaller boxes without subtitles, in admin order (rank), not the API's order.
+  await expect(dp.getByRole("link")).toHaveText(["Čištění a exfoliace", "DP Masky"])
+  await expect(dp.getByRole("link", { name: "DP Masky" })).toHaveAttribute("href", "/cz/categories/dp-masky")
+  // Side by side under the categories, not in a column.
+  const [first, second] = await Promise.all([
+    dp.getByRole("link").nth(0).boundingBox(),
+    dp.getByRole("link").nth(1).boundingBox(),
+  ])
+  expect(Math.abs(first!.y - second!.y)).toBeLessThan(2)
+  expect(second!.x).toBeGreaterThan(first!.x + first!.width)
+
+  // Without a mouse: ArrowDown on a category moves into its subcategories.
+  await header.getByRole("link", { name: /^DP Dermaceuticals/ }).focus()
+  await page.keyboard.press("ArrowDown")
+  await expect(dp.getByRole("link", { name: "Čištění a exfoliace" })).toBeFocused()
+})
+
+test("the mobile Shop menu shows the category boxes; an arrow opens a category's subcategories", async ({
+  page,
+  isMobile,
+}) => {
+  test.skip(!isMobile, "mobile layout")
+  await page.goto("/cz")
+  const open = page.getByRole("button", { name: "Otevřít menu" })
+  await waitForHydration(page, open)
+  await open.click()
+  const menu = page.getByRole("dialog", { name: "Menu" })
+  await menu.getByText("Shop", { exact: true }).click()
+
+  const herbs = menu.getByRole("link", { name: /^Herbs/ })
+  await expect(herbs).toHaveAttribute("href", "/cz/categories/herbs")
+  await expect(herbs).toContainText("Bylinné tablety")
+  await expect(menu.getByRole("link", { name: "Úvod e-shopu" })).toHaveCount(0)
+  // Only categories with subcategories get an arrow.
+  await expect(menu.getByRole("button", { name: /TCM/ })).toHaveCount(0)
+
+  const dp = menu.getByRole("list", { name: "DP Dermaceuticals" })
+  const toggle = menu.getByRole("button", { name: "Zobrazit podkategorie: DP Dermaceuticals" })
+  await expect(dp).toBeHidden()
+  await expect(toggle).toHaveAttribute("aria-expanded", "false")
+  await toggle.click()
+  await expect(toggle).toHaveAttribute("aria-expanded", "true")
+  await expect(dp.getByRole("link")).toHaveText(["Čištění a exfoliace", "DP Masky"])
+  await toggle.click()
+  await expect(dp).toBeHidden()
 })
 
 test("the mobile header opens a full-screen menu", async ({ page, isMobile }) => {
@@ -150,7 +223,7 @@ test("header search lists matching products", async ({ page, isMobile, request }
   ).toBe(true)
 })
 
-test("the footer shows the real contact details and marks missing content", async ({
+test("the footer shows the real contact details and no placeholders", async ({
   page,
 }) => {
   await page.goto("/cz")
@@ -171,6 +244,18 @@ test("the footer shows the real contact details and marks missing content", asyn
   )
   // The test build enables analytics, so the consent settings are offered.
   await expect(footer.getByRole("button", { name: "Nastavení cookies" })).toBeVisible()
-  // Content the merchant has not supplied yet is visibly marked, never invented.
-  await expect(footer.locator("[data-placeholder]")).toHaveCount(4)
+  // The top-level categories, not their subcategories.
+  await expect(footer.getByRole("link", { name: "Herbs", exact: true })).toHaveAttribute("href", "/cz/categories/herbs")
+  await expect(footer.getByRole("link", { name: "DP Masky" })).toHaveCount(0)
+  await expect(footer.getByRole("link", { name: "Doprava a platba" })).toHaveAttribute(
+    "href",
+    "/cz/content/shipping-and-payment"
+  )
+  await expect(footer.getByTestId("footer-payment-methods")).toHaveAttribute(
+    "alt",
+    "Podporované platební metody: Comgate, Visa, Mastercard, Google Pay a Apple Pay"
+  )
+  // No placeholders: the brand text, social links and newsletter are not in this version (owner, 2026-11-22).
+  await expect(footer.locator("[data-placeholder]")).toHaveCount(0)
+  await expect(footer.getByText("Newsletter", { exact: false })).toHaveCount(0)
 })

@@ -5,8 +5,6 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import { CopyText, Placeholder } from "@modules/common/components/placeholder"
 import { ArrowLink, Container, Text } from "@modules/design-system"
 
-export type MenuCollection = { id: string; handle: string; title: string }
-
 const pillClasses =
   "block rounded-full border border-line bg-white px-4 py-2 text-sm text-ink transition-colors hover:bg-surface-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink overlay:border-white/30 overlay:bg-transparent overlay:text-white overlay:hover:bg-white/10 overlay:focus-visible:outline-white"
 
@@ -89,42 +87,4 @@ export function ProceduresPanel({ categories }: { categories: ProcedureCategory[
   )
 }
 
-/** The e-shop's front page, its collections from the catalogue and the full product list. */
-export function ShopPanel({ collections }: { collections: MenuCollection[] }) {
-  const t = useTranslations("layout")
-
-  return (
-    <Container width="page" className="flex flex-col gap-4 py-8">
-      <ArrowLink href="/shop" className={`text-sm ${overlayArrow}`}>
-        {t("shopHome")}
-      </ArrowLink>
-      {collections.length > 0 && (
-        <>
-          <Text
-            as="span"
-            size="xs"
-            tone="subtle"
-            className={`uppercase tracking-widest ${overlayLabel}`}
-          >
-            {t("collections")}
-          </Text>
-          <ul className="flex flex-wrap gap-2">
-            {collections.map((collection) => (
-              <li key={collection.id}>
-                <LocalizedClientLink
-                  href={`/collections/${collection.handle}`}
-                  className={pillClasses}
-                >
-                  {collection.title}
-                </LocalizedClientLink>
-              </li>
-            ))}
-          </ul>
-        </>
-      )}
-      <ArrowLink href="/store" className={`text-sm ${overlayArrow}`}>
-        {t("allProducts")}
-      </ArrowLink>
-    </Container>
-  )
-}
+export { default as ShopPanel } from "./shop-panel"

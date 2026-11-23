@@ -6,6 +6,8 @@ import { HttpTypes } from "@medusajs/types"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import { getAuthHeaders, getCacheOptions } from "./cookies"
 import { getRegion, retrieveRegion } from "./regions"
+import { PRODUCT_LIST_FIELDS } from "@lib/util/product-fields"
+import { catalogueRevalidate } from "@lib/util/catalogue-cache"
 
 export const listProducts = async ({
   pageParam = 1,
@@ -62,13 +64,11 @@ export const listProducts = async ({
           limit,
           offset,
           region_id: region?.id,
-          fields:
-            "*variants.calculated_price,+variants.inventory_quantity,+metadata,+tags",
+          fields: PRODUCT_LIST_FIELDS,
           ...queryParams,
         },
         headers,
-        next,
-        cache: "force-cache",
+        next: { ...next, revalidate: catalogueRevalidate() },
       }
     )
     .then(({ products, count }) => {
@@ -132,5 +132,43 @@ export const listProductsWithSort = async ({
     },
     nextPage,
     queryParams,
+  }
+}
+
+/**
+ * The header search (vewao-clients#70): products whose own texts match
+ * (Medusa's `q`) and the products of the categories whose names match,
+ * without duplicates, sorted and paged like the product list.
+ */
+export const searchProducts = async ({
+  query,
+  categoryIds,
+  page = 1,
+  sortBy = "created_at",
+  countryCode,
+  limit = 12,
+}: {
+  query: string
+  categoryIds: string[]
+  page?: number
+  sortBy?: SortOptions
+  countryCode: string
+  limit?: number
+}): Promise<{ response: { products: HttpTypes.StoreProduct[]; count: number } }> => {
+  const [byText, byCategory] = await Promise.all([
+    listProducts({ pageParam: 0, queryParams: { q: query, limit: 100 }, countryCode }),
+    categoryIds.length
+      ? listProducts({ pageParam: 0, queryParams: { category_id: categoryIds, limit: 100 }, countryCode })
+      : Promise.resolve({ response: { products: [] as HttpTypes.StoreProduct[], count: 0 } }),
+  ])
+  const seen = new Set<string>()
+  const merged = byText.response.products.concat(byCategory.response.products).filter((product) => {
+    if (seen.has(product.id)) return false
+    seen.add(product.id)
+    return true
+  })
+  const start = (page - 1) * limit
+  return {
+    response: { products: sortProducts(merged, sortBy).slice(start, start + limit), count: merged.length },
   }
 }
