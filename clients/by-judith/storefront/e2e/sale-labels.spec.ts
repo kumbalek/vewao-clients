@@ -1,4 +1,4 @@
-import { expect as baseExpect, test, type APIRequestContext } from "@playwright/test"
+import { expect as baseExpect, test, type APIRequestContext, type Page } from "@playwright/test"
 
 import { NEEDS_PAYLOAD, SHOP, ensureDoc, hasPayload, payloadAuth } from "./support/payload"
 
@@ -18,6 +18,18 @@ const running = (request: APIRequestContext, sales: { promotions?: string[]; pri
 
 const cartCookie = (value: string) => ({ name: "_medusa_cart_id", value, url: SHOP, sameSite: "Lax" as const })
 
+/**
+ * Opens `url` until `check` passes. After its cache window (1 s in these
+ * tests) the shop answers once from the old entry while it asks Medusa again,
+ * so the first look can still show what an earlier spec left running.
+ */
+async function lookUntil(page: Page, url: string, check: () => Promise<void>) {
+  await expect(async () => {
+    await page.goto(url)
+    await check()
+  }).toPass()
+}
+
 test.describe("sale labels", () => {
   test.beforeEach(async ({ isMobile, request }) => {
     test.skip(isMobile, "CMS flow runs once")
@@ -34,9 +46,8 @@ test.describe("sale labels", () => {
   })
 
   test("a running sale's label sits beside the title of its category and its subcategories", async ({ page }) => {
-    await page.goto("/cz/categories/herbs")
     const label = page.getByTestId("category-container").getByTestId("sale-label")
-    await expect(label).toHaveCount(1)
+    await lookUntil(page, "/cz/categories/herbs", () => expect(label).toHaveCount(1, { timeout: 2_000 }))
     await expect(label).toContainText("2 + 1 ZDARMA")
     // The description is behind the "i".
     await expect(label.getByRole("button", { name: "Podrobnosti akce" })).toBeVisible()
@@ -50,10 +61,9 @@ test.describe("sale labels", () => {
   })
 
   test("on a product of the category the label sits under the title, before the description", async ({ page }) => {
-    await page.goto("/cz/products/akcni-produkt")
     const product = page.getByTestId("product-container")
     const label = product.getByTestId("sale-label")
-    await expect(label).toContainText("2 + 1 ZDARMA")
+    await lookUntil(page, "/cz/products/akcni-produkt", () => expect(label).toContainText("2 + 1 ZDARMA", { timeout: 2_000 }))
     await expect(label).toContainText("Třetí bylinka zdarma.")
 
     const [title, box, description] = await Promise.all([
@@ -68,11 +78,10 @@ test.describe("sale labels", () => {
   test("an ended sale loses its labels", async ({ page, request }) => {
     await running(request, { promotions: [], price_lists: [PRICE_LIST.code] })
     // The shop asks Medusa again after its cache window (1 s in these tests).
-    await expect(async () => {
-      await page.goto("/cz/categories/herbs")
+    await lookUntil(page, "/cz/categories/herbs", async () => {
       await expect(page.getByTestId("category-page-title")).toBeVisible()
       await expect(page.getByTestId("sale-label")).toHaveCount(0, { timeout: 1_000 })
-    }).toPass()
+    })
   })
 
   test("the cart lists the sales it gets under its summary", async ({ page, context, request }) => {
@@ -80,9 +89,8 @@ test.describe("sale labels", () => {
     const promoted = `cart_test_${crypto.randomUUID()}`
     await request.post(`${MOCK}/__cart/seed`, { data: { cartId: promoted, promotions: [{ id: "promo_e2e", code: HERBS.code, is_automatic: true }] } })
     await context.addCookies([cartCookie(promoted)])
-    await page.goto("/cz/cart")
     const sales = page.getByTestId("active-sales")
-    await expect(sales.getByRole("heading", { name: "Aktivní slevy" })).toBeVisible()
+    await lookUntil(page, "/cz/cart", () => expect(sales.getByRole("heading", { name: "Aktivní slevy" })).toBeVisible({ timeout: 2_000 }))
     await expect(sales.getByTestId("sale-label")).toHaveCount(1)
     await expect(sales.getByTestId("sale-label")).toContainText("Třetí bylinka zdarma.")
 
