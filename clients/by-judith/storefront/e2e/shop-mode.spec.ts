@@ -38,7 +38,8 @@ test("the home page opens with the video hero, its claims without links", async 
   const hero = page.getByTestId("landing-hero")
   await expect(hero).toBeVisible()
   await expect(hero.getByRole("heading", { level: 1 })).toHaveAccessibleName("Snoubíme západ s východem")
-  await expect(hero.getByTestId("landing-beat")).toHaveCount(4)
+  // The four claims are headings in both layouts, the animated and the reduced-motion one.
+  await expect(hero.getByRole("heading")).toHaveCount(4)
   await expect(hero.getByRole("link")).toHaveCount(0)
   // It starts under the e-shop's header (no booking bar), which floats over it.
   expect(Math.round((await hero.boundingBox())!.y)).toBe(0)
