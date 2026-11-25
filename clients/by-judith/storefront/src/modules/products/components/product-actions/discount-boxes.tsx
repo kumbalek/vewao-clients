@@ -29,7 +29,7 @@ export default function DiscountBoxes({ tiers, count }: { tiers: ProductTier[]; 
             className={clx(
               "flex flex-col items-center justify-center gap-1 rounded-popover border px-4 py-4 text-center transition-all duration-300",
               lit
-                ? "border-gold bg-white text-ink shadow-[0_0_0_1px_#D7B46B,0_0_24px_rgb(215_180_107/0.55)]"
+                ? "border-gold bg-white text-ink shadow-[0_0_24px_rgb(215_180_107/0.55)]"
                 : "border-dashed border-line bg-surface text-ink-muted opacity-60"
             )}
           >

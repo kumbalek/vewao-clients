@@ -6,8 +6,9 @@ import { InfoTip } from "@modules/design-system"
 
 /** The lit discount box of the Ultherapy areas (vewao-clients#70), so every sale looks alike. */
 const LIT = "border border-gold bg-white text-ink"
-const GLOW = "shadow-[0_0_0_1px_#D7B46B,0_0_24px_rgb(215_180_107/0.55)]"
-const SMALL_GLOW = "shadow-[0_0_0_1px_#D7B46B,0_0_16px_rgb(215_180_107/0.45)]"
+// The 1px gold border is the box's own; the shadow adds only the glow (owner, 2026-11-24).
+const GLOW = "shadow-[0_0_24px_rgb(215_180_107/0.55)]"
+const SMALL_GLOW = "shadow-[0_0_16px_rgb(215_180_107/0.45)]"
 
 /**
  * Running sales' labels from the CMS (owner, 2026-11-22). `box`: a lit box
