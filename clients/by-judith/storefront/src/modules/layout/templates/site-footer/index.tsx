@@ -65,15 +65,16 @@ export default function SiteFooter({
         width="page"
         className="grid gap-10 py-12 xsmall:grid-cols-2 small:grid-cols-3 small:py-16"
       >
-        <div className="flex flex-col items-start gap-4">
-          <LocalizedClientLink href="/" className={linkClasses}>
-            {/* The logo file has a white background; multiply drops it on the grey. */}
+        <div className="flex flex-col gap-4">
+          {/* The full logo, the mark with the name, at 70 % of its column's
+              width; the height follows its proportions (owner, 2026-11-25). */}
+          <LocalizedClientLink href="/" className={`block w-[70%] ${linkClasses}`}>
             <Image
-              src="/logo.webp"
+              src="/logo_new_full.svg"
               alt={t("logoAlt")}
-              width={120}
-              height={41}
-              className="mix-blend-multiply"
+              width={463}
+              height={405}
+              className="h-auto w-full"
             />
           </LocalizedClientLink>
         </div>

@@ -96,8 +96,9 @@ export default async function PaginatedProducts({
 
   return (
     <>
+      {/* One card per row on phones, two from 512px (owner, 2026-11-25). */}
       <ul
-        className="grid grid-cols-2 w-full small:grid-cols-3 medium:grid-cols-4 gap-x-6 gap-y-8"
+        className="grid grid-cols-1 xsmall:grid-cols-2 w-full small:grid-cols-3 medium:grid-cols-4 gap-x-6 gap-y-8"
         data-testid="products-list"
       >
         {filteredProducts.map((p) => {

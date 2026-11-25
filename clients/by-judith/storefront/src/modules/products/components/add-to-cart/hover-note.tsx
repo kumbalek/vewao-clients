@@ -24,17 +24,17 @@ export default function HoverNote({
   const [hovered, setHovered] = useState(false)
   const [focused, setFocused] = useState(false)
   const [dismissed, setDismissed] = useState(false)
-  const shown = hovered || focused
 
-  // A hovered note has no focus inside, so Escape is heard on the document.
+  // A hovered note has no focus inside, so Escape is heard on the document. With
+  // focus inside, onKeyDown below hears it at once, before this effect has run.
   useEffect(() => {
-    if (!shown) return
+    if (!hovered) return
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") setDismissed(true)
     }
     document.addEventListener("keydown", onKey)
     return () => document.removeEventListener("keydown", onKey)
-  }, [shown])
+  }, [hovered])
 
   return (
     <div
@@ -49,6 +49,9 @@ export default function HoverNote({
       onBlur={() => {
         setFocused(false)
         if (!hovered) setDismissed(false)
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "Escape") setDismissed(true)
       }}
       data-testid={testId}
     >

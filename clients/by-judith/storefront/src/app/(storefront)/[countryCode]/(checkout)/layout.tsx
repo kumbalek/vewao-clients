@@ -35,10 +35,10 @@ export default function CheckoutLayout({
             data-testid="store-link"
           >
             <Image
-              src="/logo.svg"
+              src="/logo_new.svg"
               alt={tLayout("logoAlt")}
-              width={160}
-              height={202}
+              width={157}
+              height={198}
               className="h-11 w-auto"
             />
           </LocalizedClientLink>
