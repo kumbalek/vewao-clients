@@ -89,6 +89,13 @@ test("a product with a choice shows an i that explains it and leads to the produ
   await expect(link).toHaveAccessibleDescription("Produkt má více variant, vyberte na detailu.")
   await expect(note).toBeHidden()
 
+  // The card is server-rendered: CSS shows the note on focus at once, but Escape
+  // is React's to handle, so wait until React has hydrated the link (CI, main run
+  // of 2026-11-25).
+  await page.waitForFunction(
+    (element) => !!element && Object.keys(element).some((key) => key.startsWith("__reactFiber")),
+    await link.elementHandle()
+  )
   await link.focus()
   await expect(note).toBeVisible()
   await page.keyboard.press("Escape")

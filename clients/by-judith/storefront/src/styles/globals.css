@@ -3,6 +3,28 @@
 @import "tailwindcss/utilities";
 
 @layer utilities {
+  /*
+   * Medusa UI's text classes (txt-compact-medium and the like) hard-code Inter;
+   * the site is set in Quiche throughout (owner, 2026-11-25). In this layer the
+   * rule comes after the preset's.
+   */
+  [class*="txt-"] {
+    font-family: theme("fontFamily.sans");
+  }
+  /* Their important variants (!txt-medium on the checkbox label) set Inter with !important. */
+  [class*="!txt-"] {
+    font-family: theme("fontFamily.sans") !important;
+  }
+
+  /*
+   * Every button is a pill, as the add-to-cart is (owner, 2026-11-25): Medusa
+   * UI's Button (cart, checkout, account) comes with 6px corners.
+   */
+  button.transition-fg.rounded-md,
+  a.transition-fg.rounded-md {
+    border-radius: 9999px;
+  }
+
   /* 4px, a quarter of the original 16px (owner, 2026-11-25). */
   .scrollbar::-webkit-scrollbar {
     width: 4px;
@@ -131,17 +153,18 @@
   }
 
   /*
-   * The add-to-cart's flat colour (vewao-clients#75; owner, 2026-11-25): an
-   * olive brown, a shade darker on hover. White on it is 8.2:1.
+   * The add-to-cart's flat colour (vewao-clients#75; owner, 2026-11-25): the
+   * off-black of the product page's price, a shade lighter on hover. White on
+   * it is 17.7:1.
    */
   .buy-button {
     border-radius: 9999px;
     color: theme("colors.white");
-    background-color: #535039;
+    background-color: theme("colors.ink.DEFAULT");
     transition: background-color 0.15s;
   }
   .buy-button:hover:not(:disabled, [aria-disabled="true"]) {
-    background-color: #474430;
+    background-color: theme("colors.action.DEFAULT");
   }
   /* Unavailable: dimmed, and a note says why instead of a "not allowed" cursor (owner, 2026-11-24). */
   .buy-button:disabled,
