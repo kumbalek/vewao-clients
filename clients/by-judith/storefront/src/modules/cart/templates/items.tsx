@@ -21,21 +21,28 @@ const ItemsTemplate = ({ cart }: ItemsTemplateProps) => {
           {t("title")}
         </Heading>
       </div>
-      <Table>
-        <Table.Header className="border-t-0">
-          <Table.Row className="text-ui-fg-subtle txt-medium-plus">
-            <Table.HeaderCell>{t("item")}</Table.HeaderCell>
-            <Table.HeaderCell></Table.HeaderCell>
-            <Table.HeaderCell>{t("quantity")}</Table.HeaderCell>
+      {/* Below 1024px the rows are two-column grids, so a phone needs no
+          sideways scroll: the photo over the title on the left, the quantity
+          over the line total on the right (owner, 2026-11-25). */}
+      <Table className="max-small:block">
+        <Table.Header className="border-t-0 max-small:block">
+          <Table.Row className="text-ui-fg-subtle txt-medium-plus max-small:grid max-small:grid-cols-[minmax(0,1fr)_auto] max-small:items-center max-small:gap-x-4 max-small:px-4 max-small:py-2">
+            <Table.HeaderCell className="max-small:row-span-2 max-small:h-auto max-small:!p-0">
+              {t("item")}
+            </Table.HeaderCell>
+            <Table.HeaderCell className="max-small:hidden"></Table.HeaderCell>
+            <Table.HeaderCell className="max-small:h-auto max-small:!p-0 max-small:text-right">
+              {t("quantity")}
+            </Table.HeaderCell>
             <Table.HeaderCell className="hidden small:table-cell">
               {t("price")}
             </Table.HeaderCell>
-            <Table.HeaderCell className="text-right">
+            <Table.HeaderCell className="text-right max-small:h-auto max-small:!p-0">
               {t("total")}
             </Table.HeaderCell>
           </Table.Row>
         </Table.Header>
-        <Table.Body>
+        <Table.Body className="max-small:block">
           {items
             ? items
                 .sort((a, b) => {
