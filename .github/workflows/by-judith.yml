@@ -1,9 +1,11 @@
 name: By Judith CI and dev deployment
+# Tests run once, on main, before the image and the deploy. Pull requests into
+# develop and the develop → main release ran the same suite again; the full
+# suite runs locally before a release instead (owner, 2026-11-25). A branch can
+# still be tested on demand with "Run workflow" (workflow_dispatch).
 on:
   push:
     branches: [main]
-    paths: ['clients/by-judith/**', '.github/workflows/by-judith.yml']
-  pull_request:
     paths: ['clients/by-judith/**', '.github/workflows/by-judith.yml']
   workflow_dispatch:
 concurrency:
