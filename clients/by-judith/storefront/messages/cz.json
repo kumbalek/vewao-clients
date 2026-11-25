@@ -84,7 +84,7 @@
     "quantity": "Počet",
     "item": "Položka",
     "price": "Cena",
-    "total": "Součet",
+    "total": "Celková cena",
     "summary": "Přehled",
     "activeSales": "Aktivní slevy",
     "goToCheckout": "Přejít k objednávce",
@@ -295,7 +295,7 @@
     "contact": "Kontakt",
     "magazin": "Magazín",
     "about": "O nás",
-    "copyright": "© {year} Herbs by JuditH",
+    "copyright": "© {year} Clinic by JuditH",
     "shippingPayment": "Doprava a platba",
     "paymentMethods": "Podporované platební metody: Comgate, Visa, Mastercard, Google Pay a Apple Pay"
   },

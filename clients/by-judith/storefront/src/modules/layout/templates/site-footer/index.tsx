@@ -65,7 +65,9 @@ export default function SiteFooter({
         width="page"
         className="grid gap-10 py-12 xsmall:grid-cols-2 small:grid-cols-3 small:py-16"
       >
-        <div className="flex flex-col gap-4">
+        {/* The cell stretches to the row's height: the logo sits in its middle,
+            across and down (owner, 2026-11-25). */}
+        <div className="flex items-center justify-center">
           {/* The full logo, the mark with the name, at 70 % of its column's
               width; the height follows its proportions (owner, 2026-11-25). */}
           <LocalizedClientLink href="/" className={`block w-[70%] ${linkClasses}`}>

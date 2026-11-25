@@ -183,7 +183,7 @@ function cart(id) {
     carts.set(id, {
       id, region_id: region.id, region, currency_code: "czk", email: "test@example.invalid", completed_at: null,
       shipping_address: address, billing_address: address, items, shipping_methods: [],
-      total: itemTotal, subtotal: itemTotal, item_subtotal: itemTotal, item_total: itemTotal, shipping_subtotal: 0, shipping_total: 0,
+      total: itemTotal, subtotal: itemTotal, item_subtotal: itemTotal, item_total: itemTotal, original_item_total: itemTotal, shipping_subtotal: 0, shipping_total: 0, original_shipping_total: 0,
       discount_total: 0, tax_total: 0, original_total: itemTotal, promotions: [],
       payment_collection: { id: `paycol_${id}`, payment_sessions: [] },
     })
@@ -197,7 +197,7 @@ function cart(id) {
       shipping_address: addressSk, billing_address: addressSk,
       items: [{ id: "item_test", variant_id: "variant_test", title: "Testovací produkt", product_title: "Testovací produkt", product_handle: "testovaci-produkt", quantity: 1, unit_price: price, total: price, original_total: price, is_discountable: true, thumbnail: "/logo.webp", variant: { id: "variant_test", title: "Standard", options: [] }, product: { id: "prod_test", handle: "testovaci-produkt" }, metadata: {} }],
       shipping_methods: [{ id: "sm_test", shipping_option_id: option.id, name: option.name, amount, total: amount }],
-      total: price + amount, subtotal: price + amount, item_subtotal: price, item_total: price, shipping_subtotal: amount, shipping_total: amount,
+      total: price + amount, subtotal: price + amount, item_subtotal: price, item_total: price, original_item_total: price, shipping_subtotal: amount, shipping_total: amount, original_shipping_total: amount,
       discount_total: 0, tax_total: 0, original_total: price + amount, promotions: [],
       payment_collection: { id: `paycol_${id}`, payment_sessions: [] },
     })
@@ -210,7 +210,7 @@ function cart(id) {
       items: [{ id: "item_test", variant_id: "variant_test", title: "Testovací produkt", product_title: "Testovací produkt", product_handle: "testovaci-produkt", quantity: 1, unit_price: 490, total: 490, original_total: 490, is_discountable: true, thumbnail: "/logo.webp", variant: { id: "variant_test", title: "Standard", options: [] }, product: { id: "prod_test", handle: "testovaci-produkt" }, metadata: {} }],
       shipping_methods: [{ id: "sm_test", shipping_option_id: option.id, name: option.name, amount, total: amount }],
       // As in Medusa 2.20: `subtotal` includes shipping; `item_subtotal` does not.
-      total: 490 + amount, subtotal: 490 + amount, item_subtotal: 490, item_total: 490, shipping_subtotal: amount, shipping_total: amount,
+      total: 490 + amount, subtotal: 490 + amount, item_subtotal: 490, item_total: 490, original_item_total: 490, shipping_subtotal: amount, shipping_total: amount, original_shipping_total: amount,
       discount_total: 0, tax_total: 0, original_total: 490 + amount, promotions: [],
       payment_collection: { id: `paycol_${id}`, payment_sessions: [] },
     })
@@ -228,9 +228,10 @@ function recalcCart(current) {
   lineDefaults(current)
   current.item_subtotal = current.items.reduce((sum, item) => sum + item.total, 0)
   current.item_total = current.item_subtotal
+  current.original_item_total = current.item_subtotal
   if (current.items.every((item) => item.requires_shipping === false)) {
     // Vouchers alone: no shipping method, nothing to pay for delivery.
-    Object.assign(current, { shipping_methods: [], shipping_subtotal: 0, shipping_total: 0, discount_total: 0 })
+    Object.assign(current, { shipping_methods: [], shipping_subtotal: 0, shipping_total: 0, original_shipping_total: 0, discount_total: 0 })
     current.subtotal = current.item_subtotal
     current.total = current.subtotal
     current.original_total = current.subtotal
@@ -239,6 +240,7 @@ function recalcCart(current) {
   const { option, amount } = shippingFor(current.id)
   current.shipping_subtotal = amount
   current.shipping_total = amount
+  current.original_shipping_total = amount
   current.shipping_methods = [{ id: "sm_test", shipping_option_id: option.id, name: option.name, amount, total: amount }]
   current.discount_total = current.id.startsWith("cart_discount") ? 100 : 0
   current.subtotal = current.item_subtotal + amount
@@ -268,8 +270,8 @@ function placeOrder(current, session) {
     customer_id: current.customer_id ?? null,
     currency_code: "czk", status: "pending", payment_status: session.provider_id === "pp_system_default" ? "authorized" : "captured",
     fulfillment_status: "not_fulfilled", items: current.items, shipping_address: current.shipping_address,
-    shipping_methods: current.shipping_methods, subtotal: current.subtotal, item_subtotal: current.item_subtotal, item_total: current.item_total,
-    total: current.total, shipping_total: current.shipping_total, shipping_subtotal: current.shipping_subtotal,
+    shipping_methods: current.shipping_methods, subtotal: current.subtotal, item_subtotal: current.item_subtotal, item_total: current.item_total, original_item_total: current.original_item_total,
+    total: current.total, shipping_total: current.shipping_total, original_shipping_total: current.original_shipping_total, shipping_subtotal: current.shipping_subtotal,
     discount_total: 0, tax_total: 0, original_total: current.total,
     payment_collections: [{ payments: [{ id: "pay_test", provider_id: session.provider_id, amount: current.total, created_at: new Date().toISOString() }] }],
   }
@@ -346,7 +348,7 @@ const server = createServer(async (req, res) => {
       }],
       shipping_address: jana.addresses[0],
       shipping_methods: [{ id: "sm_account_1", name: "PPL", amount: 150, total: 150 }],
-      subtotal: 2980, item_subtotal: 2980, item_total: 2980, shipping_total: 150, shipping_subtotal: 150,
+      subtotal: 2980, item_subtotal: 2980, item_total: 2980, original_item_total: 2980, shipping_total: 150, original_shipping_total: 150, shipping_subtotal: 150,
       discount_total: 0, tax_total: 0, total: 3130, original_total: 3130,
       payment_collections: [{ payments: [{ id: "pay_account_1", provider_id: "pp_comgate_comgate", amount: 3130, created_at: "2026-10-01T09:31:00.000Z" }] }],
     })

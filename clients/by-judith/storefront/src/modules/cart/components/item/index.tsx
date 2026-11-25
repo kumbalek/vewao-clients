@@ -55,10 +55,24 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
   }
 
   const maxQuantity = Math.max(item.quantity + 10, 20)
+  // The cart page's table, below 1024px: the photo over the title, the quantity
+  // over the line total (see ItemsTemplate). Not the checkout's preview.
+  const stacked = type === "full"
 
   return (
-    <Table.Row className="w-full" data-testid="product-row">
-      <Table.Cell className="p-4 w-24">
+    <Table.Row
+      className={clx("w-full", {
+        "max-small:grid max-small:grid-cols-[minmax(0,1fr)_auto] max-small:items-center max-small:gap-x-4 max-small:gap-y-2 max-small:px-4 max-small:py-4":
+          stacked,
+      })}
+      data-testid="product-row"
+    >
+      <Table.Cell
+        className={clx("p-4 w-24", {
+          "max-small:col-start-1 max-small:row-start-1 max-small:h-auto max-small:w-auto max-small:!p-0":
+            stacked,
+        })}
+      >
         {isGiftPackaging ? (
           <Thumbnail
             thumbnail={item.thumbnail}
@@ -83,7 +97,12 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
         )}
       </Table.Cell>
 
-      <Table.Cell className="text-left">
+      <Table.Cell
+        className={clx("text-left", {
+          "max-small:col-start-1 max-small:row-start-2 max-small:h-auto max-small:!p-0":
+            stacked,
+        })}
+      >
         <Text
           className="txt-medium-plus text-ui-fg-base"
           data-testid="product-title"
@@ -99,8 +118,8 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
       </Table.Cell>
 
       {type === "full" && (
-        <Table.Cell>
-          <div className="flex gap-2 items-center w-28">
+        <Table.Cell className="max-small:col-start-2 max-small:row-start-1 max-small:h-auto max-small:!p-0">
+          <div className="flex gap-2 items-center w-28 max-small:justify-end">
             <DeleteButton
               id={item.id}
               data-testid="product-delete-button"
@@ -151,7 +170,12 @@ const Item = ({ item, type = "full", currencyCode }: ItemProps) => {
         </Table.Cell>
       )}
 
-      <Table.Cell className="">
+      <Table.Cell
+        className={clx({
+          "max-small:col-start-2 max-small:row-start-2 max-small:h-auto max-small:!p-0 max-small:text-right":
+            stacked,
+        })}
+      >
         <span
           className={clx("!pr-0", {
             "flex flex-col items-end h-full justify-center": type === "preview",

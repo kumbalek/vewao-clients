@@ -9,6 +9,8 @@ type CartTotalsProps = {
     total?: number | null
     subtotal?: number | null
     item_subtotal?: number | null
+    original_item_total?: number | null
+    original_shipping_total?: number | null
     tax_total?: number | null
     shipping_total?: number | null
     discount_total?: number | null
@@ -24,15 +26,21 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
     total,
     subtotal,
     item_subtotal,
+    original_item_total,
+    original_shipping_total,
     tax_total,
     discount_total,
     gift_card_total,
     shipping_subtotal,
   } = totals
   const t = useTranslations("cart")
-  // Medusa's `subtotal` already includes shipping, which is listed below.
+  // Every line with VAT, as the prices are shown (owner, 2026-11-25): the goods
+  // and the delivery before discounts, so that subtotal − discount + shipping
+  // is the total. Medusa's `item_subtotal` and `shipping_subtotal` are without
+  // VAT (a 1 890 Kč herb showed as 1 562 Kč, PPL's 150 Kč as 124 Kč).
   const itemsSubtotal =
-    item_subtotal ?? (subtotal ?? 0) - (shipping_subtotal ?? 0)
+    original_item_total ?? item_subtotal ?? (subtotal ?? 0) - (shipping_subtotal ?? 0)
+  const shipping = original_shipping_total ?? shipping_subtotal ?? 0
 
   return (
     <div>
@@ -58,8 +66,8 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
         )}
         <div className="flex items-center justify-between">
           <span>{t("shipping")}</span>
-          <span data-testid="cart-shipping" data-value={shipping_subtotal || 0}>
-            {convertToLocale({ amount: shipping_subtotal ?? 0, currency_code })}
+          <span data-testid="cart-shipping" data-value={shipping}>
+            {convertToLocale({ amount: shipping, currency_code })}
           </span>
         </div>
         {/* <div className="flex justify-between">

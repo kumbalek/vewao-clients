@@ -31,11 +31,16 @@ test("customer service links to Doprava a platba", async ({ page }) => {
   await expect(link).toHaveAttribute("href", "/cz/content/shipping-and-payment")
 })
 
-for (const path of ["/cz/content/terms-of-use", "/cz/content/privacy-policy"]) {
+// The terms name the seller in a box, the privacy information as its controller
+// (texts of 2026-12-01, vewao-clients#85); both with the commercial register entry.
+for (const [path, heading] of [
+  ["/cz/content/terms-of-use", "Prodávající:"],
+  ["/cz/content/privacy-policy", "1. Správce osobních údajů"],
+]) {
   test(`${path} names the seller with the commercial register entry`, async ({ page }) => {
     await page.goto(path)
 
-    const seller = page.getByRole("heading", { name: "Prodávající:" }).locator("..")
+    const seller = page.getByRole("heading", { name: heading }).locator("..")
     await expect(seller).toContainText("Mgr. Judita Halvová")
     await expect(seller).toContainText("64417441")
     await expect(seller).toContainText(
@@ -43,3 +48,14 @@ for (const path of ["/cz/content/terms-of-use", "/cz/content/privacy-policy"]) {
     )
   })
 }
+
+test("the terms name the checkout's last button and link the withdrawal form", async ({ page }) => {
+  await page.goto("/cz/content/terms-of-use")
+
+  const terms = page.getByTestId("legal-document")
+  await expect(terms).toContainText("tlačítko označené „Objednat s povinností platby“")
+  await expect(
+    terms.getByRole("link", { name: "https://www.by-judith.com/cz/odstoupeni-od-smlouvy" }).first()
+  ).toHaveAttribute("href", "/cz/odstoupeni-od-smlouvy")
+  await expect(terms).not.toContainText(/příloh\S* č\./)
+})
