@@ -14,6 +14,8 @@ import { clx } from "@medusajs/ui"
 import { categoryCta, categoryImage } from "@lib/util/menu-categories"
 import { ButtonLink, buttonClasses } from "@modules/design-system"
 import CategoryBox from "@modules/layout/components/category-box"
+import SaleLabels from "@modules/common/components/sale-labels"
+import type { SaleLabel } from "@lib/util/sale-labels"
 
 const ctaPlacement = "shrink-0 self-start small:self-center"
 
@@ -22,11 +24,14 @@ export default function CategoryTemplate({
   sortBy,
   page,
   countryCode,
+  saleLabels = [],
 }: {
   category: HttpTypes.StoreProductCategory
   sortBy?: SortOptions
   page?: string
   countryCode: string
+  /** Labels of the running sales on this category or its parents. */
+  saleLabels?: SaleLabel[]
 }) {
   const t = useTranslations("product")
   const pageNumber = page ? parseInt(page) : 1
@@ -71,11 +76,15 @@ export default function CategoryTemplate({
       <div className="w-full">
         {/* The title with its subtitle close under it; the category's call to action
             beside them from `small` up, under them on a phone (vewao-clients#70). The
-            title is 15 % above text-2xl. */}
+            title is as large as the home page's category headings (owner, 2026-11-25). */}
         <div className="mb-8 flex flex-col gap-4 small:flex-row small:items-center small:justify-between small:gap-8">
           <div className="flex min-w-0 flex-col gap-2">
-            <div className="text-[1.725rem] leading-tight">
-              <h1 data-testid="category-page-title">{category.name}</h1>
+            {/* The running sales' labels beside the title, at its top (owner, 2026-11-22). */}
+            <div className="flex flex-wrap items-start gap-x-4 gap-y-2">
+              <h1 data-testid="category-page-title" className="text-4xl leading-tight small:text-6xl">
+                {category.name}
+              </h1>
+              <SaleLabels labels={saleLabels} variant="chip" className="pt-0.5" />
             </div>
             {category.description && (
               <p data-testid="category-description" className="text-base-regular">

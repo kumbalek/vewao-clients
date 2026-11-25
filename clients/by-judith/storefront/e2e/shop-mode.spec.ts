@@ -28,7 +28,7 @@ async function waitForHydration(page: Page, control: Locator) {
 test("the home page is the e-shop's front page", async ({ page }) => {
   await page.goto("/cz")
   await expect(page).toHaveTitle("JuditH")
-  await expect(page.getByRole("heading", { level: 2, name: "Naše produkty" })).toBeVisible()
+  await expect(page.getByTestId("category-rail").first()).toBeVisible()
   await expect(page.getByTestId("landing-hero")).toHaveCount(0)
 })
 

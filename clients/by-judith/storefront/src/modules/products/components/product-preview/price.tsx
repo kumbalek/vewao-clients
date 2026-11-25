@@ -22,11 +22,12 @@ export default async function PreviewPrice({
   const t = await getTranslations("product")
 
   // Each price on one line; on sale the new price above the struck one, as
-  // on the product page (owner, 2026-11-22).
+  // on the product page (owner, 2026-11-22). On the left under the card's
+  // title: 18px, the struck one 14px, close under it (owner, 2026-11-25).
   return (
-    <div className="flex flex-col items-end">
+    <div className="flex flex-col items-start">
       <Text
-        className={clx("whitespace-nowrap text-ui-fg-muted", {
+        className={clx("whitespace-nowrap text-lg leading-6 text-ui-fg-muted", {
           "text-ui-fg-interactive": !!claim,
         })}
         data-testid="price"
@@ -36,7 +37,7 @@ export default async function PreviewPrice({
       </Text>
       {claim && (
         <Text
-          className="whitespace-nowrap line-through text-ui-fg-muted"
+          className="whitespace-nowrap text-sm leading-[19px] line-through text-ui-fg-muted"
           data-testid="original-price"
           title={t("referencePrice")}
         >

@@ -20,6 +20,11 @@ type ThumbnailProps = {
   alt?: string
   /** A gift voucher's name: the image is the empty voucher, shown with the name on it. */
   voucherTitle?: string | null
+  /**
+   * Not square: "portrait" 11:14, or "product" 29:34, the product page's photo,
+   * which product cards use too (owner, 2026-11-25).
+   */
+  ratio?: "portrait" | "product"
 }
 
 const SIZES = "(max-width: 576px) 280px, (max-width: 768px) 360px, (max-width: 992px) 480px, 800px"
@@ -33,6 +38,7 @@ const Thumbnail: React.FC<ThumbnailProps> = ({
   "data-testid": dataTestid,
   alt = "",
   voucherTitle,
+  ratio = "portrait",
 }) => {
   const initialImage = thumbnail || images?.[0]?.url
 
@@ -42,8 +48,13 @@ const Thumbnail: React.FC<ThumbnailProps> = ({
         "relative w-full overflow-hidden p-4 bg-ui-bg-subtle shadow-elevation-card-rest rounded-[3rem] group-hover:shadow-elevation-card-hover transition-shadow ease-in-out duration-150 m-px",
         className,
         {
-          "aspect-[11/14]": size !== "square",
+          "aspect-[11/14]": size !== "square" && ratio === "portrait",
+          "aspect-[29/34]": size !== "square" && ratio === "product",
           "aspect-[1/1]": size === "square",
+          // Line items (cart, cart preview, orders) are 46–96px wide: a fixed 3rem or even 1.4rem corner
+          // makes the small ones circles. 23% of the side is the popover's 1.4rem at 96px and keeps
+          // the same shape when smaller (owner, 2026-11-24).
+          "rounded-[23%]": size === "square",
           "w-[180px]": size === "small",
           "w-[290px]": size === "medium",
           "w-[440px]": size === "large",

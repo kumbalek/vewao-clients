@@ -8,17 +8,22 @@ import BackButton from "../components/backButton"
 import PromotionProgressBar from "../components/promotion-progress"
 import type { GiftPackaging } from "@lib/data/gift-packaging"
 import type { PromotionTier } from "@lib/util/promotion-progress"
+import type { SaleLabel } from "@lib/util/sale-labels"
+import ActiveSales from "../components/active-sales"
 
 const CartTemplate = ({
   cart,
   customer,
   promotionTiers = [],
   giftPackaging = null,
+  activeSales = [],
 }: {
   cart: HttpTypes.StoreCart | null
   customer: HttpTypes.StoreCustomer | null
   promotionTiers?: PromotionTier[]
   giftPackaging?: GiftPackaging | null
+  /** Labels of the running sales this cart gets (owner, 2026-11-22). */
+  activeSales?: SaleLabel[]
 }) => {
   return (
     <div className="py-12">
@@ -48,6 +53,7 @@ const CartTemplate = ({
                     <div className="bg-white py-6">
                       <Summary cart={cart as any} giftPackaging={giftPackaging} />
                     </div>
+                    <ActiveSales labels={activeSales} />
                   </>
                 )}
               </div>

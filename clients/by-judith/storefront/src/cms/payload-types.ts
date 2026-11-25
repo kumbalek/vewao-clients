@@ -74,6 +74,7 @@ export interface Config {
     procedures: Procedure;
     news: News;
     products: Product;
+    sales: Sale;
     media: Media;
     users: User;
     'payload-kv': PayloadKv;
@@ -91,6 +92,7 @@ export interface Config {
     procedures: ProceduresSelect<false> | ProceduresSelect<true>;
     news: NewsSelect<false> | NewsSelect<true>;
     products: ProductsSelect<false> | ProductsSelect<true>;
+    sales: SalesSelect<false> | SalesSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -650,6 +652,37 @@ export interface News {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Štítek se na webu ukáže jen po dobu, kdy akce s tímto kódem běží v administraci e-shopu.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sales".
+ */
+export interface Sale {
+  id: number;
+  /**
+   * Kód promoakce v administraci e-shopu (např. VANOCE-HERBS-2PLUS1), nebo název cenového seznamu (např. Vánoční ceny).
+   */
+  code: string;
+  /**
+   * Krátce a výrazně, např. „2 + 1 ZDARMA“.
+   */
+  label: string;
+  /**
+   * Jedna až dvě věty pod štítkem.
+   */
+  description?: string | null;
+  /**
+   * Adresy kategorií, kde se akce ukáže (např. herbs). Platí i pro jejich podkategorie a produkty v nich.
+   */
+  categories?: string[] | null;
+  /**
+   * V sekci „Aktivní slevy“, když se akce na košík uplatní.
+   */
+  showInCart?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
@@ -823,6 +856,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'products';
         value: number | Product;
+      } | null)
+    | ({
+        relationTo: 'sales';
+        value: number | Sale;
       } | null)
     | ({
         relationTo: 'media';
@@ -1136,6 +1173,19 @@ export interface ProductsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sales_select".
+ */
+export interface SalesSelect<T extends boolean = true> {
+  code?: T;
+  label?: T;
+  description?: T;
+  categories?: T;
+  showInCart?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

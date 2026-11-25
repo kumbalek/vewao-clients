@@ -1,6 +1,3 @@
-import { Heading } from "@medusajs/ui"
-import { getTranslations } from "next-intl/server"
-
 import { listMenuCategories } from "@lib/data/categories"
 import { getRegion } from "@lib/data/regions"
 import About from "@modules/home/components/about"
@@ -13,7 +10,6 @@ import Reviews from "@modules/home/components/reviews"
  * at /shop, and the home page itself while only the e-shop is live (#47).
  */
 export default async function ShopFront({ countryCode }: { countryCode: string }) {
-  const t = await getTranslations("hero")
   const region = await getRegion(countryCode)
   const categories = await listMenuCategories().catch(() => [])
 
@@ -24,11 +20,9 @@ export default async function ShopFront({ countryCode }: { countryCode: string }
   return (
     <>
       <Hero />
+      {/* The categories' rails, each under its own heading; no overall title (owner, 2026-11-25). */}
       <div className="py-12 small:py-24 flex flex-col items-center">
-        <Heading level="h2" className="text-2xl small:text-3xl text-ui-fg-base font-normal max-w-3xl pb-8">
-          {t("productsTitle")}
-        </Heading>
-        <ul className="flex flex-col gap-4 w-full">
+        <ul className="flex flex-col w-full">
           <FeaturedProducts categories={categories} region={region} />
         </ul>
       </div>

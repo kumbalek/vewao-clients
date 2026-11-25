@@ -28,7 +28,7 @@ export default function SalePrice({
   const money = (value: number) => convertToLocale({ amount: value, currency_code: currencyCode })
 
   return (
-    <div className="flex flex-col items-center text-ui-fg-base">
+    <div className="flex flex-col items-start text-ui-fg-base">
       <span className="text-2xl text-ui-fg-interactive">
         {prefix && <span data-testid="price-from">{prefix} </span>}
         <span data-testid="product-price" data-value={amount}>
