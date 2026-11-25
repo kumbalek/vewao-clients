@@ -18,7 +18,8 @@ export const contact = {
   street: "Kosmická 19",
   city: "149 00 Praha 4 – Háje",
   phone: { label: "+420 720 980 530", href: "tel:+420720980530" },
-  email: "info@bbclinic.cz",
+  // The address the new terms and privacy information give (owner, 2026-11-25, vewao-clients#85).
+  email: "info@by-judith.com",
   hours: "Po–Pá 10:00–18:00",
 }
 

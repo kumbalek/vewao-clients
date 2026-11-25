@@ -2,6 +2,7 @@ import { Metadata } from "next"
 import { getTranslations } from "next-intl/server"
 import { Heading } from "@medusajs/ui"
 import Help from "@modules/order/components/help"
+import { contact } from "content/site"
 import { useTranslations } from "next-intl"
 
 type Props = {
@@ -85,10 +86,10 @@ export default function ContactPage(props: Props) {
                       </p>
                       <p>
                         <a
-                          href="mailto:info@bbclinic.cz"
+                          href={`mailto:${contact.email}`}
                           className="text-[#85977b]  transition-colors duration-300"
                         >
-                          info@bbclinic.cz
+                          {contact.email}
                         </a>
                       </p>
                     </div>

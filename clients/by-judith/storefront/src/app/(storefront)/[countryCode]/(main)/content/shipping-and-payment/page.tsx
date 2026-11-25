@@ -54,10 +54,17 @@ const shippingOptions: Option[] = [
   },
 ]
 
+// Comgate's methods, or cash or card on site with a pickup. A bank transfer
+// goes through Comgate too; the shop takes no direct transfer to its account
+// (owner, 2026-11-25, vewao-clients#85; terms V.1).
 const paymentOptions: Option[] = [
   {
     name: "Bankovní převod",
-    description: "Bankovním převodem na účet.",
+    description: (
+      <>
+        Bankovním převodem na účet. Službu zajišťuje <ComgateLink />.
+      </>
+    ),
   },
   {
     name: "Hotově",
