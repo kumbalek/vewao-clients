@@ -60,18 +60,20 @@ test.describe("sale labels", () => {
     await expect(page.getByTestId("sale-label")).toHaveCount(0)
   })
 
-  test("on a product of the category the label sits under the title, before the description", async ({ page }) => {
+  test("on a product of the category the label sits under the add-to-cart, before the description", async ({ page }) => {
     const product = page.getByTestId("product-container")
     const label = product.getByTestId("sale-label")
     await lookUntil(page, "/cz/products/akcni-produkt", () => expect(label).toContainText("2 + 1 ZDARMA", { timeout: 2_000 }))
     await expect(label).toContainText("Třetí bylinka zdarma.")
 
-    const [title, box, description] = await Promise.all([
-      product.getByTestId("product-title").boundingBox(),
+    // The add-to-cart tops the column beside the photo, the sale boxes come
+    // next, then the description (owner, 2026-11-25, #76).
+    const [add, box, description] = await Promise.all([
+      product.getByTestId("add-product-button").boundingBox(),
       label.boundingBox(),
       product.getByTestId("product-description").boundingBox(),
     ])
-    expect(box!.y).toBeGreaterThan(title!.y)
+    expect(box!.y).toBeGreaterThanOrEqual(add!.y + add!.height)
     expect(box!.y).toBeLessThan(description!.y)
   })
 
