@@ -14,6 +14,9 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    # A stalled Playwright run otherwise holds the job for GitHub's six hours
+    # (the shop-mode step on #78, 2026-11-25).
+    timeout-minutes: 45
     # e2e/cms.spec.ts runs only against a fresh, migrated Payload database.
     # Throwaway CI-only credentials, not secrets.
     services:
