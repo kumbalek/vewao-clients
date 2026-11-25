@@ -43,6 +43,38 @@ export function BagIcon(props: IconProps) {
   )
 }
 
+/**
+ * The cart's bag with a plus overlapping its lower right side (vewao-clients#75).
+ * The bag is masked where the plus sits, so the lines do not cross.
+ */
+export function BagPlusIcon(props: IconProps) {
+  const mask = `bag-plus-${React.useId().replace(/:/g, "")}`
+  return (
+    <Icon {...props}>
+      <defs>
+        <mask id={mask} maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24">
+          <rect width="24" height="24" fill="white" />
+          <circle cx="18" cy="18" r="5.5" fill="black" />
+        </mask>
+      </defs>
+      <g mask={`url(#${mask})`}>
+        <path d="M4 7.5h13l-.9 11.5H4.9L4 7.5Z" />
+        <path d="M7.5 7.5V6a3 3 0 0 1 6 0v1.5" />
+      </g>
+      <circle cx="18" cy="18" r="4.25" />
+      <path d="M18 16v4M16 18h4" />
+    </Icon>
+  )
+}
+
+export function MinusIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M6 12h12" />
+    </Icon>
+  )
+}
+
 export function UserIcon(props: IconProps) {
   return (
     <Icon {...props}>

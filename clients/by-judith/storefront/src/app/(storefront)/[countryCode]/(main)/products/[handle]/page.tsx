@@ -61,7 +61,7 @@ export default async function ProductPage(props: Props) {
   const pricedProduct = await listProducts({
     countryCode: params.countryCode,
     // The categories, with their parent, make the breadcrumb.
-    queryParams: { handle: params.handle, fields: `${PRODUCT_LIST_FIELDS},*categories,*categories.parent_category` },
+    queryParams: { handle: params.handle, fields: PRODUCT_LIST_FIELDS },
   }).then(({ response }) => response.products[0])
 
   if (!pricedProduct) {

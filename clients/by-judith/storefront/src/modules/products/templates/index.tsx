@@ -3,7 +3,7 @@ import React, { Suspense } from "react"
 import ImageGallery from "@modules/products/components/image-gallery"
 import { productVoucherTitle } from "@lib/util/voucher"
 import ProductActions from "@modules/products/components/product-actions"
-import { VariantOptions, VariantOptionsProvider } from "@modules/products/components/product-actions/variant-options"
+import { VariantDiscountBoxes, VariantOptionsProvider } from "@modules/products/components/product-actions/variant-options"
 import ProductTabs from "@modules/products/components/product-tabs"
 import RelatedProducts from "@modules/products/components/related-products"
 import ProductInfo from "@modules/products/templates/product-info"
@@ -12,7 +12,7 @@ import Breadcrumbs from "@modules/common/components/breadcrumbs"
 import { notFound } from "next/navigation"
 import ProductActionsWrapper from "./product-actions-wrapper"
 import { HttpTypes } from "@medusajs/types"
-import { clx } from "@medusajs/ui"
+import { Heading } from "@medusajs/ui"
 import { useTranslations } from "next-intl"
 import type { ProductTexts } from "@lib/cms/product-texts"
 import type { ProductTier } from "@lib/util/product-tiers"
@@ -73,39 +73,28 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
         className="content-container flex flex-col small:flex-row small:justify-center items-center small:items-start py-6 relative"
         data-testid="product-container"
       >
-        <div className="flex flex-col small:sticky small:top-24 small:py-0 max-w-[420px] w-full pb-8 gap-y-1">
+        {/* Left, as on a product card (owner, 2026-11-25): the photo, the name, the price. */}
+        <div className="flex flex-col small:sticky small:top-24 small:py-0 max-w-[420px] w-full pb-8">
           <ImageGallery images={product?.images || []} title={product.title} voucherTitle={productVoucherTitle(product)} />
-          {/* <ProductOnboardingCta /> */}
-          <Suspense
-            fallback={
-              <ProductActions
-                disabled={true}
-                product={product}
-                region={region}
-              />
-            }
-          >
-            <ProductActionsWrapper id={product.id} region={region} withReferences={productTiers.length > 0} />
-          </Suspense>
+          <div className="mt-3 flex flex-col items-start gap-y-2 px-4">
+            <Heading level="h2" className="text-left text-3xl leading-10 text-ui-fg-base" data-testid="product-title">
+              {product.title}
+            </Heading>
+            <Suspense fallback={<ProductActions part="price" disabled={true} product={product} region={region} />}>
+              <ProductActionsWrapper part="price" id={product.id} region={region} withReferences={productTiers.length > 0} />
+            </Suspense>
+          </div>
         </div>
-        <div className="flex flex-col items-center gap-4 block w-full small:max-w-[500px] small:pl-8 relative">
-          {/* Under the title, before a long description can push them out of
-              sight (owner, 2026-11-22): the running sales, then the choice. On a
-              phone the choice sits with the price (ProductActions). */}
-          <ProductInfo
-            product={product}
-            texts={texts}
-            afterTitle={
-              (saleLabels.length > 0 || staticVariants || (product.variants?.length ?? 0) > 1) && (
-                // Only the variant choice: hidden on a phone, where it sits with the price.
-                <div className={clx("w-full flex-col gap-4", saleLabels.length > 0 || staticVariants ? "flex" : "hidden small:flex")}>
-                  <SaleLabels labels={saleLabels} />
-                  {staticVariants && <StaticVariants variants={staticVariants} />}
-                  <VariantOptions product={product} className="hidden small:flex" />
-                </div>
-              )
-            }
-          />
+        {/* Right: the add-to-cart on top (with the choice a variant needs), then the
+            sale boxes, then the description (owner, 2026-11-25). */}
+        <div className="flex w-full flex-col gap-4 pb-8 small:max-w-[500px] small:pl-8">
+          <Suspense fallback={<ProductActions part="buy" disabled={true} product={product} region={region} />}>
+            <ProductActionsWrapper part="buy" id={product.id} region={region} withReferences={productTiers.length > 0} />
+          </Suspense>
+          <VariantDiscountBoxes />
+          <SaleLabels labels={saleLabels} />
+          {staticVariants && <StaticVariants variants={staticVariants} />}
+          <ProductInfo texts={texts} />
           <ProductTabs texts={texts} />
         </div>
       </div>

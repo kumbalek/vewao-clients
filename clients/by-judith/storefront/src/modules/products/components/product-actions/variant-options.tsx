@@ -93,7 +93,7 @@ export function VariantOptions({
   disabled?: boolean
   className?: string
 }) {
-  const { options, setOptionValue, multiple, chosen, toggleVariant, busy, tiers } = useVariantOptions()
+  const { options, setOptionValue, multiple, chosen, toggleVariant, busy } = useVariantOptions()
   const variants = product.variants ?? []
   if (variants.length < 2) return null
 
@@ -125,8 +125,16 @@ export function VariantOptions({
           disabled={disabled || busy}
         />
       ))}
-      {/* How many the choice holds: the chosen variants, or one once an option is picked. */}
-      <DiscountBoxes tiers={tiers} count={multiple ? chosen.length : Object.values(options).some(Boolean) ? 1 : 0} />
     </div>
   )
+}
+
+/**
+ * The volume discounts (vewao-clients#70) as boxes lit by the choice. The page
+ * places them under the add-to-cart, with the other sale boxes (owner, 2026-11-25).
+ */
+export function VariantDiscountBoxes() {
+  const { options, multiple, chosen, tiers } = useVariantOptions()
+  // How many the choice holds: the chosen variants, or one once an option is picked.
+  return <DiscountBoxes tiers={tiers} count={multiple ? chosen.length : Object.values(options).some(Boolean) ? 1 : 0} />
 }

@@ -76,12 +76,12 @@ export default function CategoryTemplate({
       <div className="w-full">
         {/* The title with its subtitle close under it; the category's call to action
             beside them from `small` up, under them on a phone (vewao-clients#70). The
-            title is 15 % above text-2xl. */}
+            title is as large as the home page's category headings (owner, 2026-11-25). */}
         <div className="mb-8 flex flex-col gap-4 small:flex-row small:items-center small:justify-between small:gap-8">
           <div className="flex min-w-0 flex-col gap-2">
             {/* The running sales' labels beside the title, at its top (owner, 2026-11-22). */}
             <div className="flex flex-wrap items-start gap-x-4 gap-y-2">
-              <h1 data-testid="category-page-title" className="text-[1.725rem] leading-tight">
+              <h1 data-testid="category-page-title" className="text-4xl leading-tight small:text-6xl">
                 {category.name}
               </h1>
               <SaleLabels labels={saleLabels} variant="chip" className="pt-0.5" />

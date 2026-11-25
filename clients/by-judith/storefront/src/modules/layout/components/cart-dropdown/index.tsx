@@ -10,8 +10,7 @@ import LocalizedClientLink from "@modules/common/components/localized-client-lin
 import { ButtonLink } from "@modules/design-system"
 import { BagIcon } from "@modules/design-system/components/icons"
 import Thumbnail from "@modules/products/components/thumbnail"
-import { usePathname } from "next/navigation"
-import { Fragment, useEffect, useRef, useState } from "react"
+import { Fragment, useState } from "react"
 import { useTranslations } from "next-intl"
 import { isGiftPackaging as isGift } from "@lib/util/gift-packaging"
 
@@ -23,9 +22,6 @@ const CartDropdown = ({
 }) => {
   const t = useTranslations("cart")
   const tLayout = useTranslations("layout")
-  const [activeTimer, setActiveTimer] = useState<ReturnType<typeof setTimeout> | undefined>(
-    undefined
-  )
   const [cartDropdownOpen, setCartDropdownOpen] = useState(false)
 
   const open = () => setCartDropdownOpen(true)
@@ -37,47 +33,15 @@ const CartDropdown = ({
     }, 0) || 0
 
   const total = cartState?.total ?? 0
-  const itemRef = useRef<number>(totalItems || 0)
 
-  const timedOpen = () => {
-    open()
-
-    const timer = setTimeout(close, 5000)
-
-    setActiveTimer(timer)
-  }
-
-  const openAndCancel = () => {
-    if (activeTimer) {
-      clearTimeout(activeTimer)
-    }
-
-    open()
-  }
-
-  // Clean up the timer when the component unmounts
-  useEffect(() => {
-    return () => {
-      if (activeTimer) {
-        clearTimeout(activeTimer)
-      }
-    }
-  }, [activeTimer])
-
-  const pathname = usePathname()
-
-  // open cart dropdown when modifying the cart items, but only if we're not on the cart page
-  useEffect(() => {
-    if (itemRef.current !== totalItems && !pathname.includes("/cart")) {
-      timedOpen()
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [totalItems, itemRef.current])
+  // Opens on hover only. It used to open by itself for 5 s after a cart change,
+  // but the add-to-cart now shows the count beside itself, and the opened
+  // preview covered that control on the product page (vewao-clients#75).
 
   return (
     <div
       className="relative z-50 flex h-full items-center"
-      onMouseEnter={openAndCancel}
+      onMouseEnter={open}
       onMouseLeave={close}
     >
       <LocalizedClientLink

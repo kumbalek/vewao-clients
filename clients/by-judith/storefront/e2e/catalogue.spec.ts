@@ -57,8 +57,9 @@ test("a category page shows its call to action beside the title and subtitle", a
   const cta = page.getByTestId("category-cta")
   await expect(cta).toHaveText("Objednat konzultaci")
   await expect(cta).toHaveAttribute("href", "/cz/kontakt")
-  // The title is 15 % above text-2xl (24 px), the subtitle close under it.
-  expect(await title.evaluate((el) => parseFloat(getComputedStyle(el).fontSize))).toBeCloseTo(27.6, 0)
+  // The title is as large as the home page's category headings (text-4xl, from
+  // `small` up text-6xl), the subtitle close under it.
+  expect(await title.evaluate((el) => parseFloat(getComputedStyle(el).fontSize))).toBeCloseTo(isMobile ? 36 : 60, 0)
   const [t, s, c] = await Promise.all([title.boundingBox(), subtitle.boundingBox(), cta.boundingBox()])
   expect(s!.y - (t!.y + t!.height)).toBeLessThanOrEqual(12)
   if (isMobile) {

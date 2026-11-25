@@ -1,12 +1,14 @@
 import { Metadata } from "next"
 
 import { listCartOptions, retrieveCart } from "@lib/data/cart"
+import { CartLinesProvider } from "@lib/context/cart-lines"
 import { listProcedureMenu } from "@lib/data/procedures"
 import { listMenuCategories } from "@lib/data/categories"
 import { retrieveCustomer } from "@lib/data/customer"
 import { listRegions } from "@lib/data/regions"
 import { isShopOnly } from "@lib/site-mode"
 import { regionOptions } from "@lib/util/region-options"
+import { cartLinesOf } from "@lib/util/cart-product-state"
 import { getBaseURL } from "@lib/util/env"
 import { StoreCartShippingOption } from "@medusajs/types"
 import { deliveryCountries } from "content/site"
@@ -67,7 +69,10 @@ export default async function PageLayout(props: {
           shippingOptions={shippingOptions}
         />
       )}
-      <main id="main">{props.children}</main>
+      {/* The add-to-cart controls read this cart's lines (vewao-clients#75). */}
+      <CartLinesProvider lines={cartLinesOf(cart?.items)}>
+        <main id="main">{props.children}</main>
+      </CartLinesProvider>
       <SiteFooter shopCategories={shopCategories} shopOnly={shopOnly} />
     </>
   )

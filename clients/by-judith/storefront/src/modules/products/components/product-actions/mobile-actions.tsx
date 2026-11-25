@@ -22,10 +22,8 @@ type MobileActionsProps = {
   selectionLabel: string | null
   /** Several variants chosen: their total instead of the variant's price. */
   priceOverride?: string | null
-  canAdd: boolean
-  buttonLabel: string
-  handleAddToCart: () => void
-  isAdding?: boolean
+  /** The page's add-to-cart control (vewao-clients#75). */
+  cartControl: React.ReactNode
   show: boolean
   optionsDisabled: boolean
   priceReferences?: PriceReference[]
@@ -36,10 +34,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
   variant,
   selectionLabel,
   priceOverride,
-  canAdd,
-  buttonLabel,
-  handleAddToCart,
-  isAdding,
+  cartControl,
   show,
   optionsDisabled,
   priceReferences,
@@ -133,15 +128,7 @@ const MobileActions: React.FC<MobileActionsProps> = ({
                   </div>
                 </Button>
               )}
-              <Button
-                onClick={handleAddToCart}
-                disabled={!canAdd}
-                className="w-full rounded-[3rem]"
-                isLoading={isAdding}
-                data-testid="mobile-cart-button"
-              >
-                {buttonLabel}
-              </Button>
+              {cartControl}
             </div>
           </div>
         </Transition>

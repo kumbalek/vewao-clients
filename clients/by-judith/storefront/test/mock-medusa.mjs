@@ -215,9 +215,17 @@ function cart(id) {
       payment_collection: { id: `paycol_${id}`, payment_sessions: [] },
     })
   }
-  return carts.get(id)
+  return lineDefaults(carts.get(id))
+}
+// As Medusa's line items: the product's id beside the line (the add-to-cart
+// control counts a product's lines, vewao-clients#75). No created_at: the cart's
+// newest-first order would change what other specs expect.
+function lineDefaults(current) {
+  for (const item of current.items) item.product_id ??= item.product?.id ?? null
+  return current
 }
 function recalcCart(current) {
+  lineDefaults(current)
   current.item_subtotal = current.items.reduce((sum, item) => sum + item.total, 0)
   current.item_total = current.item_subtotal
   if (current.items.every((item) => item.requires_shipping === false)) {
@@ -400,6 +408,10 @@ const server = createServer(async (req, res) => {
       (p) => url.searchParams.get("handle") === p.handle || [...url.searchParams].some(([key, value]) => key.startsWith("id") && value === p.id)
     )
     if (extra) return send({ products: [pricedFor(extra, regionId)], count: 1 })
+    // A search for the Ultherapy areas lists them: a product card with a choice (vewao-clients#75).
+    if (url.searchParams.get("q") && partieProduct.title.toLowerCase().includes(url.searchParams.get("q").toLowerCase())) {
+      return send({ products: [pricedFor(partieProduct, regionId)], count: 1 })
+    }
     // An unfiltered listing (Novinky's sale section) holds the sale product.
     const unfiltered = !url.searchParams.get("handle") && !url.searchParams.get("q") && ![...url.searchParams.keys()].some((key) => key.startsWith("id") || key.startsWith("collection_id") || key.startsWith("category_id"))
     if (unfiltered) return send({ products: [pricedFor(saleProduct, regionId)], count: 1 })
