@@ -61,7 +61,9 @@ Environment secrets in both repos:
   through the Hetzner console. Do not blindly trust ssh-keyscan during deployment.
 
 Repository variable `DEPLOY_ENABLED=true` enables deployment after `main` passes.
-Leave unset during initial bootstrap. Protect `main` with required CI checks.
+Leave unset during initial bootstrap. The storefront's CI runs on pushes to
+`main` only, not on pull requests: the full suite runs locally before a
+release (owner, 2026-11-25), so `main` has no required PR checks.
 Both repositories are now configured and deploying; see the 2026-09-24 record below.
 
 ## First boot (resolves the publishable-key dependency)
