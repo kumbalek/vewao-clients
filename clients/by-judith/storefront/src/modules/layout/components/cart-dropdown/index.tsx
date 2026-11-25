@@ -34,9 +34,10 @@ const CartDropdown = ({
 
   const total = cartState?.total ?? 0
 
-  // Opens on hover only. It used to open by itself for 5 s after a cart change,
-  // but the add-to-cart now shows the count beside itself, and the opened
-  // preview covered that control on the product page (vewao-clients#75).
+  // 576px wide, 20 % more than before (owner, 2026-11-25). Opens on hover
+  // only: it used to open by itself for 5 s after a cart change, but the
+  // add-to-cart now shows the count beside itself, and the opened preview
+  // covered that control on the product page (vewao-clients#75).
 
   return (
     <div
@@ -73,7 +74,7 @@ const CartDropdown = ({
         leaveTo="opacity-0 translate-y-1"
       >
         <div
-          className="absolute right-0 top-[calc(100%+1px)] hidden w-[480px] border-x border-b border-line bg-white text-ink small:block"
+          className="absolute right-0 top-[calc(100%+1px)] hidden w-[576px] border-x border-b border-line bg-white text-ink small:block"
           data-testid="nav-cart-dropdown"
         >
           <div className="p-4 flex items-center justify-center">

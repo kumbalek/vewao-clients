@@ -303,7 +303,7 @@ export default function TermsPage() {
                       Před odesláním objednávky je kupujícímu umožněno
                       kontrolovat a měnit údaje, které do objednávky vložil.
                       Objednávku odešle kupující prodávajícímu kliknutím na
-                      tlačítko „Odeslat objednávku“. Údaje uvedené v objednávce
+                      tlačítko „Objednat s povinností platby“. Údaje uvedené v objednávce
                       jsou prodávajícím považovány za správné.
                     </p>
                     <p>
