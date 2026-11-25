@@ -69,8 +69,8 @@ test("keeps the Czech homepage and the brand's logos", async ({
   await page.goto("/cz")
   await expect(page.locator("html")).toHaveAttribute("lang", "cs")
   // The diamond in the header; the footer keeps the JuditH wordmark.
-  await expect(page.getByRole("banner").locator('img[src="/logo.svg"]')).toBeVisible()
-  await expect(page.getByRole("contentinfo").locator('img[src*="logo.webp"]')).toBeVisible()
+  await expect(page.getByRole("banner").locator('img[src="/logo_new.svg"]')).toBeVisible()
+  await expect(page.getByRole("contentinfo").locator('img[src*="logo_new_full.svg"]')).toBeVisible()
   await expect(page.locator("main")).toBeVisible()
   await page.screenshot({
     path: testInfo.outputPath("homepage.png"),
@@ -84,7 +84,7 @@ test("checkout shows the diamond logo, leading home", async ({ page }) => {
   await expect(logo).toHaveAttribute("href", "/cz")
   await expect(logo.getByRole("img", { name: "JuditH – úvodní stránka" })).toHaveAttribute(
     "src",
-    "/logo.svg"
+    "/logo_new.svg"
   )
 })
 
