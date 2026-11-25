@@ -63,7 +63,7 @@ export default async function NewsPage({ params }: Props) {
           <Heading id="novinky-sale" level={2} size="md" className="mb-8">
             Zlevněné produkty
           </Heading>
-          <ul className="grid grid-cols-2 gap-x-6 gap-y-8 small:grid-cols-3" data-testid="sale-products">
+          <ul className="grid grid-cols-1 xsmall:grid-cols-2 gap-x-6 gap-y-8 small:grid-cols-3" data-testid="sale-products">
             {saleProducts.map((product) => (
               <li key={product.id}>
                 <ProductPreview product={product} region={region} />
