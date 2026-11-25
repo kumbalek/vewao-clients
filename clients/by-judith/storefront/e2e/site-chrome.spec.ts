@@ -230,9 +230,9 @@ test("the footer shows the real contact details and no placeholders", async ({
   const footer = page.getByRole("contentinfo")
 
   await expect(footer.getByText("Kosmická 19")).toBeVisible()
-  await expect(footer.getByRole("link", { name: "info@bbclinic.cz" })).toHaveAttribute(
+  await expect(footer.getByRole("link", { name: "info@by-judith.com" })).toHaveAttribute(
     "href",
-    "mailto:info@bbclinic.cz"
+    "mailto:info@by-judith.com"
   )
   await expect(footer.getByRole("link", { name: "Obchodní podmínky" })).toHaveAttribute(
     "href",
