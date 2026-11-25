@@ -13,6 +13,7 @@ import { Pages } from "./cms/collections/Pages"
 import { ProcedureCategories } from "./cms/collections/ProcedureCategories"
 import { Procedures } from "./cms/collections/Procedures"
 import { Products } from "./cms/collections/Products"
+import { Sales } from "./cms/collections/Sales"
 import { Topics } from "./cms/collections/Topics"
 import { Users } from "./cms/collections/Users"
 import { migrations } from "./cms/migrations"
@@ -62,7 +63,7 @@ export default buildConfig({
   },
   i18n: { supportedLanguages: { cs, en }, fallbackLanguage: "cs" },
   onInit: ensureInitialAdmin,
-  collections: [Pages, Articles, Topics, ProcedureCategories, Procedures, News, Products, Media, Users],
+  collections: [Pages, Articles, Topics, ProcedureCategories, Procedures, News, Products, Sales, Media, Users],
   // Scheduled publishing queues a job; this server runs due jobs every minute.
   // The cron starts with Payload, on the first request that uses the CMS. A job
   // runs outside any request, where Next cannot expire cached pages, so a

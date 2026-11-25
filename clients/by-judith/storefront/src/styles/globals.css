@@ -3,9 +3,10 @@
 @import "tailwindcss/utilities";
 
 @layer utilities {
+  /* 4px, a quarter of the original 16px (owner, 2026-11-25). */
   .scrollbar::-webkit-scrollbar {
-    width: 16px;
-    height: 16px;
+    width: 4px;
+    height: 4px;
   }
 
   .scrollbar::-webkit-scrollbar-track {
@@ -16,7 +17,6 @@
   .scrollbar::-webkit-scrollbar-thumb {
     background: theme("colors.greige");
     border-radius: 100vh;
-    border: 2px solid theme("colors.greige");
   }
 
   .scrollbar::-webkit-scrollbar-thumb:hover {
@@ -128,6 +128,35 @@
 
   .text-3xl-semi {
     @apply text-[32px] leading-[44px] font-semibold;
+  }
+
+  /*
+   * The add-to-cart's flat colour (vewao-clients#75; owner, 2026-11-25): an
+   * olive brown, a shade darker on hover. White on it is 8.2:1.
+   */
+  .buy-button {
+    border-radius: 9999px;
+    color: theme("colors.white");
+    background-color: #535039;
+    transition: background-color 0.15s;
+  }
+  .buy-button:hover:not(:disabled, [aria-disabled="true"]) {
+    background-color: #474430;
+  }
+  /* Unavailable: dimmed, and a note says why instead of a "not allowed" cursor (owner, 2026-11-24). */
+  .buy-button:disabled,
+  .buy-button[aria-disabled="true"] {
+    cursor: default;
+    opacity: 0.5;
+  }
+  .buy-button:focus-visible {
+    outline: 2px solid theme("colors.ink.DEFAULT");
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .buy-button {
+      transition: none;
+    }
   }
 }
 

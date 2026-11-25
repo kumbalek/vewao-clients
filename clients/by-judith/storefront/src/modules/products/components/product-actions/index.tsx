@@ -1,32 +1,33 @@
 "use client"
 
-import { addToCart } from "@lib/data/cart"
+import { useProductCart } from "@lib/context/cart-lines"
 import type { PriceReference } from "@lib/util/discount-claim"
 import { useIntersection } from "@lib/hooks/use-in-view"
 import { convertToLocale } from "@lib/util/money"
 import { discounted, reachedTier, regularIsLowest } from "@lib/util/product-tiers"
 import { HttpTypes } from "@medusajs/types"
-import { Button } from "@medusajs/ui"
 import { isEqual } from "lodash"
-import { useParams } from "next/navigation"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useMemo, useRef } from "react"
 import { useTranslations } from "next-intl"
+import AddToCartControl from "../add-to-cart"
 import ProductPrice from "../product-price"
 import SalePrice from "../product-price/sale-price"
 import MobileActions from "./mobile-actions"
 import { VariantOptions, optionsAsKeymap, useVariantOptions } from "./variant-options"
-
-import { useDelayedRefresh } from "@lib/hooks/use-delayed-refresh"
+import { inStock } from "@lib/util/product"
 
 type ProductActionsProps = {
   product: HttpTypes.StoreProduct
   region: HttpTypes.StoreRegion
   disabled?: boolean
   priceReferences?: PriceReference[]
+  /**
+   * The page places them apart (owner, 2026-11-25): the price under the title
+   * in the left column, the choice and the add-to-cart atop the right one.
+   */
+  part?: "price" | "buy"
 }
 
-const inStock = (variant: HttpTypes.StoreProductVariant) =>
-  !variant.manage_inventory || !!variant.allow_backorder || (variant.inventory_quantity ?? 0) > 0
 
 const totalOf = (variants: HttpTypes.StoreProductVariant[]) =>
   variants.reduce((sum, v) => sum + (v.calculated_price?.calculated_amount ?? 0), 0)
@@ -55,7 +56,7 @@ function TotalPrice({
     // Unconfirmed: the discounted price alone, no struck price.
     const price = discounted(total, percent)
     return (
-      <div className="flex flex-col items-center text-ui-fg-base">
+      <div className="flex flex-col items-start text-ui-fg-base">
         <span className="text-2xl text-ui-fg-interactive">
           <span data-testid="product-price" data-value={price}>
             {convertToLocale({ amount: price, currency_code: currency })}
@@ -65,7 +66,7 @@ function TotalPrice({
     )
   }
   return (
-    <div className="flex flex-col items-center text-ui-fg-base">
+    <div className="flex flex-col items-start text-ui-fg-base">
       <span className="text-2xl">
         <span data-testid="product-price" data-value={total}>
           {convertToLocale({ amount: total, currency_code: currency })}
@@ -75,58 +76,65 @@ function TotalPrice({
   )
 }
 
-export default function ProductActions({
-  product,
-  disabled,
-  priceReferences,
-}: ProductActionsProps) {
-  const t = useTranslations("cart")
+/**
+ * The variant the options describe, or, where several may be chosen
+ * (vewao-clients#70), the chosen ones in the product's order; and the volume
+ * discount that choice reaches, which the cart will apply.
+ */
+function useChosen(product: HttpTypes.StoreProduct) {
   // Shared with the option buttons, which the page places (vewao-clients#70).
-  const { options, setBusy, multiple, chosen, tiers } = useVariantOptions()
-  const [isAdding, setIsAdding] = useState(false)
-  const countryCode = useParams().countryCode as string
-  const { delayedRefresh, isRefreshing } = useDelayedRefresh()
-
-  // The options wait while the items are added.
-  useEffect(() => setBusy(isAdding || isRefreshing), [isAdding, isRefreshing, setBusy])
-
-  const hasVariants = (product.variants?.length ?? 0) > 1
-
-  // The variant the options describe, or, where several may be chosen
-  // (vewao-clients#70), the chosen ones in the product's order.
+  const { options, multiple, chosen, tiers } = useVariantOptions()
   const chosenVariants = useMemo(() => {
     const variants = product.variants ?? []
     if (multiple) return variants.filter((v) => chosen.includes(v.id))
     const match = variants.find((v) => isEqual(optionsAsKeymap(v.options), options))
     return match ? [match] : []
   }, [product.variants, multiple, chosen, options])
-
   const count = chosenVariants.length
-  const available = count > 0 && chosenVariants.every(inStock)
-  // The volume discount the choice reaches, which the cart will apply.
   const percent = count > 0 ? reachedTier(tiers, count)?.value : undefined
+  return { chosenVariants, count, percent }
+}
+
+export default function ProductActions({ part = "buy", ...props }: ProductActionsProps) {
+  return part === "price" ? <PricePart {...props} /> : <BuyPart {...props} />
+}
+
+/** The price of the choice: a variant's, or several added up, with a reached volume discount. */
+function PricePart({ product, priceReferences }: Omit<ProductActionsProps, "part">) {
+  const { chosenVariants, count, percent } = useChosen(product)
+  return (
+    <div className="flex flex-col items-start" data-testid="product-price-block">
+      {count > 1 || percent ? (
+        <TotalPrice variants={chosenVariants} percent={percent} struck={regularIsLowest(chosenVariants, priceReferences ?? [])} />
+      ) : (
+        <ProductPrice product={product} variant={chosenVariants[0]} priceReferences={priceReferences} />
+      )}
+    </div>
+  )
+}
+
+/** The variant choice and the add-to-cart, with the phone's sticky bar once they scroll away. */
+function BuyPart({ product, disabled, priceReferences }: Omit<ProductActionsProps, "part">) {
+  const t = useTranslations("cart")
+  const { setBusy } = useVariantOptions()
+  const { chosenVariants, count, percent } = useChosen(product)
+  // This product in the cart, all variants together (vewao-clients#75).
+  const { quantity: inCart, add, removeOne, isPending, failed } = useProductCart(product.id)
+
+  // The options wait while the cart changes.
+  useEffect(() => setBusy(isPending), [isPending, setBusy])
+
+  const hasVariants = (product.variants?.length ?? 0) > 1
+  const available = count > 0 && chosenVariants.every(inStock)
 
   const actionsRef = useRef<HTMLDivElement>(null)
 
   const inView = useIntersection(actionsRef, "0px")
 
   // Each chosen variant is its own cart line.
-  const handleAddToCart = async () => {
-    if (!available) return null
-
-    setIsAdding(true)
-
-    for (const variant of chosenVariants) {
-      await addToCart({
-        variantId: variant.id,
-        quantity: 1,
-        countryCode,
-      })
-    }
-
-    await delayedRefresh()
-
-    setIsAdding(false)
+  const handleAddToCart = () => {
+    if (!available) return
+    void add(chosenVariants.map((variant) => variant.id))
   }
 
   const buttonLabel =
@@ -136,9 +144,31 @@ export default function ProductActions({
         : t("outOfStock")
       : !available
       ? t("outOfStock")
+      : inCart > 0
+      ? count > 1
+        ? t("addMoreCount", { count })
+        : t("addMore")
       : count > 1
       ? t("addToCartCount", { count })
       : t("addToCart")
+
+  // The same control on the page and in the phone's sticky bar.
+  const cartControl = (inBar: boolean) => (
+    <AddToCartControl
+      size="big"
+      quantity={inCart}
+      onAdd={handleAddToCart}
+      onRemoveOne={() => void removeOne()}
+      label={buttonLabel}
+      removeLabel={t("removeOne")}
+      countLabel={t("inCartCount", { count: inCart })}
+      busy={isPending}
+      disabled={!available || !!disabled}
+      error={failed ? t("updateFailed") : null}
+      buttonTestId={inBar ? "mobile-cart-button" : "add-product-button"}
+      data-testid={inBar ? "mobile-add-to-cart" : "add-to-cart"}
+    />
+  )
 
   // The sticky bar on a phone names the choice and its price.
   const selectionLabel = count
@@ -154,45 +184,18 @@ export default function ProductActions({
 
   return (
     <>
-      <div className="flex flex-col items-center gap-y-4" ref={actionsRef}>
-        {/* On a phone the options come first; from `small` up they are under the description. */}
-        <VariantOptions product={product} disabled={!!disabled} className="small:hidden" />
-
-        {count > 1 || percent ? (
-          <TotalPrice
-            variants={chosenVariants}
-            percent={percent}
-            struck={regularIsLowest(chosenVariants, priceReferences ?? [])}
-          />
-        ) : (
-          <ProductPrice
-            product={product}
-            variant={chosenVariants[0]}
-            priceReferences={priceReferences}
-          />
-        )}
-
-        <Button
-          onClick={handleAddToCart}
-          disabled={!available || !!disabled || isAdding || isRefreshing}
-          variant="primary"
-          className="w-full h-10 rounded-[3rem]"
-          isLoading={isAdding || isRefreshing}
-          data-testid="add-product-button"
-        >
-          {buttonLabel}
-        </Button>
+      <div className="flex w-full flex-col items-stretch gap-y-4" ref={actionsRef}>
+        {/* A variant is chosen before it can be bought: the choice right above the button. */}
+        <VariantOptions product={product} disabled={!!disabled} />
+        {cartControl(false)}
         <MobileActions
           product={product}
           variant={chosenVariants[0]}
           selectionLabel={selectionLabel}
           priceOverride={totalLabel}
-          canAdd={available}
-          buttonLabel={buttonLabel}
-          handleAddToCart={handleAddToCart}
-          isAdding={isAdding || isRefreshing}
+          cartControl={cartControl(true)}
           show={!inView}
-          optionsDisabled={!!disabled || isAdding || isRefreshing}
+          optionsDisabled={!!disabled || isPending}
           priceReferences={priceReferences}
         />
       </div>

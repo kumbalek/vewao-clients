@@ -171,5 +171,5 @@ test("the former home page is the e-shop's front page", async ({ page }) => {
 
   await expect(page).toHaveURL(/\/cz\/shop$/)
   await expect(page).toHaveTitle("Shop")
-  await expect(page.getByRole("heading", { level: 2, name: "Naše produkty" })).toBeVisible()
+  await expect(page.getByTestId("category-rail").first()).toBeVisible()
 })

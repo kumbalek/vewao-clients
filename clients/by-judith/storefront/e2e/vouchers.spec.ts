@@ -106,7 +106,7 @@ test.describe("the voucher line in the cart", () => {
 test.describe("Ultherapy's single areas", () => {
   test.beforeEach(useCart("cart_partie"))
 
-  test("are in Czech, whole words, under the description on a large screen", async ({ page, isMobile }) => {
+  test("are in Czech, whole words, right above the add-to-cart", async ({ page, isMobile }) => {
     await page.goto("/cz/products/ultherapy-aplikace-na-jednotlive-partie")
     const product = page.getByTestId("product-container")
 
@@ -126,16 +126,18 @@ test.describe("Ultherapy's single areas", () => {
     await expect(product.getByTestId("price-from").filter({ visible: true })).toHaveText("Od")
     await expect(product.getByTestId("product-price").filter({ visible: true }).first()).toContainText("6.000")
 
+    // The name and price are under the photo; the choice tops the other column,
+    // right above the add-to-cart (owner, 2026-11-25). On a phone that column follows.
     const price = product.getByTestId("product-price").filter({ visible: true }).first()
-    const [title, group, priceBox] = await Promise.all([
-      product.getByTestId("product-title").boundingBox(),
+    const [group, priceBox, add] = await Promise.all([
       options.boundingBox(),
       price.boundingBox(),
+      product.getByTestId("add-product-button").boundingBox(),
     ])
+    expect(group!.y + group!.height).toBeLessThanOrEqual(add!.y)
     if (isMobile) {
-      expect(group!.y + group!.height).toBeLessThanOrEqual(priceBox!.y)
+      expect(group!.y).toBeGreaterThanOrEqual(priceBox!.y + priceBox!.height)
     } else {
-      expect(group!.y).toBeGreaterThan(title!.y + title!.height)
       expect(group!.x).toBeGreaterThan(priceBox!.x + priceBox!.width)
     }
   })

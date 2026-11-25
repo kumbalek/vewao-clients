@@ -101,6 +101,8 @@ const faceliftProduct = {
 // Products served by handle or id only, so listings stay as they are.
 const byHandleOrIdOnly = [voucherProduct, partieProduct, faceliftProduct]
 // Active quantity-tier promotions as vewao-platform's GET /store/promotion-tiers returns them.
+// Running sales as vewao-platform#49's GET /store/active-sales returns them.
+let activeSales = { promotions: [], price_lists: [] }
 let promotionTiers = []
 // Volume discounts on one product (vewao-platform#45), empty unless a test sets them.
 let productTiers = []
@@ -213,9 +215,17 @@ function cart(id) {
       payment_collection: { id: `paycol_${id}`, payment_sessions: [] },
     })
   }
-  return carts.get(id)
+  return lineDefaults(carts.get(id))
+}
+// As Medusa's line items: the product's id beside the line (the add-to-cart
+// control counts a product's lines, vewao-clients#75). No created_at: the cart's
+// newest-first order would change what other specs expect.
+function lineDefaults(current) {
+  for (const item of current.items) item.product_id ??= item.product?.id ?? null
+  return current
 }
 function recalcCart(current) {
+  lineDefaults(current)
   current.item_subtotal = current.items.reduce((sum, item) => sum + item.total, 0)
   current.item_total = current.item_subtotal
   if (current.items.every((item) => item.requires_shipping === false)) {
@@ -297,7 +307,7 @@ const server = createServer(async (req, res) => {
     eurPrices[data.variant] = [data.amount, data.original ?? data.amount]
     return send({ ok: true })
   }
-  if (url.pathname === "/__reset") { Object.assign(eurPrices, structuredClone(EUR_PRICES)); carts.clear(); orders.clear(); requests.length = 0; gatewayOutcome = "PAID"; Object.assign(cartControls, { delayMs: 0, status: 200, message: "Košík se nepodařilo aktualizovat." }); promotionTiers = []; productTiers = []; priceHistory = { current_amount: 1490, reference_price: 1690, history_complete: true }; customers.clear(); tokens.clear(); lastResetToken = null; return send({ ok: true }) }
+  if (url.pathname === "/__reset") { Object.assign(eurPrices, structuredClone(EUR_PRICES)); carts.clear(); orders.clear(); requests.length = 0; gatewayOutcome = "PAID"; Object.assign(cartControls, { delayMs: 0, status: 200, message: "Košík se nepodařilo aktualizovat." }); promotionTiers = []; productTiers = []; activeSales = { promotions: [], price_lists: [] }; priceHistory = { current_amount: 1490, reference_price: 1690, history_complete: true }; customers.clear(); tokens.clear(); lastResetToken = null; return send({ ok: true }) }
   if (url.pathname === "/__cart/seed") {
     const current = cart(data.cartId)
     if (data.quantity > 1) {
@@ -305,10 +315,13 @@ const server = createServer(async (req, res) => {
     }
     if (data.items?.length) current.items = data.items
     recalcCart(current)
+    if (data.promotions) current.promotions = data.promotions
     return send({ cart: current })
   }
   if (url.pathname === "/__promotion-tiers") { promotionTiers = data.tiers ?? []; productTiers = data.product_tiers ?? []; return send({ ok: true }) }
   if (url.pathname === "/store/promotion-tiers") return send({ tiers: promotionTiers, product_tiers: productTiers })
+  if (url.pathname === "/__active-sales") { activeSales = { promotions: data.promotions ?? [], price_lists: data.price_lists ?? [] }; return send({ ok: true }) }
+  if (url.pathname === "/store/active-sales") return send({ codes: [...activeSales.promotions, ...activeSales.price_lists].sort(), ...activeSales })
   if (url.pathname === "/__cart/controls") {
     Object.assign(cartControls, data)
     return send({ ok: true })
@@ -395,6 +408,10 @@ const server = createServer(async (req, res) => {
       (p) => url.searchParams.get("handle") === p.handle || [...url.searchParams].some(([key, value]) => key.startsWith("id") && value === p.id)
     )
     if (extra) return send({ products: [pricedFor(extra, regionId)], count: 1 })
+    // A search for the Ultherapy areas lists them: a product card with a choice (vewao-clients#75).
+    if (url.searchParams.get("q") && partieProduct.title.toLowerCase().includes(url.searchParams.get("q").toLowerCase())) {
+      return send({ products: [pricedFor(partieProduct, regionId)], count: 1 })
+    }
     // An unfiltered listing (Novinky's sale section) holds the sale product.
     const unfiltered = !url.searchParams.get("handle") && !url.searchParams.get("q") && ![...url.searchParams.keys()].some((key) => key.startsWith("id") || key.startsWith("collection_id") || key.startsWith("category_id"))
     if (unfiltered) return send({ products: [pricedFor(saleProduct, regionId)], count: 1 })

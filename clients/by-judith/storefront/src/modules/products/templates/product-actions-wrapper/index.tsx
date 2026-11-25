@@ -10,11 +10,14 @@ export default async function ProductActionsWrapper({
   id,
   region,
   withReferences = false,
+  part = "buy",
 }: {
   id: string
   region: HttpTypes.StoreRegion
   /** A volume discount may strike prices through: fetch the ledger regardless of a sale. */
   withReferences?: boolean
+  /** Which part of the actions this place shows (the price, or the choice and add-to-cart). */
+  part?: "price" | "buy"
 }) {
   const product = await listProducts({
     queryParams: { id: [id] },
@@ -34,6 +37,7 @@ export default async function ProductActionsWrapper({
       product={product}
       region={region}
       priceReferences={priceReferences}
+      part={part}
     />
   )
 }
