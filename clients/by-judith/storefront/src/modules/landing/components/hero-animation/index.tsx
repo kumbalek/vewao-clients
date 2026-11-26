@@ -25,11 +25,9 @@ import { readBeats, useHeroMotion } from "./use-hero-motion"
  * The hero starts at the top of the page, under the site header and mobile
  * booking bar, which turn transparent over it (`data-header-overlay`, see
  * layout/templates/site-header for the heights). The stage fills the viewport;
- * `--stage` is the height everything in the choreography is measured in. The
- * e-shop alone has no booking bar: its header is 65px below `medium`.
+ * `--stage` is the height everything in the choreography is measured in.
  */
 const underHeader = "-mt-[129px] medium:-mt-[114px] [--stage:100svh]"
-const underShopHeader = "-mt-[65px] medium:-mt-[114px] [--stage:100svh]"
 
 /** Keeps the header's light text legible over the top of the frame. */
 const HeaderScrim = () => (
@@ -69,13 +67,10 @@ const ClaimBlock = ({
   beat,
   index,
   bookLabel,
-  withActions,
 }: {
   beat: Beat
   index: number
   bookLabel: string
-  /** The links to the clinic's pages and the booking button; not in the e-shop alone. */
-  withActions: boolean
 }) => (
   <div className={`w-full small:px-0 ${mobileNudge(beat)} ${channelClass(beat)}`}>
     <Text
@@ -98,7 +93,7 @@ const ClaimBlock = ({
     </Heading>
 
     {/* Real anchors, present at load — only their opacity is animated. */}
-    {withActions && beat.action && (
+    {beat.action && (
       <div className="pt-6" style={{ opacity: "var(--action, 1)" }}>
         <LocalizedClientLink
           href={beat.action.href}
@@ -110,7 +105,7 @@ const ClaimBlock = ({
     )}
 
     {/* Same wording and target as the header's booking button. */}
-    {withActions && beat.isResolve && (
+    {beat.isResolve && (
       <div className="pt-8" style={{ opacity: "var(--action, 1)" }}>
         <ButtonLink href={bookingPath} variant="outline-inverse" size="lg">
           {bookLabel}
@@ -123,14 +118,9 @@ const ClaimBlock = ({
 /**
  * The landing hero: a frame sequence of the clinic's lead doctor whose gaze is
  * driven by the claims scrolling past her. See ../../README.md.
- *
- * `shopOnly`: the e-shop's front page while only the e-shop is live (#47). The
- * claims stay, without their links to the clinic's pages (a 404 there) and
- * without the booking button; it fits under the e-shop's shorter header.
  */
-const HeroAnimation = ({ shopOnly = false }: { shopOnly?: boolean }) => {
+const HeroAnimation = () => {
   const t = useTranslations("layout")
-  const offset = shopOnly ? underShopHeader : underHeader
 
   const sectionRef = useRef<HTMLElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
@@ -196,7 +186,7 @@ const HeroAnimation = ({ shopOnly = false }: { shopOnly?: boolean }) => {
         data-testid="landing-hero"
         data-motion="reduced"
         data-header-overlay=""
-        className={`relative bg-black ${offset}`}
+        className={`relative bg-black ${underHeader}`}
       >
         {BEATS.map((beat, index) => (
           <div key={beat.id}>
@@ -213,7 +203,7 @@ const HeroAnimation = ({ shopOnly = false }: { shopOnly?: boolean }) => {
 
             <div className="mx-auto w-full max-w-8xl px-6 py-16 small:px-12 small:py-24">
               <div className="max-w-2xl">
-                <ClaimBlock beat={beat} index={index} bookLabel={t("book")} withActions={!shopOnly} />
+                <ClaimBlock beat={beat} index={index} bookLabel={t("book")} />
               </div>
             </div>
           </div>
@@ -229,7 +219,7 @@ const HeroAnimation = ({ shopOnly = false }: { shopOnly?: boolean }) => {
       data-testid="landing-hero"
       data-motion="full"
       data-header-overlay=""
-      className={`relative bg-black ${offset}`}
+      className={`relative bg-black ${underHeader}`}
     >
       {/* The stage. The only thing that is pinned. */}
       <div
@@ -341,7 +331,7 @@ const HeroAnimation = ({ shopOnly = false }: { shopOnly?: boolean }) => {
                 {/* Lifted off the measured element, not applied to it — the
                     trigger line reads these rects to decide the active beat. */}
                 <div className={`mx-auto w-full max-w-8xl ${lift}`}>
-                  <ClaimBlock beat={beat} index={index} bookLabel={t("book")} withActions={!shopOnly} />
+                  <ClaimBlock beat={beat} index={index} bookLabel={t("book")} />
                 </div>
               </div>
             </div>
