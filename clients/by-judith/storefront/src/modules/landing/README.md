@@ -5,14 +5,6 @@ the legacy repository's `new-hp` branch (`bbc-ng`, staged on top of `df902c9`,
 imported 2026-09-30). The design brief it was built to is summarised below. The
 e-shop's former front page is at `/shop`.
 
-Since 2026-11-25 the e-shop's front page (`home/templates/shop-front`) opens
-with the same hero instead of its gradient one. While only the e-shop is live
-(`SITE_MODE=shop`) it renders with `shopOnly`:
-- the four claims stay, without their links to the clinic's pages (a 404 in
-  shop mode) and without the booking button;
-- it starts under the e-shop's header, which has no booking bar: 65px below
-  `medium`.
-
 ## What it does
 
 A clip of the clinic's lead doctor plays as a **frame sequence on a canvas**,
