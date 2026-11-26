@@ -128,9 +128,8 @@ test("an open menu stays dark and see-through over the hero", async ({ page, isM
   await expect.poll(() => color(header.getByRole("link", { name: "Kontakt" }))).toBe(WHITE)
 })
 
-// /shop opens with the same video hero since 2026-11-25 (vewao-clients#87).
 test("pages without a dark hero keep the white header", async ({ page }) => {
-  await page.goto("/cz/content/contact")
+  await page.goto("/cz/shop")
   await expect.poll(() => background(page.getByRole("banner"))).toBe(WHITE)
 })
 
