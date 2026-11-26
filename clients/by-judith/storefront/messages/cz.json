@@ -39,8 +39,22 @@
     "shippingPaymentTitle": "Doprava a platba",
     "shippingPaymentDescription": "Možnosti dopravy a platby – osobní odběr, PPL, bankovní převod, platba kartou a rychlé online platby."
   },
+  "diamondHero": {
+    "label": "Naše nabídka",
+    "slideOf": "{index} z {total}",
+    "show": "Zobrazit nabídku",
+    "previous": "Předchozí",
+    "next": "Další",
+    "pause": "Zastavit přepínání",
+    "play": "Spustit přepínání"
+  },
   "hero": {
     "claim": "Objevte moudrost mistrů tradiční čínské medicíny a sílu bylin ukrytou v každé tabletě.",
+    "shop": "Nakupovat",
+    "sale": "Akce",
+    "playVideo": "Přehrát video",
+    "pauseVideo": "Pozastavit video",
+    "replayVideo": "Přehrát video znovu",
     "showProduct": "Zobrazit",
     "dnTitle": "Řekla o nás",
     "dnReview1": "Čínské byliny od Judity jsou absolutní zázrak – ať už ty na nachlazení (podchytíte v začátku a nemoc se nerozjede!), ekzém (tady to chce trpělivost a trochu víc času, ale remise se dostaví!), nebo hlasivky (ráno jsem nemluvila a večer už jsem odzpívala hlavni roli v muzikálu)...",

@@ -31,18 +31,19 @@ test("the home page is the e-shop's front page", async ({ page }) => {
   await expect(page.getByTestId("category-rail").first()).toBeVisible()
 })
 
-// The landing's video hero opens the e-shop's front page (owner, 2026-11-25):
-// the four claims, but no links to the clinic's pages (a 404 here) and no booking.
-test("the home page opens with the video hero, its claims without links", async ({ page }) => {
+// A compact video hero, then "Akce" (owner, 2026-11-25): the call to action
+// and the offers within the first screen; the still shows before the clip.
+test("the home page opens with the video hero, its call to action and the offers", async ({ page }) => {
   await page.goto("/cz")
-  const hero = page.getByTestId("landing-hero")
+  const hero = page.getByTestId("shop-hero")
   await expect(hero).toBeVisible()
-  await expect(hero.getByRole("heading", { level: 1 })).toHaveAccessibleName("Snoubíme západ s východem")
-  // The four claims are headings in both layouts, the animated and the reduced-motion one.
-  await expect(hero.getByRole("heading")).toHaveCount(4)
-  await expect(hero.getByRole("link")).toHaveCount(0)
-  // It starts under the e-shop's header (no booking bar), which floats over it.
+  await expect(hero.getByRole("heading", { level: 1 })).toContainText("Objevte moudrost mistrů")
+  await expect(hero.locator("img")).toHaveAttribute("src", /\/assets\/shop-hero\/(start|end)-wide\.jpg$/)
+  await expect(hero.getByRole("link", { name: "Nakupovat" })).toHaveAttribute("href", "#produkty")
+  await expect(hero.getByRole("link", { name: "Akce" })).toHaveAttribute("href", "#akce")
+  // It starts under the e-shop's header, which floats over it.
   expect(Math.round((await hero.boundingBox())!.y)).toBe(0)
+  await expect(page.getByTestId("landing-hero")).toHaveCount(0)
 })
 
 test("the header offers the shop, account, cart and delivery country, not the clinic", async ({ page, isMobile }) => {

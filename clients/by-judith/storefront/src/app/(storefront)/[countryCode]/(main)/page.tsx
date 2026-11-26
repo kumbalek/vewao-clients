@@ -16,10 +16,15 @@ export async function generateMetadata(): Promise<Metadata> {
  * The clinic's landing page; the e-shop's front page is at /shop. While only
  * the e-shop is live (SITE_MODE=shop, #47), the home page is the e-shop's.
  */
-export default async function Home(props: { params: Promise<{ countryCode: string }> }) {
+export default async function Home(props: {
+  params: Promise<{ countryCode: string }>
+  searchParams: Promise<{ hero?: string }>
+}) {
   if (isShopOnly()) {
     const { countryCode } = await props.params
-    return <ShopFront countryCode={countryCode} />
+    // Hero prototypes to compare (2026-11-25): ?hero=video shows the clip.
+    const { hero } = await props.searchParams
+    return <ShopFront countryCode={countryCode} hero={hero === "video" ? "video" : "diamond"} />
   }
   return <HeroAnimation />
 }
